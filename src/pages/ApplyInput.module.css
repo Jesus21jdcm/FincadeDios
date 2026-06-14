@@ -1,0 +1,197 @@
+.container {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.formCard, .statusCard {
+  width: 100%;
+  max-width: 500px;
+  padding: 32px;
+  border-radius: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.statusCard {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 0 0 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--color-muted-foreground);
+  margin: 0 0 20px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-foreground);
+}
+
+.select, .input {
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-size: 16px;
+  font-family: 'Fira Sans', sans-serif;
+  transition: border-color 0.2s ease;
+  outline: none;
+  appearance: none;
+}
+
+.select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+.select:focus, .input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
+
+.select:disabled {
+  opacity: 0.5;
+}
+
+.stockInfo {
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--color-muted);
+  font-size: 14px;
+  color: var(--color-muted-foreground);
+}
+
+.stockInfo strong {
+  color: var(--color-accent);
+  font-family: 'Fira Code', monospace;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-destructive) 15%, transparent);
+  color: var(--color-destructive);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Fira Sans', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.statusIconOk {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  color: var(--color-accent);
+}
+
+.statusIconError {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-destructive) 20%, transparent);
+  color: var(--color-destructive);
+}
+
+.statusTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 0;
+}
+
+.statusDesc {
+  font-size: 14px;
+  color: var(--color-muted-foreground);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.climaInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--color-muted);
+  font-size: 13px;
+  color: var(--color-muted-foreground);
+}
+
+.climaInfo svg {
+  flex-shrink: 0;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

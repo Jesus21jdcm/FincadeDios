@@ -1,0 +1,127 @@
+.sidebar {
+  width: 110px;
+  min-width: 110px;
+  background: var(--color-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0;
+  z-index: 10;
+}
+
+.avatarContainer {
+  margin-bottom: 50px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.avatarCircle {
+  width: 64px;
+  height: 64px;
+  background: #FFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+
+.navContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  width: 100%;
+  align-items: center;
+  flex: 1;
+}
+
+.navItem {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  position: relative;
+  padding: 8px 0;
+}
+
+.iconWrapper {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.navItem span {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.navItem:hover {
+  color: #FFFFFF;
+}
+
+.navItem:hover .iconWrapper {
+  transform: translateY(-2px);
+}
+
+.navItem.active {
+  color: #FFFFFF;
+}
+
+.navItem.active .iconWrapper {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.settingsContainer {
+  margin-top: auto;
+  width: 100%;
+  padding-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    min-width: auto;
+    height: 80px;
+    flex-direction: row;
+    padding: 0 20px;
+    position: fixed;
+    bottom: 0;
+    top: auto;
+    z-index: 50;
+    border-radius: 0;
+  }
+  
+  .avatarContainer, .settingsContainer {
+    display: none;
+  }
+  
+  .navContainer {
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 0;
+  }
+  
+  .navItem {
+    padding: 4px;
+  }
+  
+  .iconWrapper {
+    width: 40px;
+    height: 40px;
+  }
+}

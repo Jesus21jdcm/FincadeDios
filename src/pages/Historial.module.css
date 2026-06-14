@@ -1,0 +1,208 @@
+.container {
+  padding: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.headerRow {
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 0 0 4px;
+  font-family: 'Fira Code', monospace;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--color-muted-foreground);
+  margin: 0;
+}
+
+.filtros {
+  margin-bottom: 24px;
+}
+
+.filtroRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.input {
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-size: 13px;
+  font-family: 'Fira Sans', sans-serif;
+  outline: none;
+  min-width: 150px;
+  flex: 1;
+  max-width: 200px;
+}
+
+.input:focus {
+  border-color: var(--color-accent);
+}
+
+.btnExport {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Fira Sans', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.btnExport:hover {
+  opacity: 0.9;
+}
+
+.statsRow {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 160px;
+  padding: 18px 20px;
+  border-radius: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.statCard strong {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-accent);
+  font-family: 'Fira Code', monospace;
+  line-height: 1;
+}
+
+.statCard small {
+  font-size: 12px;
+  color: var(--color-muted-foreground);
+  font-weight: 500;
+}
+
+.seccion {
+  margin-bottom: 28px;
+}
+
+.seccionTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 0 0 12px;
+  font-family: 'Fira Code', monospace;
+}
+
+.tableContainer {
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-muted-foreground);
+  text-transform: uppercase;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table td {
+  padding: 10px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-foreground);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.cellTitulo {
+  display: flex;
+  flex-direction: column;
+}
+
+.cellTitulo strong {
+  font-size: 13px;
+}
+
+.cellDesc {
+  font-size: 11px;
+  color: var(--color-muted-foreground);
+}
+
+.cellFecha {
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+}
+
+.estadoBadge {
+  display: inline-flex;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.Generado {
+  background: color-mix(in srgb, var(--color-muted-foreground) 15%, transparent);
+  color: var(--color-muted-foreground);
+}
+
+.Asignado {
+  background: color-mix(in srgb, #3B82F6 15%, transparent);
+  color: #3B82F6;
+}
+
+.Ejecutado {
+  background: color-mix(in srgb, var(--color-warning) 15%, transparent);
+  color: var(--color-warning);
+}
+
+.Validado {
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  color: var(--color-accent);
+}
+
+.empty {
+  text-align: center;
+  padding: 32px;
+  color: var(--color-muted-foreground);
+}

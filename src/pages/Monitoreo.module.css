@@ -1,0 +1,451 @@
+.container {
+  padding: 24px;
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.container svg {
+  vertical-align: middle;
+}
+
+.headerRow {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 0 0 4px;
+  font-family: 'Fira Code', monospace;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--color-muted-foreground);
+  margin: 0;
+}
+
+.loteSelector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.selectorLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-foreground);
+  white-space: nowrap;
+}
+
+.selectorLabel svg {
+  color: var(--color-accent);
+}
+
+.select {
+  flex: 1;
+  height: 42px;
+  padding: 0 32px 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-size: 13px;
+  font-family: 'Fira Sans', sans-serif;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.select:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.leftCol, .rightCol {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-foreground);
+  border-bottom: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-muted) 30%, var(--color-surface));
+}
+
+.cardHeader svg {
+  color: var(--color-accent);
+}
+
+.cardBody {
+  padding: 18px;
+}
+
+.camBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 220px;
+  border: 2px dashed var(--color-border);
+  border-radius: 12px;
+  background: var(--color-background);
+  color: var(--color-muted-foreground);
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: 'Fira Sans', sans-serif;
+}
+
+.camBtn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 4%, var(--color-background));
+}
+
+.camBtn svg {
+  width: 40px;
+  height: 40px;
+}
+
+.camBtnLabel {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.camBtnHint {
+  font-size: 12px;
+  color: var(--color-muted-foreground);
+}
+
+.camBtn:hover .camBtnHint {
+  color: var(--color-accent);
+}
+
+.viewfinder {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.video {
+  width: 100%;
+  border-radius: 10px;
+  background: #000;
+}
+
+.camActions, .previewActions {
+  display: flex;
+  gap: 8px;
+}
+
+.previewSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.preview {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-muted-foreground);
+}
+
+.input {
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-size: 13px;
+  font-family: 'Fira Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
+
+.btnPrimary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Fira Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.2);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  opacity: 0.92;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+.btnSecondary {
+  flex: 1;
+  height: 40px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-muted-foreground);
+  font-size: 13px;
+  font-family: 'Fira Sans', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnSecondary:hover {
+  background: var(--color-muted);
+  color: var(--color-foreground);
+  border-color: var(--color-muted-foreground);
+}
+
+.fotoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fotoCard {
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.fotoCard:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.08);
+}
+
+.fotoImg {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+}
+
+.fotoInfo {
+  padding: 10px 12px;
+}
+
+.fotoComentario {
+  font-size: 13px;
+  color: var(--color-foreground);
+  margin: 0 0 4px;
+  line-height: 1.4;
+}
+
+.fotoFecha {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--color-muted-foreground);
+}
+
+/* ── Salud selector ── */
+
+.saludSelector {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.saludOptions {
+  display: flex;
+  gap: 6px;
+}
+
+.saludBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 36px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-foreground);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Fira Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.saludBtn:hover {
+  background: var(--color-muted);
+}
+
+.saludActivo {
+  box-shadow: 0 0 0 1px var(--color-border);
+}
+
+/* ── Foto health tag ── */
+
+.fotoImgWrapper {
+  position: relative;
+}
+
+.fotoSaludTag {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px;
+  color: var(--color-muted-foreground);
+  font-size: 13px;
+  text-align: center;
+}
+
+.empty svg {
+  color: var(--color-border);
+  width: 32px;
+  height: 32px;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 20px;
+}
+
+.modalContent {
+  position: relative;
+  max-width: 92vw;
+  max-height: 92vh;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.modalClose {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+.modalClose:hover {
+  background: rgba(0,0,0,0.8);
+}
+
+.fotoFull {
+  display: block;
+  max-width: 92vw;
+  max-height: 92vh;
+  width: auto;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+
+  .loteSelector {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

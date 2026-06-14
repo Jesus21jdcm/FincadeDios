@@ -1,0 +1,793 @@
+.container {
+  padding: 32px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 640px) {
+  .container { padding: 16px; }
+  .headerRow { flex-direction: column; gap: 12px; }
+  .headerMeta { flex-direction: row; align-items: center; gap: 8px; width: 100%; justify-content: flex-start; }
+  .title { font-size: 20px; letter-spacing: -0.2px; padding-left: 0; }
+  .subtitle { font-size: 12px; }
+  .sectionCard { border-radius: 8px; border-left: none; border-right: none; }
+  .sectionHeader { flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px 14px; }
+  .sectionTitle { font-size: 13px; }
+  .sectionInfo { flex-wrap: wrap; gap: 6px; }
+  .sectionMeta { white-space: normal; }
+
+  .table { min-width: unset; }
+  .table th, .table td { padding: 10px 8px; font-size: 12px; }
+  .table th:first-child, .table td:first-child { padding-left: 12px; }
+  .table th:last-child, .table td:last-child { padding-right: 12px; }
+  .cellTitulo { min-width: 120px; }
+  .cellTitulo strong { font-size: 12px; }
+  .cellDesc { font-size: 10px; }
+  .cellFecha { font-size: 11px; }
+
+  .btnAsignar, .btnValidar, .btnEmpReasignar { height: 36px; padding: 0 16px; font-size: 13px; }
+  .btnAsignarClose { width: 36px; height: 36px; }
+  .select { height: 36px; min-width: 120px; font-size: 13px; }
+
+  .table th:nth-child(3), .table td:nth-child(3) { display: none; }
+  .table th:nth-child(5), .table td:nth-child(5) { display: none; }
+  .table th:nth-child(4), .table td:nth-child(4) { display: none; }
+}
+
+@media (max-width: 480px) {
+  .container { padding: 12px; }
+  .title { font-size: 17px; }
+  .headerMeta { flex-wrap: wrap; gap: 4px; }
+  .metaTotal { font-size: 11px; padding: 3px 10px; }
+  .metaPct { font-size: 10px; }
+
+  .pipelineBar { gap: 4px; }
+  .pipelineStep { padding: 8px 3px 6px; border-radius: 8px; }
+  .pipelineCircle { width: 22px; height: 22px; font-size: 10px; }
+  .pipelineLabel { font-size: 8px; }
+  .notifBell { width: 16px; height: 16px; top: -4px; right: -4px; }
+  .notifBell svg { width: 10px; height: 10px; }
+
+  .table th, .table td { padding: 8px 6px; font-size: 11px; }
+  .table th:first-child, .table td:first-child { padding-left: 8px; }
+  .table th:last-child, .table td:last-child { padding-right: 8px; }
+  .cellTitulo { min-width: 100px; }
+  .cellTitulo strong { font-size: 11px; }
+  .cellDesc { font-size: 10px; }
+  .cellFecha { font-size: 10px; }
+
+  .btnAsignar, .btnValidar, .btnEmpReasignar { height: 34px; padding: 0 12px; font-size: 12px; }
+  .btnAsignarClose { width: 34px; height: 34px; }
+  .select { height: 34px; min-width: 100px; font-size: 12px; }
+
+  .empleadoTag { font-size: 11px; }
+  .empAvatar { width: 22px; height: 22px; font-size: 10px; }
+  .estadoBadge { font-size: 11px; }
+  .vencido { font-size: 9px; padding: 1px 5px; }
+}
+
+.headerRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 0 0 6px;
+  font-family: 'Fira Code', monospace;
+  letter-spacing: -0.3px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--color-muted-foreground);
+  margin: 0;
+  font-weight: 400;
+}
+
+.headerMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.metaTotal {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-foreground);
+  background: var(--color-muted);
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.metaPct {
+  font-size: 11px;
+  color: var(--color-muted-foreground);
+}
+
+.btnWsp {
+  height: 28px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 6px;
+  background: #25D366;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Fira Sans', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btnWsp:hover {
+  opacity: 0.85;
+}
+
+/* ── Pipeline ── */
+
+.pipeline {
+  margin-bottom: 20px;
+}
+
+.pipelineBar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.pipelineItem {
+  display: flex;
+  align-items: center;
+}
+
+.pipelineArrow {
+  color: var(--color-border);
+  flex-shrink: 0;
+}
+
+.pipelineStep {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.steptodas { border-color: #64748B; background: #64748B; color: #fff; box-shadow: 0 2px 8px rgba(100,116,139,0.15); }
+.stepGenerado { border-color: #94A3B8; background: #94A3B8; color: #fff; box-shadow: 0 2px 8px rgba(148,163,184,0.15); }
+.stepAsignado { border-color: #3B82F6; background: #3B82F6; color: #fff; box-shadow: 0 2px 8px rgba(59,130,246,0.2); }
+.stepEjecutado { border-color: #D97706; background: #D97706; color: #fff; box-shadow: 0 2px 8px rgba(217,119,6,0.2); }
+.stepValidado { border-color: #16A34A; background: #16A34A; color: #fff; box-shadow: 0 2px 8px rgba(22,163,74,0.2); }
+
+.pipelineStep:hover { transform: translateY(-2px); }
+.steptodas:hover { border-color: #475569; background: #475569; box-shadow: 0 6px 16px rgba(100,116,139,0.3); }
+.stepGenerado:hover { border-color: #64748B; background: #64748B; box-shadow: 0 6px 16px rgba(148,163,184,0.3); }
+.stepAsignado:hover { border-color: #2563EB; background: #2563EB; box-shadow: 0 6px 16px rgba(59,130,246,0.35); }
+.stepEjecutado:hover { border-color: #B45309; background: #B45309; box-shadow: 0 6px 16px rgba(217,119,6,0.35); }
+.stepValidado:hover { border-color: #15803D; background: #15803D; box-shadow: 0 6px 16px rgba(22,163,74,0.35); }
+
+.steptodas.pipelineActive { border-color: #334155; background: #334155; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #64748B; }
+.stepGenerado.pipelineActive { border-color: #475569; background: #475569; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #94A3B8; }
+.stepAsignado.pipelineActive { border-color: #1D4ED8; background: #1D4ED8; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3B82F6; }
+.stepEjecutado.pipelineActive { border-color: #92400E; background: #92400E; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #D97706; }
+.stepValidado.pipelineActive { border-color: #15803D; background: #15803D; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #16A34A; }
+
+.steptodas.pipelineActive:hover { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #64748B, 0 6px 16px rgba(100,116,139,0.3); }
+.stepGenerado.pipelineActive:hover { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #94A3B8, 0 6px 16px rgba(148,163,184,0.3); }
+.stepAsignado.pipelineActive:hover { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3B82F6, 0 6px 16px rgba(59,130,246,0.35); }
+.stepEjecutado.pipelineActive:hover { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #D97706, 0 6px 16px rgba(217,119,6,0.35); }
+.stepValidado.pipelineActive:hover { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #16A34A, 0 6px 16px rgba(22,163,74,0.35); }
+
+.pipelineCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Fira Code', monospace;
+  transition: all 0.2s ease;
+}
+
+.pipelineLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.notifBell {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-destructive);
+  color: #fff;
+  box-shadow: 0 0 0 2px var(--color-surface);
+  animation: notifPulse 2s infinite;
+}
+
+.belltodas { background: var(--color-destructive); }
+.bellGenerado { background: var(--color-destructive); }
+.bellAsignado { background: #3B82F6; }
+.bellEjecutado { background: var(--color-warning); }
+
+@keyframes notifPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@media (max-width: 900px) {
+  .pipelineBar {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .pipelineArrow { display: none; }
+
+  .table { min-width: unset; }
+  .table th:nth-child(4),
+  .table td:nth-child(4) { display: none; }
+}
+
+@media (max-width: 600px) {
+  .pipelineBar {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+  }
+  .pipelineStep {
+    padding: 10px 4px 8px;
+    gap: 4px;
+  }
+  .pipelineCircle {
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+  }
+  .pipelineLabel {
+    font-size: 9px;
+  }
+}
+
+
+
+
+/* ── Section cards (grouped by siembra) ── */
+
+.sectionCard {
+  margin-bottom: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  gap: 16px;
+}
+
+.sectionInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-foreground);
+  margin: 0;
+}
+
+.sectionMeta {
+  font-size: 12px;
+  color: var(--color-muted-foreground);
+  white-space: nowrap;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--color-muted-foreground);
+  font-size: 14px;
+}
+
+/* ── Alertas / Excepciones ── */
+
+.alertList {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alertItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+}
+
+.alertContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.alertContent strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-foreground);
+}
+
+.alertContent span {
+  font-size: 11px;
+  color: var(--color-muted-foreground);
+}
+
+.alertContent p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--color-muted-foreground);
+}
+
+.alertFecha {
+  font-size: 11px;
+  color: var(--color-muted-foreground);
+}
+
+.alertActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.alertFoto {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  transition: opacity 0.2s;
+}
+
+.alertFoto:hover {
+  opacity: 0.7;
+}
+
+.btnCorrectiva {
+  height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 6px;
+  background: #DC2626;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Fira Sans', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.btnCorrectiva:hover {
+  opacity: 0.85;
+}
+
+.btnConciliar {
+  height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 6px;
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Fira Sans', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.btnConciliar:hover {
+  opacity: 0.85;
+}
+
+/* ── Table ── */
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.table th {
+  padding: 10px 18px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.table th:first-child {
+  padding-left: 20px;
+  position: sticky;
+  left: 0;
+  z-index: 5;
+}
+.table th:last-child {
+  padding-right: 20px;
+  position: sticky;
+  right: 0;
+  z-index: 5;
+}
+
+.table td {
+  padding: 12px 18px;
+  font-size: 13px;
+  color: var(--color-foreground);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  vertical-align: middle;
+}
+
+.table td:first-child {
+  padding-left: 20px;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+.table td:last-child {
+  padding-right: 20px;
+  position: sticky;
+  right: 0;
+  z-index: 2;
+}
+
+.table tbody tr:last-child td { border-bottom: none; }
+
+.rowRojo td {
+  background: color-mix(in srgb, var(--color-destructive) 3%, var(--color-surface));
+}
+
+.cellTitulo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 200px;
+}
+
+.cellTitulo strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-foreground);
+  line-height: 1.4;
+}
+
+.cellDesc {
+  font-size: 12px;
+  color: var(--color-muted-foreground);
+  line-height: 1.4;
+}
+
+
+.cellFecha {
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--color-muted-foreground);
+}
+
+.vencido {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--color-destructive);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* ── Assignment ── */
+
+.asignador {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.select {
+  height: 32px;
+  padding: 0 30px 0 10px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-size: 12px;
+  font-family: 'Fira Sans', sans-serif;
+  outline: none;
+  min-width: 140px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+}
+
+.select:focus {
+  border-color: var(--color-accent);
+}
+
+.btnAsignarClose {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-muted-foreground);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnAsignarClose:hover {
+  background: color-mix(in srgb, var(--color-destructive) 10%, transparent);
+  color: var(--color-destructive);
+}
+
+.empleadoTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-muted-foreground);
+}
+
+.empAvatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  color: var(--color-accent);
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.empNombre {
+  color: var(--color-foreground);
+  font-weight: 500;
+}
+
+.sinEmpleado {
+  color: var(--color-muted-foreground);
+  font-size: 13px;
+}
+
+.btnEmpReasignar {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-muted-foreground);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Fira Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btnEmpReasignar:hover {
+  border-color: var(--color-destructive);
+  color: var(--color-destructive);
+}
+
+.btnAsignar {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 6px;
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Fira Sans', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.btnAsignar:hover {
+  opacity: 0.85;
+}
+
+/* ── Status badges ── */
+
+.estadoBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--color-muted-foreground);
+}
+
+.estadoBadge::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.Generado::before { background: var(--color-muted-foreground); }
+.Asignado::before { background: #3B82F6; }
+.Ejecutado::before { background: var(--color-warning); }
+.Validado::before { background: var(--color-accent); }
+
+/* ── Action button ── */
+
+.btnValidar {
+  height: 30px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 6px;
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Fira Sans', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btnValidar:hover {
+  opacity: 0.85;
+}
+
+.empty {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--color-muted-foreground);
+  font-size: 14px;
+}
+
+/* ── Evidencia ── */
+
+.evidenciaThumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+  cursor: pointer;
+  display: block;
+  transition: opacity 0.15s ease;
+}
+
+.evidenciaThumb:hover {
+  opacity: 0.7;
+}
+
+.sinEvidencia {
+  color: var(--color-muted-foreground);
+  font-size: 12px;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 20px;
+}
+
+.modalContent {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.modalClose {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+.modalClose:hover {
+  background: rgba(0,0,0,0.8);
+}
+
+.evidenciaFull {
+  display: block;
+  max-width: 90vw;
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+}

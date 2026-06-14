@@ -1,0 +1,10 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "skills": [
+    {
+      "name": "aplicar-insumo",
+      "description": "Flujo completo para aplicar un insumo a un lote agrícola con verificación de stock, clima, registro en Firestore y alertas automáticas vía WhatsApp.",
+      "location": "file:///C:/Users/Dani2103/Desktop/Fincadigi/.opencode/skills/aplicar-insumo/instructions.md"
+    }
+  ]
+}

@@ -1,0 +1,763 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.container {
+  padding: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  font-family: 'Inter', sans-serif;
+}
+
+.container svg {
+  vertical-align: middle;
+}
+
+.headerRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .headerRow {
+    flex-direction: column;
+  }
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .headerActions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  
+  .headerActions select,
+  .headerActions button {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.filterSelect {
+  height: 44px;
+  padding: 0 32px 0 12px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-foreground);
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.filterSelect:focus {
+  border-color: var(--color-accent);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 0 0 4px;
+  font-family: 'Inter', sans-serif;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--color-muted-foreground);
+  margin: 0;
+}
+
+.listTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 24px 0 16px;
+  font-family: 'Inter', sans-serif;
+}
+
+.formCard {
+  padding: 24px;
+  border-radius: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  margin-bottom: 24px;
+}
+
+.formTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 0 0 20px;
+  font-family: 'Inter', sans-serif;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-foreground);
+}
+
+.input, .select {
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+}
+
+.input:focus, .select:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.btnPrimary:hover {
+  opacity: 0.9;
+}
+
+.btnSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 24px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-foreground);
+  font-size: 15px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnSecondary:hover {
+  background: var(--color-muted);
+}
+
+.error {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-destructive) 15%, transparent);
+  color: var(--color-destructive);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.infoBar {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: var(--color-muted);
+  font-size: 13px;
+  color: var(--color-muted-foreground);
+  margin-bottom: 16px;
+}
+
+.infoBar strong {
+  color: var(--color-foreground);
+}
+
+.descBox {
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
+  font-size: 14px;
+  color: var(--color-foreground);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 0 0 12px;
+  font-family: 'Inter', sans-serif;
+}
+
+.etapasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.etapaCard {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+}
+
+.etapaDias {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.etapaNombre {
+  font-size: 14px;
+  color: var(--color-foreground);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.etapaDesc {
+  font-size: 12px;
+  color: var(--color-muted-foreground);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.resumenStats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-muted-foreground);
+}
+
+.tareasList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.tareaCard {
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  transition: border-color 0.2s;
+}
+
+.tareaCard:hover {
+  border-color: var(--color-accent);
+}
+
+.tareaHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.tareaIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-accent);
+}
+
+.tareaBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.tareaTitulo {
+  font-size: 14px;
+  color: var(--color-foreground);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.tareaDesc {
+  font-size: 12px;
+  color: var(--color-muted-foreground);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.tareaFecha {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.fechaLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-accent);
+  font-family: 'Inter', sans-serif;
+}
+
+.recurrencia {
+  display: block;
+  font-size: 11px;
+  color: var(--color-muted-foreground);
+  margin-top: 2px;
+}
+
+.actionsRow {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.statusCard {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 32px;
+  border-radius: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.statusIconOk {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  color: var(--color-accent);
+}
+
+.statusTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.statusDesc {
+  font-size: 14px;
+  color: var(--color-muted-foreground);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 28px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-top: 8px;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 14px;
+}
+
+.siembraCard {
+  border-radius: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.siembraCard:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 4px 16px rgba(22, 163, 74, 0.08);
+}
+
+.cardImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  mix-blend-mode: multiply;
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.siembraCard > *:not(.cardImage) {
+  position: relative;
+  z-index: 1;
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 16px 12px;
+}
+
+.cardIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-accent);
+}
+
+.cardInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.cardCultivo {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.cardLote {
+  font-size: 12px;
+  color: var(--color-muted-foreground);
+  margin: 2px 0 0;
+}
+
+.badgeEstado {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.badgeActiva {
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  color: var(--color-accent);
+}
+
+.badgeFinalizada {
+  background: color-mix(in srgb, var(--color-muted-foreground) 15%, transparent);
+  color: var(--color-muted-foreground);
+}
+
+.btnDeleteCard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-muted-foreground);
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.btnDeleteCard:hover {
+  background: color-mix(in srgb, var(--color-destructive) 12%, transparent);
+  color: var(--color-destructive);
+}
+
+.cardDates {
+  display: flex;
+  gap: 20px;
+  padding: 0 16px 12px;
+  flex-wrap: wrap;
+}
+
+.dateItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-muted-foreground);
+}
+
+.dateItem strong {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
+
+.cardFooter {
+  padding: 10px 16px;
+  display: flex;
+}
+
+.btnTareas {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 36px;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-muted-foreground);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnTareas:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 5%, transparent);
+}
+
+.empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px;
+  color: var(--color-muted-foreground);
+  border-radius: 12px;
+  border: 1px dashed var(--color-border);
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.modal {
+  background: var(--color-background);
+  border-radius: 14px;
+  max-width: 640px;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modalTitle {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  color: var(--color-foreground);
+  margin: 0;
+}
+
+.modalClose {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-muted-foreground);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modalClose:hover { background: var(--color-muted); color: var(--color-foreground); }
+
+.modalBody {
+  padding: 16px 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modalTarea {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.modalTareaTop {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.modalTareaTipo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-accent);
+}
+
+.modalTareaInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.modalTareaTitulo {
+  font-size: 13px;
+  color: var(--color-foreground);
+  display: block;
+}
+
+.modalTareaDesc {
+  font-size: 11px;
+  color: var(--color-muted-foreground);
+  margin: 2px 0 0;
+}
+
+.modalTareaBottom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-left: 28px;
+}
+
+.modalTareaFecha {
+  font-size: 11px;
+  color: var(--color-muted-foreground);
+  font-family: 'Inter', sans-serif;
+}
+
+.modalTareaEmpleado {
+  font-size: 12px;
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+.estadoTag {
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.estGen { background: color-mix(in srgb, var(--color-muted-foreground) 15%, transparent); color: var(--color-muted-foreground); }
+.estAsig { background: color-mix(in srgb, #3B82F6 15%, transparent); color: #3B82F6; }
+.estEjec { background: color-mix(in srgb, var(--color-warning) 15%, transparent); color: var(--color-warning); }
+.estVal { background: color-mix(in srgb, var(--color-accent) 15%, transparent); color: var(--color-accent); }
+
+.selectAsignar {
+  height: 30px;
+  padding: 0 24px 0 8px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-size: 11px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  cursor: pointer;
+  max-width: 140px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+}
+
+.selectAsignar:focus {
+  border-color: var(--color-accent);
+}

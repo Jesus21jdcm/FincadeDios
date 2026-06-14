@@ -1,0 +1,56 @@
+.header {
+  height: 80px;
+  background: transparent;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 40px;
+  margin-top: 16px;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.iconBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+  color: var(--color-primary);
+}
+
+.iconBtn:hover {
+  transform: scale(1.1);
+}
+
+.badgeWarn {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: var(--color-orange);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.timeDisplay {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-primary);
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 0 20px;
+    margin-top: 10px;
+  }
+}
