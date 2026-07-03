@@ -481,3 +481,60 @@
   border: 1px dashed var(--color-border);
   background: var(--color-surface);
 }
+
+/* Responsiveness for all devices */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+  .headerRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .btnNuevo, .btnCancelarTop {
+    width: 100%;
+  }
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardTop {
+    position: relative;
+    /* Ensure padding accommodates absolute actions if needed */
+    padding-right: 48px; 
+  }
+  .loteActions {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+  }
+  .loteMeta {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+/* Standardize main buttons for mobile */
+@media (max-width: 768px) {
+  .btn, .btnNuevo, .btnPrimary, .btnCancelarTop {
+    height: 48px !important;
+    width: 100% !important;
+    font-size: 16px !important;
+    border-radius: 12px !important;
+    justify-content: center !important;
+    display: flex !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+  }
+}

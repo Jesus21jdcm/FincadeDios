@@ -39,6 +39,9 @@ export default function PanelEmpleado() {
   const [adHocActivo, setAdHocActivo] = useState(false);
   const [adHocNombre, setAdHocNombre] = useState('');
   const [adHocCantidad, setAdHocCantidad] = useState('');
+  const [showFinalConfirm, setShowFinalConfirm] = useState(null);
+  const [lotes, setLotes] = useState([]);
+  const [siembras, setSiembras] = useState([]);
   const fileRef = useRef(null);
 
   const uid = user?.uid;
@@ -64,6 +67,12 @@ export default function PanelEmpleado() {
     return unsub;
   }, []);
 
+  useEffect(() => {
+    const unsubLotes = onSnapshot(collection(db, 'lotes'), snap => setLotes(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
+    const unsubSiembras = onSnapshot(collection(db, 'siembras'), snap => setSiembras(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
+    return () => { unsubLotes(); unsubSiembras(); };
+  }, []);
+
   const pendientes = tareas.filter(t => t.estado === 'Asignado');
   const ejecutadas = tareas.filter(t => t.estado === 'Ejecutado' || t.estado === 'Validado');
   const vencidas = pendientes.filter(t => new Date(t.fechaSugerida) < new Date());
@@ -71,7 +80,7 @@ export default function PanelEmpleado() {
   const SvgCheck = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
   const SvgClock = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
   const SvgCalendar = <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
-  const SvgAlert = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>;
+  const SvgAlert = <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>;
   const SvgCamera = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>;
   const SvgBox = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>;
   const SvgClipboard = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>;
@@ -203,7 +212,13 @@ export default function PanelEmpleado() {
                       <span className={styles.cardMeta}>
                         {SvgCalendar} {new Date(t.fechaSugerida).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}
                       </span>
-                      <span className={styles.cardCultivo}>{t.cultivo || '—'}</span>
+                      <span className={styles.cardCultivo}>
+                        {(() => {
+                          const siembra = siembras.find(s => s.id === t.siembraId);
+                          const lote = lotes.find(l => l.id === siembra?.loteId);
+                          return lote ? `${lote.nombre} • ${t.cultivo || '?'}` : (t.cultivo || '?');
+                        })()}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -284,7 +299,7 @@ export default function PanelEmpleado() {
                     {evidenciaPreview && <img src={evidenciaPreview} alt="Preview" className={styles.previewImg} />}
                     <div className={styles.confirmActions}>
                       <button className={styles.btnSecondary} onClick={() => { setConfirmando(null); setEvidenciaPreview(null); setInsumosUsados([{ id: '', cantidad: '' }]); setAdHocActivo(false); setAdHocNombre(''); setAdHocCantidad(''); }}>Cancelar</button>
-                      <button className={styles.btnPrimary} style={{ background: 'var(--color-primary)', color: 'white', border: 'none', fontWeight: 600 }} onClick={() => finalizarTarea(t.id)} disabled={subiendo}>
+                      <button className={styles.btnPrimary} style={{ background: 'var(--color-primary)', color: 'white', border: 'none', fontWeight: 600 }} onClick={() => setShowFinalConfirm(t.id)} disabled={subiendo}>
                         {subiendo ? `Subiendo ${progresoSubida}%` : SvgCheck}
                         {subiendo ? '' : ' Finalizar'}
                       </button>
@@ -319,6 +334,13 @@ export default function PanelEmpleado() {
                       <span className={styles.cardMeta}>
                         {SvgCalendar} {new Date(t.fechaSugerida).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}
                       </span>
+                      <span className={styles.cardCultivo}>
+                        {(() => {
+                          const siembra = siembras.find(s => s.id === t.siembraId);
+                          const lote = lotes.find(l => l.id === siembra?.loteId);
+                          return lote ? `${lote.nombre} • ${t.cultivo || '?'}` : (t.cultivo || '?');
+                        })()}
+                      </span>
                     </div>
                   </div>
                   <span className={`${styles.estadoTag} ${styles[t.estado]}`}>{t.estado}</span>
@@ -331,6 +353,22 @@ export default function PanelEmpleado() {
           </div>
         )}
       </section>
+
+      {showFinalConfirm && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalCard}>
+            <div className={styles.modalIconWrap}>{SvgAlert}</div>
+            <h3 className={styles.modalTitle}>¿Finalizar tarea?</h3>
+            <p className={styles.modalText}>Verifica que la foto y los insumos sean correctos. Esta acción descontará automáticamente el inventario y no se puede deshacer.</p>
+            <div className={styles.modalActions}>
+              <button className={styles.modalBtnCancel} onClick={() => setShowFinalConfirm(null)}>Cancelar</button>
+              <button className={styles.modalBtnConfirm} onClick={() => { finalizarTarea(showFinalConfirm); setShowFinalConfirm(null); }}>
+                Sí, finalizar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

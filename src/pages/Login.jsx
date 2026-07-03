@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../firebase';
 import styles from './Login.module.css';
 import tractorImg from '../assets/header.jpg';
@@ -21,6 +21,25 @@ export default function Login({ onGoToLanding, onGoToRegister }) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    if (!email) {
+      setError('Por favor, ingresa tu correo electrónico arriba y presiona "Olvidaste tu contraseña".');
+      return;
+    }
+    try {
+      setLoading(true);
+      setError('');
+      await sendPasswordResetEmail(auth, email);
+      setResetSent(true);
+    } catch (err) {
+      setError('No pudimos enviar el correo. Verifica que la dirección sea correcta.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,8 +63,25 @@ export default function Login({ onGoToLanding, onGoToRegister }) {
   return (
     <div className={styles.wrapper}>
       <div className={styles.leftSide}>
-        <div className={styles.brand}>
-          <SvgIcon name="leaf" size={24} /> Finca Digi
+        <div className={styles.brand} style={{ cursor: 'pointer' }} onClick={onGoToLanding}>
+          <svg width="155" height="33" viewBox="0 0 140 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g transform="translate(0, 0)">
+              <path d="M4 10C4 4.477 8.477 0 14 0H24.5C26.985 0 29 2.015 29 4.5C29 6.985 26.985 9 24.5 9H14.5C13.67 9 13 9.67 13 10.5V26.5C13 27.88 11.88 29 10.5 29H6.5C5.12 29 4 27.88 4 26.5V10Z" fill="url(#gradLogoLogin1)"/>
+              <path d="M13 13H20.5C22.985 13 25 15.015 25 17.5C25 19.985 22.985 22 20.5 22H13V13Z" fill="url(#gradLogoLogin2)"/>
+            </g>
+            <defs>
+              <linearGradient id="gradLogoLogin1" x1="4" y1="0" x2="29" y2="29" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#34D399"/>
+                <stop offset="1" stopColor="#14C2F4"/>
+              </linearGradient>
+              <linearGradient id="gradLogoLogin2" x1="13" y1="13" x2="25" y2="22" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#14C2F4"/>
+                <stop offset="1" stopColor="#633AF8"/>
+              </linearGradient>
+            </defs>
+            <text x="36" y="21" fontFamily="'Poppins', sans-serif" fontWeight="800" fontSize="17" fill="var(--color-foreground)" letterSpacing="0.5">FINCA</text>
+            <text x="86" y="21" fontFamily="'Poppins', sans-serif" fontWeight="800" fontSize="17" fill="var(--color-cyan)" letterSpacing="0.5">DIGI</text>
+          </svg>
         </div>
 
         <div className={styles.formContainer}>
@@ -61,6 +97,12 @@ export default function Login({ onGoToLanding, onGoToRegister }) {
               <div className={styles.error} role="alert">
                 <SvgIcon name="alertCircle" size={16} />
                 <span>{error}</span>
+              </div>
+            )}
+            
+            {resetSent && (
+              <div className={styles.error} style={{ background: '#dcfce7', color: '#166534', border: '1px solid #bbf7d0' }} role="alert">
+                <span>Enlace de recuperación enviado. Revisa tu bandeja de entrada o carpeta de spam.</span>
               </div>
             )}
 
@@ -83,24 +125,12 @@ export default function Login({ onGoToLanding, onGoToRegister }) {
               </div>
             </div>
 
-            <div className={styles.optionsRow}>
-              <label className={styles.checkboxLabel}>
-                <input type="checkbox" className={styles.checkbox} />
-                <span>Recordarme</span>
-              </label>
-              <a href="#" className={styles.forgotLink}>¿Olvidaste tu contraseña?</a>
+            <div className={styles.optionsRow} style={{ justifyContent: 'flex-end', marginTop: '8px' }}>
+              <a href="#" className={styles.forgotLink} onClick={handleResetPassword}>¿Olvidaste tu contraseña?</a>
             </div>
 
             <button type="submit" className={styles.submitBtn} disabled={loading}>
               {loading ? <span className={styles.spinner} /> : 'Iniciar sesión'}
-            </button>
-
-            <div className={styles.divider}>
-              <span>o</span>
-            </div>
-
-            <button type="button" className={styles.googleBtn} onClick={() => alert('Próximamente: Integración con Google')}>
-              <SvgIcon name="google" size={20} /> Continuar con Google
             </button>
 
             {onGoToLanding && (

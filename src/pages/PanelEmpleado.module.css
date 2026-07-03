@@ -467,3 +467,50 @@
   border: 1px dashed var(--color-border);
   background: var(--color-surface);
 }
+.modalOverlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.modalCard {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  animation: slideUp 0.3s ease;
+}
+.modalIconWrap {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: #FFF0E6;
+  color: #FF8A20;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+}
+.modalTitle {
+  font-size: 1.25rem; font-weight: 700; color: var(--color-text); margin-bottom: 8px;
+}
+.modalText {
+  font-size: 0.95rem; color: var(--color-text-mut); margin-bottom: 24px; line-height: 1.5;
+}
+.modalActions {
+  display: flex; gap: 12px;
+}
+.modalActions button {
+  flex: 1; height: 44px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.modalBtnCancel {
+  background: var(--color-bg); color: var(--color-text); border: 1px solid var(--color-border);
+}
+.modalBtnConfirm {
+  background: var(--color-primary); color: white; border: none;
+}

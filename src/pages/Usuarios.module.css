@@ -504,3 +504,24 @@
   padding: 32px;
   color: var(--color-muted-foreground);
 }
+/* Standardize main buttons for mobile */
+@media (max-width: 768px) {
+  .headerRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+  .btn, .btnNuevo, .btnPrimary, .btnCancelarTop {
+    height: 48px !important;
+    width: 100% !important;
+    font-size: 16px !important;
+    border-radius: 12px !important;
+    justify-content: center !important;
+    display: flex !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+  }
+}
