@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
 
 const AppContext = createContext(null);
 
@@ -37,12 +37,21 @@ export function AppProvider({ children }) {
             setUserRole(userDoc.rol);
             setUserData({ id: userDoc.id, ...userDoc });
           } else {
-            setUserRole('admin');
-            setUserData({ nombre: firebaseUser.displayName || firebaseUser.email, rol: 'admin' });
+            const newDoc = {
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              nombre: firebaseUser.displayName || firebaseUser.email,
+              rol: 'pendiente',
+              activo: true,
+              createdAt: new Date().toISOString()
+            };
+            await setDoc(doc(db, 'usuarios', firebaseUser.uid), newDoc);
+            setUserRole('pendiente');
+            setUserData({ id: firebaseUser.uid, ...newDoc });
           }
         } catch {
-          setUserRole('admin');
-          setUserData({ nombre: firebaseUser.email, rol: 'admin' });
+          setUserRole('pendiente');
+          setUserData({ nombre: firebaseUser.email, rol: 'pendiente' });
         }
       } else {
         setUserRole(null);

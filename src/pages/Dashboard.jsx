@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { db, auth } from '../firebase';
 import { collection, query, onSnapshot, where } from 'firebase/firestore';
 import { useAppContext } from '../context/AppContext';
@@ -24,8 +25,8 @@ const Iconos = {
   alertas: () => (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>
   ),
-  usuarios: () => (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+  usuarios: (props) => (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" {...props}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
   ),
 };
 
@@ -41,10 +42,62 @@ export default function Dashboard({ onNavigate }) {
   const [stats, setStats] = useState({ lotes: 0, insumos: 0, aplicaciones: 0, stockBajo: 0 });
   const [tareasPendientes, setTareasPendientes] = useState(0);
   const [misTareas, setMisTareas] = useState([]);
+  const [activeMembers, setActiveMembers] = useState([]);
+
+  const [chartData, setChartData] = useState([]);
 
   const userId = userData?.id || user?.uid;
 
   useEffect(() => {
+    let allApps = [];
+    let allTareas = [];
+    let allExcepciones = [];
+
+    const buildChartData = (apps, tareas, excepciones) => {
+      const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+      
+      const weeklyData = Array.from({length: 7}).map((_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (6 - i));
+        return {
+          name: days[d.getDay()],
+          dateString: d.toISOString().split('T')[0],
+          consumo: 0
+        };
+      });
+
+      const addConsumo = (dateObj, amount) => {
+        if (!dateObj || !amount) return;
+        const dStr = dateObj.toISOString().split('T')[0];
+        const dayMatch = weeklyData.find(w => w.dateString === dStr);
+        if (dayMatch) {
+          dayMatch.consumo += Number(amount);
+        }
+      };
+
+      apps.forEach(app => {
+        if (app.fecha) {
+           const date = app.fecha.toDate ? app.fecha.toDate() : new Date(app.fecha);
+           addConsumo(date, app.cantidad);
+        }
+      });
+
+      tareas.forEach(tarea => {
+        if (tarea.estado === 'Ejecutado' && tarea.fechaEjecucion && tarea.cantidadConsumida) {
+          addConsumo(new Date(tarea.fechaEjecucion), tarea.cantidadConsumida);
+        }
+      });
+      
+      excepciones.forEach(exc => {
+        if (exc.fechaReporte) {
+           const date = exc.fechaReporte.toDate ? exc.fechaReporte.toDate() : new Date(exc.fechaReporte);
+           addConsumo(date, exc.cantidad);
+        }
+      });
+
+      setChartData(weeklyData);
+    };
+
     const unsubLotes = onSnapshot(query(collection(db, 'lotes')), snapshot => {
       setStats(prev => ({ ...prev, lotes: snapshot.size }));
     });
@@ -56,11 +109,24 @@ export default function Dashboard({ onNavigate }) {
     });
     const unsubApps = onSnapshot(query(collection(db, 'aplicaciones')), snapshot => {
       setStats(prev => ({ ...prev, aplicaciones: snapshot.size }));
+      allApps = snapshot.docs.map(d => d.data());
+      buildChartData(allApps, allTareas, allExcepciones);
     });
     const unsubTareas = onSnapshot(query(collection(db, 'tareas')), snapshot => {
       setTareasPendientes(snapshot.docs.filter(d => d.data().estado === 'Ejecutado').length);
+      allTareas = snapshot.docs.map(d => d.data());
+      buildChartData(allApps, allTareas, allExcepciones);
     });
-    return () => { unsubLotes(); unsubInsumos(); unsubApps(); unsubTareas(); };
+    const unsubExcepciones = onSnapshot(query(collection(db, 'excepciones')), snapshot => {
+      allExcepciones = snapshot.docs.map(d => d.data());
+      buildChartData(allApps, allTareas, allExcepciones);
+    });
+    const unsubUsuarios = onSnapshot(query(collection(db, 'usuarios')), snapshot => {
+      const active = snapshot.docs.filter(d => d.data().activo !== false).map(d => d.data());
+      setActiveMembers(active.slice(0, 4));
+    });
+
+    return () => { unsubLotes(); unsubInsumos(); unsubApps(); unsubTareas(); unsubExcepciones(); unsubUsuarios(); };
   }, []);
 
   useEffect(() => {
@@ -87,7 +153,7 @@ export default function Dashboard({ onNavigate }) {
 
   const mainModules = [
     { id: 'apply', label: 'Insumos', icon: Iconos.apply },
-    { id: 'lotes', label: 'Lotes', icon: Iconos.lotes },
+    { id: 'historial', label: 'Reportes', icon: Iconos.historial },
     { id: 'monitoreo', label: 'Monitoreo', icon: Iconos.monitoreo },
     { id: rolePanel.id, label: rolePanel.label, icon: Iconos.usuarios },
   ];
@@ -188,42 +254,59 @@ export default function Dashboard({ onNavigate }) {
         
         {/* Consumed / Chart Row */}
         <div className={styles.chartSection}>
-          <h3 className={styles.sectionTitle}>Actividad</h3>
-          <div className={`${styles.chartCard} white-card`}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h3 className={styles.sectionTitle} style={{ marginBottom: 0 }}>Consumo de Insumos</h3>
+            <span style={{ background: '#F0EAFB', color: '#7E4FF6', padding: '6px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 'bold' }}>Últimos 7 días</span>
+          </div>
+          <div className={`${styles.chartCard} white-card`} style={{ height: 'auto', padding: '32px' }}>
             <div className={styles.chartLines}>
-              {/* Mock SVG Line Chart */}
-              <svg viewBox="0 0 400 100" preserveAspectRatio="none">
-                <path d="M 0 80 Q 50 10 100 50 T 200 40 T 300 80 T 400 20" fill="none" stroke="#14C2F4" strokeWidth="2" />
-                <path d="M 0 50 Q 100 90 200 30 T 300 10 T 400 60" fill="none" stroke="#7E4FF6" strokeWidth="2" />
-                <path d="M 0 20 Q 50 60 150 40 T 250 80 T 400 40" fill="none" stroke="#FF8F1F" strokeWidth="2" />
-              </svg>
-            </div>
-            <div className={styles.chartLegend}>
-              <span><span className={styles.dot} style={{background: '#14C2F4'}}></span> Lotes</span>
-              <span><span className={styles.dot} style={{background: '#7E4FF6'}}></span> Insumos</span>
-              <span><span className={styles.dot} style={{background: '#FF8F1F'}}></span> Apps</span>
+              <ResponsiveContainer width="100%" height={250}>
+                <AreaChart data={chartData} margin={{ top: 25, right: 20, left: 0, bottom: 20 }}>
+                  <defs>
+                    <linearGradient id="colorConsumo" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#7E4FF6" stopOpacity={0.2}/>
+                      <stop offset="95%" stopColor="#7E4FF6" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} stroke="#F0F0F5" strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="name" 
+                    tick={{fontSize: 12, fill: '#8BA3B8', fontWeight: 600}} 
+                    axisLine={false} 
+                    tickLine={false} 
+                    dy={10} 
+                    label={{ value: 'Día de la semana', position: 'insideBottom', offset: -15, fill: '#8BA3B8', fontSize: 12, fontWeight: 700 }}
+                  />
+                  <YAxis 
+                    tick={{fontSize: 12, fill: '#8BA3B8'}} 
+                    axisLine={false} 
+                    tickLine={false} 
+                    dx={-10}
+                    label={{ value: 'Cantidad de Insumos', angle: -90, position: 'insideLeft', offset: 10, fill: '#8BA3B8', fontSize: 12, fontWeight: 700 }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: 'var(--shadow-sm)' }}
+                    itemStyle={{ color: '#7E4FF6', fontWeight: 600 }}
+                    formatter={(value) => [`${value} unidades`, 'Consumo']}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="consumo" 
+                    stroke="#7E4FF6" 
+                    strokeWidth={3} 
+                    fillOpacity={1} 
+                    fill="url(#colorConsumo)" 
+                    dot={{ stroke: '#7E4FF6', strokeWidth: 3, r: 4, fill: '#fff' }}
+                    activeDot={{ stroke: '#7E4FF6', strokeWidth: 3, r: 6, fill: '#fff' }}
+                    label={{ position: 'top', fill: '#7E4FF6', fontSize: 13, fontWeight: 'bold', offset: 10 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>
 
-        {/* Lock Home Row */}
-        <div className={styles.lockSection}>
-          <h3 className={styles.sectionTitle}>Acceso Rápido</h3>
-          <div className={`${styles.lockCard} white-card`}>
-            {quickAccessItems.map((item, idx) => {
-              const bgColors = ['#FE5C36', '#FF8F1F', '#34D399', '#7E4FF6'];
-              const RenderIcon = item.icon;
-              return (
-                <div key={idx} className={styles.lockItem} onClick={() => onNavigate(item.id)} style={{cursor: 'pointer'}}>
-                  <div className={styles.lockIcon} style={{background: bgColors[idx]}}>
-                    <RenderIcon style={{stroke: 'white', width: '20px', height: '20px'}} />
-                  </div>
-                  <span>{item.label}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+
 
       </div>
 
@@ -236,12 +319,18 @@ export default function Dashboard({ onNavigate }) {
         <div className={styles.membersSection}>
           <h3 className={styles.sectionTitle}>Miembros Activos</h3>
           <div className={`${styles.membersCard} white-card`}>
-            {['A', 'B', 'C', 'D'].map((member, i) => (
-              <div key={i} className={styles.memberAvatar}>
-                <div className={styles.memberImg}>{member}</div>
-                <span>Usuario {i+1}</span>
-              </div>
-            ))}
+            {activeMembers.map((member, i) => {
+              const colors = ['#14C2F4', '#FF9F1C', '#7E4FF6', '#FF5A5F', '#34D399'];
+              const color = colors[i % colors.length];
+              return (
+                <div key={i} className={styles.memberAvatar}>
+                  <div className={styles.memberImg} style={{ background: color, border: 'none' }}>
+                    <Iconos.usuarios style={{ stroke: 'white', width: '20px', height: '20px' }} />
+                  </div>
+                  <span>{member.nombre || member.email?.split('@')[0] || 'Usuario'}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
 

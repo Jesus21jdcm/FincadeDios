@@ -95,11 +95,15 @@ export default function PanelEmpleado() {
           estado: 'Ejecutado',
           fechaEjecucion: new Date().toISOString(),
           evidencia: url,
+          insumoConsumido: insumoUsado || null,
+          cantidadConsumida: cantidadUsada ? Number(cantidadUsada) : 0,
         });
       } else {
         await updateDoc(doc(db, 'tareas', tareaId), {
           estado: 'Ejecutado',
           fechaEjecucion: new Date().toISOString(),
+          insumoConsumido: insumoUsado || null,
+          cantidadConsumida: cantidadUsada ? Number(cantidadUsada) : 0,
         });
       }
 

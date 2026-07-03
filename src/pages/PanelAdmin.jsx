@@ -6,10 +6,10 @@ import styles from './PanelAdmin.module.css';
 
 const stages = [
   { id: 'todas', label: 'Todas' },
-  { id: 'Generado', label: 'Generadas' },
-  { id: 'Asignado', label: 'Asignadas' },
-  { id: 'Ejecutado', label: 'Ejecutadas' },
-  { id: 'Validado', label: 'Validadas' },
+  { id: 'Generado', label: 'Por Asignar' },
+  { id: 'Asignado', label: 'En Progreso' },
+  { id: 'Ejecutado', label: 'Por Revisar' },
+  { id: 'Validado', label: 'Completadas' },
 ];
 
 export default function PanelAdmin() {
@@ -17,6 +17,7 @@ export default function PanelAdmin() {
   const [siembras, setSiembras] = useState([]);
   const [empleados, setEmpleados] = useState([]);
   const [encargados, setEncargados] = useState([]);
+  const [lotes, setLotes] = useState([]);
   const [filter, setFilter] = useState('todas');
   const [asignando, setAsignando] = useState(null);
   const [evidenciaModal, setEvidenciaModal] = useState(null);
@@ -51,7 +52,10 @@ export default function PanelAdmin() {
     const unsubAl = onSnapshot(query(collection(db, 'alertas'), where('estado', '==', 'pendiente')),
       snap => setAlertas(snap.docs.map(d => ({ id: d.id, ...d.data() })))
     );
-    return () => { unsubT(); unsubS(); unsubE(); unsubC(); unsubEx(); unsubAl(); };
+    const unsubL = onSnapshot(query(collection(db, 'lotes')), snap => {
+      setLotes(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    });
+    return () => { unsubT(); unsubS(); unsubE(); unsubC(); unsubEx(); unsubAl(); unsubL(); };
   }, []);
 
   const asignar = async (tareaId, empleadoId) => {
@@ -174,43 +178,22 @@ export default function PanelAdmin() {
     <div className={styles.container}>
       <div className={styles.headerRow}>
         <div>
-          <h1 className={styles.title}>Panel de Administracion</h1>
-          <p className={styles.subtitle}>Gestion de tareas, semaforo operativo y flujo de trabajo</p>
-        </div>
-        <div className={styles.headerMeta}>
-          <span className={styles.metaTotal}>{tareas.length} tareas</span>
-          <span className={styles.metaPct}>{pct}% completado</span>
-          <button className={styles.btnWsp} onClick={enviarRecordatorio} title="Enviar recordatorio diario">📋 Recordar</button>
-          <button className={styles.btnWsp} onClick={enviarReporte} title="Enviar reporte semanal">📊 Reporte</button>
+          <h1 className={styles.title}>Panel de Control</h1>
+          <p className={styles.subtitle}>Gestión operativa y seguimiento en tiempo real</p>
         </div>
       </div>
 
-      <div className={styles.pipeline}>
-        <div className={styles.pipelineBar}>
-          {stages.map((stage, i) => (
-            <div key={stage.id} className={styles.pipelineItem}>
-              {i > 0 && (
-                <svg className={styles.pipelineArrow} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="9 18 15 12 9 6" />
-                </svg>
-              )}
-              <button
-                className={`${styles.pipelineStep} ${styles[`step${stage.id}`] || ''} ${filter === stage.id ? styles.pipelineActive : ''}`}
-                onClick={() => setFilter(stage.id)}
-              >
-                {vencidasPorStage[stage.id] > 0 && (
-                  <span className={`${styles.notifBell} ${styles[`bell${stage.id}`] || ''}`}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                  </span>
-                )}
-                <div className={styles.pipelineCircle}>
-                  {conteo[stage.id] || 0}
-                </div>
-                <span className={styles.pipelineLabel}>{stage.label}</span>
-              </button>
-            </div>
-          ))}
-        </div>
+      <div className={styles.tabsContainer}>
+        {stages.map((stage) => (
+          <button
+            key={stage.id}
+            className={`${styles.tabBtn} ${filter === stage.id ? styles.tabActive : ''}`}
+            onClick={() => setFilter(stage.id)}
+          >
+            {stage.label}
+            <span className={`${styles.tabBadge} ${filter === stage.id ? styles.tabBadgeActive : ''}`}>{conteo[stage.id] || 0}</span>
+          </button>
+        ))}
       </div>
 
       {alertas.length > 0 && (
@@ -268,98 +251,97 @@ export default function PanelAdmin() {
         <div className={styles.emptyState}>No hay tareas en este estado</div>
       )}
 
-      {siembras.filter(s => filtradas.some(t => t.siembraId === s.id)).map(s => {
-        const tareasSiembra = filtradas.filter(t => t.siembraId === s.id);
-        return (
-          <div key={s.id} className={styles.sectionCard}>
-            <div className={styles.sectionHeader}>
-              <div className={styles.sectionInfo}>
-                <h3 className={styles.sectionTitle}>{s.cultivo}</h3>
-                <span className={styles.sectionMeta}>
-                  {tareasSiembra.length} tareas &middot; {new Date(s.fechaSiembra).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
-                </span>
-              </div>
-            </div>
-            <div className={styles.tableContainer}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Tarea</th>
-                    <th>Empleado</th>
-                    <th>Fecha límite</th>
-                    <th>Estado</th>
-                    <th>Evidencia</th>
-                    <th>Acción</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tareasSiembra.map(t => (
-                      <tr key={t.id} className={isVencida(t) ? styles.rowRojo : ''}>
-                        <td className={styles.cellTitulo}>
+      {filtradas.length > 0 && (
+        <div className={styles.sectionCard} style={{ padding: 0, overflow: 'hidden' }}>
+          <div className={styles.tableContainer}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>ESTADO</th>
+                  <th>DETALLE TAREA</th>
+                  <th>FECHA LÍMITE</th>
+                  <th>UBICACIÓN</th>
+                  <th style={{ textAlign: 'right' }}>ACCIONES</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtradas.map(t => {
+                  const siembra = siembras.find(s => s.id === t.siembraId);
+                  const lote = lotes.find(l => l.id === siembra?.loteId);
+                  return (
+                    <tr key={t.id} className={isVencida(t) ? styles.rowRojo : ''}>
+                      <td className={styles.cellEstado}>
+                        <span className={`${styles.estadoText} ${styles[t.estado] || ''}`}>
+                          #{t.estado.toUpperCase()}
+                        </span>
+                      </td>
+                      <td>
+                        <div className={styles.cellTitulo}>
                           <strong>{t.titulo}</strong>
-                          <span className={styles.cellDesc}>{t.descripcion?.slice(0, 60)}</span>
-                        </td>
-                        <td>
-                          {t.idEmpleado ? (
-                            <span className={styles.empleadoTag}>
-                              <span className={styles.empAvatar}>{t.nombreEmpleado?.charAt(0).toUpperCase() || '?'}</span>
-                              <span className={styles.empNombre}>{t.nombreEmpleado || 'Asignado'}</span>
-                            </span>
-                          ) : (
-                            <span className={styles.sinEmpleado}>—</span>
-                          )}
-                        </td>
-                        <td className={styles.cellFecha}>
-                          {new Date(t.fechaSugerida).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
-                          {isVencida(t) && <span className={styles.vencido}>VENCIDO</span>}
-                        </td>
-                        <td>
-                          <span className={`${styles.estadoBadge} ${styles[t.estado] || ''}`}>{t.estado}</span>
-                        </td>
-                        <td>
-                          {t.evidencia ? (
-                            <img src={t.evidencia} alt="Evidencia" className={styles.evidenciaThumb} onClick={() => setEvidenciaModal(t.evidencia)} />
-                          ) : (
-                            <span className={styles.sinEvidencia}>—</span>
-                          )}
-                        </td>
-                        <td>
-                          {asignando === t.id ? (
-                            <div className={styles.asignador}>
-                              <select className={styles.select} onChange={e => asignar(t.id, e.target.value)} defaultValue="">
-                                <option value="" disabled>Seleccionar empleado</option>
-                                {empleados.map(e => (
-                                  <option key={e.id} value={e.id}>{e.nombre}</option>
-                                ))}
-                              </select>
-                              <button className={styles.btnAsignarClose} onClick={() => setAsignando(null)} title="Cancelar">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                              </button>
-                            </div>
-                          ) : !t.idEmpleado ? (
-                            <button className={styles.btnAsignar} onClick={() => setAsignando(t.id)}>
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                              Asignar
-                            </button>
-                          ) : t.estado === 'Ejecutado' ? (
-                            <button className={styles.btnValidar} onClick={() => updateDoc(doc(db, 'tareas', t.id), { estado: 'Validado' })}>
-                              Aprobar
-                            </button>
-                          ) : t.estado !== 'Validado' && (
-                            <button className={styles.btnEmpReasignar} onClick={() => reasignar(t.id)}>
-                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-                              Reasignar
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
+                          <span className={styles.cellDesc}>
+                             {t.idEmpleado ? (
+                                <>
+                                  <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg> {t.nombreEmpleado}
+                                </>
+                             ) : (
+                               <span className={styles.sinAsignar}>Sin asignar</span>
+                             )}
+                          </span>
+                        </div>
+                      </td>
+                      <td className={`${styles.cellFecha} ${isVencida(t) ? styles.textRojo : ''}`}>
+                        {new Date(t.fechaSugerida).toLocaleDateString('es-ES', { day: 'numeric', month: 'numeric', year: 'numeric' })}
+                      </td>
+                      <td>
+                        <div className={styles.cellUbicacion}>
+                          <span className={styles.badgeCultivo}>{siembra?.cultivo || t.cultivo}</span>
+                          <span className={styles.badgeLote}>{lote?.nombre || siembra?.loteId || '—'}</span>
+                        </div>
+                      </td>
+                      <td className={styles.cellAcciones}>
+                        {t.evidencia && (
+                          <button className={styles.btnIconList} onClick={() => setEvidenciaModal(t.evidencia)} title="Ver evidencia">
+                            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
+                          </button>
+                        )}
+                        {t.estado !== 'Validado' && t.estado !== 'Ejecutado' && t.idEmpleado && (
+                          <button className={styles.btnIconList} onClick={() => reasignar(t.id)} title="Reasignar/Desasignar">
+                            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg> 
+                          </button>
+                        )}
+                        {!t.idEmpleado && t.estado !== 'Validado' && t.estado !== 'Ejecutado' && (
+                           asignando === t.id ? (
+                              <div className={styles.asignadorInline}>
+                                <select className={styles.selectSmall} onChange={e => asignar(t.id, e.target.value)} defaultValue="">
+                                  <option value="" disabled>Seleccionar empleado</option>
+                                  {empleados.map(e => (
+                                    <option key={e.id} value={e.id}>{e.nombre}</option>
+                                  ))}
+                                </select>
+                                <button className={styles.btnIconList} onClick={() => setAsignando(null)}>
+                                  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                                </button>
+                              </div>
+                           ) : (
+                             <button className={styles.btnAsignarBlue} onClick={() => setAsignando(t.id)}>
+                               Asignar
+                             </button>
+                           )
+                        )}
+                        {t.estado === 'Ejecutado' && (
+                          <button className={styles.btnAprobar} onClick={() => updateDoc(doc(db, 'tareas', t.id), { estado: 'Validado' })}>
+                            Aprobar
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
           </div>
-        );
-      })}
+        </div>
+      )}
 
       {evidenciaModal && (
         <div className={styles.modalOverlay} onClick={() => setEvidenciaModal(null)}>

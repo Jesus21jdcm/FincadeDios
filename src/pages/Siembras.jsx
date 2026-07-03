@@ -29,6 +29,7 @@ const SvgIcon = ({ name, size = 16 }) => {
     alert: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>,
     layers: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg>,
     trash: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>,
+    edit: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
   };
   return icons[name] || null;
 };
@@ -45,6 +46,8 @@ export default function Siembras() {
   const [error, setError] = useState('');
   const [modalTareas, setModalTareas] = useState(null);
   const [filtroCultivo, setFiltroCultivo] = useState('');
+  const [editingTaskModal, setEditingTaskModal] = useState(null);
+  const [editingTaskData, setEditingTaskData] = useState(null);
 
   useEffect(() => {
     const unsubL = onSnapshot(query(collection(db, 'lotes')), snap => {
@@ -76,6 +79,38 @@ export default function Siembras() {
     }
     setAnalisis(resultado);
     setPaso('revision');
+  };
+
+  const handleEditTareaRevision = (index, field, value) => {
+    setAnalisis(prev => {
+      if (!prev) return prev;
+      const nuevas = [...prev.tareas];
+      nuevas[index] = { ...nuevas[index], [field]: value };
+      return { ...prev, tareas: nuevas };
+    });
+  };
+
+  const handleAgregarTareaRevision = () => {
+    setAnalisis(prev => {
+      if (!prev) return prev;
+      const nuevaTarea = {
+        id: 'tmp_' + Date.now(),
+        tipo: 'clipboard',
+        titulo: 'Nueva tarea',
+        descripcion: '',
+        fechaSugerida: prev.tareas.length > 0 ? prev.tareas[prev.tareas.length - 1].fechaSugerida : new Date().toISOString(),
+        isEditing: true
+      };
+      return { ...prev, tareas: [...prev.tareas, nuevaTarea] };
+    });
+  };
+
+  const handleEliminarTareaRevision = (index) => {
+    setAnalisis(prev => {
+      if (!prev) return prev;
+      const nuevas = prev.tareas.filter((_, i) => i !== index);
+      return { ...prev, tareas: nuevas };
+    });
   };
 
   const handleConfirmar = async () => {
@@ -135,6 +170,14 @@ export default function Siembras() {
       await deleteDoc(doc(db, 'siembras', id));
     } catch (err) {
       alert(err.message);
+    }
+  };
+
+  const handleUpdateSiembraField = async (id, field, value) => {
+    try {
+      await updateDoc(doc(db, 'siembras', id), { [field]: value });
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -292,27 +335,72 @@ export default function Siembras() {
                 <span><SvgIcon name="droplet" /> {analisis.resumen.riego} riegos</span>
               </div>
 
-              <div className={styles.tareasList}>
-                {analisis.tareas.map(t => (
-                  <div key={t.id} className={styles.tareaCard}>
-                    <div className={styles.tareaHeader}>
-                      <span className={styles.tareaIcon}>{tipoIcon(t.tipo)}</span>
-                      <div className={styles.tareaBody}>
-                        <strong className={styles.tareaTitulo}>{t.titulo}</strong>
-                        <p className={styles.tareaDesc}>{t.descripcion}</p>
+              <div className={styles.tareasEditList}>
+                {analisis.tareas.map((t, i) => (
+                  <div key={t.id || i} className={styles.tareaEditCard}>
+                    {t.isEditing ? (
+                      <div className={styles.tareaEditFormInline}>
+                        <div className={styles.inlineFieldRow}>
+                           <input type="text" className={styles.input} style={{ flex: 1 }} value={t.titulo} onChange={e => handleEditTareaRevision(i, 'titulo', e.target.value)} placeholder="Título de la tarea" autoFocus />
+                           <select className={styles.select} style={{ width: '150px' }} value={t.tipo} onChange={e => handleEditTareaRevision(i, 'tipo', e.target.value)}>
+                             <option value="fertilizacion">Fertilización</option>
+                             <option value="poda">Poda</option>
+                             <option value="control_plagas">Plagas</option>
+                             <option value="riego">Riego</option>
+                             <option value="clipboard">Otra</option>
+                           </select>
+                        </div>
+                        <input type="text" className={styles.input} value={t.descripcion} onChange={e => handleEditTareaRevision(i, 'descripcion', e.target.value)} placeholder="Descripción (opcional)" />
+                        <div className={styles.inlineFieldActions}>
+                          <input 
+                            type="date" 
+                            className={styles.inputDateSmall} 
+                            value={t.fechaSugerida ? t.fechaSugerida.split('T')[0] : ''} 
+                            onChange={e => handleEditTareaRevision(i, 'fechaSugerida', new Date(e.target.value).toISOString())}
+                          />
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <button type="button" className={styles.btnSecondary} style={{ padding: '4px 12px', height: '32px' }} onClick={() => handleEditTareaRevision(i, 'isEditing', false)}>OK</button>
+                            <button type="button" className={styles.btnIcon} onClick={() => handleEliminarTareaRevision(i)} title="Eliminar tarea">
+                              <SvgIcon name="trash" />
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      <div className={styles.tareaFecha}>
-                        <span className={styles.fechaLabel}>{t.fechaSugeridaLabel}</span>
-                        <span className={styles.recurrencia}>{t.recurrencia}</span>
-                      </div>
-                    </div>
+                    ) : (
+                      <>
+                        <div className={styles.tareaEditIcon}>{tipoIcon(t.tipo)}</div>
+                        <div className={styles.tareaEditInfo}>
+                          <strong className={styles.tareaEditTitulo}>{t.titulo}</strong>
+                          <p className={styles.tareaEditDesc}>{t.descripcion}</p>
+                        </div>
+                        <div className={styles.tareaEditActions}>
+                          <input 
+                            type="date" 
+                            className={styles.inputDateSmall} 
+                            value={t.fechaSugerida ? t.fechaSugerida.split('T')[0] : ''} 
+                            onChange={e => handleEditTareaRevision(i, 'fechaSugerida', new Date(e.target.value).toISOString())}
+                          />
+                          <button type="button" className={styles.btnIcon} onClick={() => handleEditTareaRevision(i, 'isEditing', true)} title="Editar detalle">
+                            <SvgIcon name="edit" />
+                          </button>
+                          <button type="button" className={styles.btnIcon} onClick={() => handleEliminarTareaRevision(i)} title="Eliminar tarea">
+                            <SvgIcon name="trash" />
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
+                <button type="button" className={styles.btnSecondary} onClick={handleAgregarTareaRevision} style={{ alignSelf: 'flex-start', marginTop: '4px' }}>
+                  <SvgIcon name="plus" /> Agregar tarea manual
+                </button>
               </div>
 
-              <div className={styles.actionsRow}>
-                <button className={styles.btnSecondary} onClick={() => setPaso('form')}>Ajustar fechas</button>
-                <button className={styles.btnPrimary} onClick={handleConfirmar}><SvgIcon name="check" /> Confirmar y registrar siembra</button>
+              <div className={styles.actionsRowSticky}>
+                <button type="button" className={styles.btnSecondary} onClick={() => setPaso('form')}>Cancelar</button>
+                <button type="button" className={styles.btnPrimary} style={{ background: '#006B3C' }} onClick={handleConfirmar}>
+                  <SvgIcon name="check" /> Confirmar y registrar siembra
+                </button>
               </div>
             </div>
           )}
@@ -326,38 +414,39 @@ export default function Siembras() {
           const tareasSiembra = tareas.filter(t => t.siembraId === s.id);
           return (
             <div key={s.id} className={styles.siembraCard}>
-              {cropImageMap[s.cultivo] && (
-                <img src={cropImageMap[s.cultivo]} alt="" className={styles.cardImage} aria-hidden="true" />
-              )}
-              <div className={styles.cardTop}>
-                <div className={styles.cardIconWrap}>{cultivoIcon(s.cultivo)}</div>
+              <div className={styles.leftSection}>
+                <div className={styles.imgWrapper}>
+                  {cropImageMap[s.cultivo] ? (
+                    <img src={cropImageMap[s.cultivo]} alt="" className={styles.avatarImg} />
+                  ) : (
+                    <div className={styles.cardIconWrap}>{cultivoIcon(s.cultivo)}</div>
+                  )}
+                </div>
                 <div className={styles.cardInfo}>
                   <h3 className={styles.cardCultivo}>{s.cultivo}</h3>
-                  <p className={styles.cardLote}>{lote?.nombre || 'Lote eliminado'} &middot; {s.area || '&mdash;'} ha</p>
+                  <p className={styles.cardLote}>{lote?.nombre || 'Lote eliminado'} - {s.area || '&mdash;'} ha</p>
+                </div>
+              </div>
+
+              <div className={styles.rightSection}>
+                <div className={styles.dateItem}>
+                  <SvgIcon name="calendar" /> {new Date(s.fechaSiembra).toLocaleDateString('es-ES')}
+                </div>
+                <div className={styles.dateItem}>
+                  <SvgIcon name="calendar" /> Cosecha: {new Date(s.fechaCosechaEstimada).toLocaleDateString('es-ES')}
                 </div>
                 <span className={`${styles.badgeEstado} ${s.estado === 'activa' ? styles.badgeActiva : styles.badgeFinalizada}`}>
                   {s.estado}
                 </span>
-                <button className={styles.btnDeleteCard} onClick={() => eliminarSiembra(s.id)} title="Eliminar siembra">
-                  <SvgIcon name="trash" />
-                </button>
-              </div>
-
-              <div className={styles.cardDates}>
-                <div className={styles.dateItem}>
-                  <SvgIcon name="calendar" /> Siembra: <strong>{new Date(s.fechaSiembra).toLocaleDateString('es-ES')}</strong>
+                
+                <div className={styles.cardActions}>
+                  <button className={styles.btnIcon} onClick={() => setModalTareas(s.id)} title="Editar tareas">
+                    <SvgIcon name="edit" />
+                  </button>
+                  <button className={styles.btnIcon} onClick={() => eliminarSiembra(s.id)} title="Eliminar siembra">
+                    <SvgIcon name="trash" />
+                  </button>
                 </div>
-                <div className={styles.dateItem}>
-                  <SvgIcon name="calendar" /> Cosecha est.: <strong>{new Date(s.fechaCosechaEstimada).toLocaleDateString('es-ES')}</strong>
-                </div>
-              </div>
-
-
-
-              <div className={styles.cardFooter}>
-                <button className={styles.btnTareas} onClick={() => setModalTareas(s.id)}>
-                  <SvgIcon name="clipboard" /> Ver tareas ({tareasSiembra.length})
-                </button>
               </div>
             </div>
           );
@@ -367,61 +456,134 @@ export default function Siembras() {
         )}
       </div>
 
-      {modalTareas && (
-        <div className={styles.modalOverlay} onClick={() => setModalTareas(null)}>
-          <div className={styles.modal} onClick={e => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}><SvgIcon name="clipboard" /> Tareas de siembra</h3>
-              <button className={styles.modalClose} onClick={() => setModalTareas(null)}><SvgIcon name="x" /></button>
-            </div>
-            <div className={styles.modalBody}>
-              {tareas.filter(t => t.siembraId === modalTareas).map(t => {
-                const emp = empleados.find(e => e.id === t.idEmpleado);
-                return (
-                  <div key={t.id} className={styles.modalTarea}>
-                    <div className={styles.modalTareaTop}>
-                      <span className={styles.modalTareaTipo}>{tipoIcon(t.tipo)}</span>
-                      <div className={styles.modalTareaInfo}>
-                        <strong className={styles.modalTareaTitulo}>{t.titulo}</strong>
-                        <p className={styles.modalTareaDesc}>{t.descripcion}</p>
-                      </div>
-                      <span className={`${styles.estadoTag} ${estadoColor(t.estado)}`}>{t.estado}</span>
-                    </div>
-                    <div className={styles.modalTareaBottom}>
-                      <span className={styles.modalTareaFecha}>
-                        <SvgIcon name="calendar" /> {t.fechaSugerida ? new Date(t.fechaSugerida).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : '—'}
-                      </span>
-                      {emp ? (
-                        <span className={styles.modalTareaEmpleado}>
-                          <SvgIcon name="user" /> {emp.nombre}
-                        </span>
-                      ) : (
-                        <select className={styles.selectAsignar} defaultValue="" onChange={e => { if (e.target.value) handleAsignarTarea(t.id, e.target.value); }}>
-                          <option value="" disabled>Asignar a...</option>
-                          {empleados.filter(e => e.rol === 'empleado').map(e => (
-                            <option key={e.id} value={e.id}>{e.nombre}</option>
-                          ))}
-                        </select>
-                      )}
-                      {emp && (
-                        <select className={styles.selectAsignar} defaultValue="" onChange={e => { if (e.target.value) handleAsignarTarea(t.id, e.target.value); }}>
-                          <option value="" disabled>Reasignar...</option>
-                          {empleados.filter(e => e.rol === 'empleado' && e.id !== t.idEmpleado).map(e => (
-                            <option key={e.id} value={e.id}>{e.nombre}</option>
-                          ))}
-                        </select>
-                      )}
-                    </div>
+      {modalTareas && (() => {
+        const siembra = siembras.find(s => s.id === modalTareas);
+        if (!siembra) return null;
+        const tareasSiembra = tareas.filter(t => t.siembraId === modalTareas).sort((a,b) => (a.orden || 0) - (b.orden || 0));
+
+        return (
+          <div className={styles.modalOverlay} onClick={() => setModalTareas(null)}>
+            <div className={styles.modalFull} onClick={e => e.stopPropagation()}>
+              <div className={styles.modalHeader}>
+                <h3 className={styles.modalTitle}><SvgIcon name="edit" /> Editar siembra</h3>
+                <button className={styles.modalClose} onClick={() => setModalTareas(null)}><SvgIcon name="x" /></button>
+              </div>
+              <div className={styles.modalBodyFull}>
+                <div className={styles.editFormGrid}>
+                  <div className={styles.field}>
+                    <label className={styles.label}>Lote</label>
+                    <select className={styles.select} value={siembra.loteId} onChange={e => handleUpdateSiembraField(siembra.id, 'loteId', e.target.value)}>
+                      {lotes.map(l => <option key={l.id} value={l.id}>{l.nombre}</option>)}
+                    </select>
                   </div>
-                );
-              })}
-              {tareas.filter(t => t.siembraId === modalTareas).length === 0 && (
-                <div className={styles.empty}>Esta siembra no tiene tareas generadas</div>
-              )}
+                  <div className={styles.field}>
+                    <label className={styles.label}>Cultivo</label>
+                    <select className={styles.select} value={siembra.cultivo} onChange={e => handleUpdateSiembraField(siembra.id, 'cultivo', e.target.value)}>
+                      {getCultivos().map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <div className={styles.field}>
+                    <label className={styles.label}>Fecha de siembra</label>
+                    <input className={styles.input} type="date" value={siembra.fechaSiembra ? siembra.fechaSiembra.split('T')[0] : ''} onChange={e => handleUpdateSiembraField(siembra.id, 'fechaSiembra', new Date(e.target.value).toISOString())} />
+                  </div>
+                  <div className={styles.field}>
+                    <label className={styles.label}>Area (ha)</label>
+                    <input className={styles.input} type="number" value={siembra.area} onChange={e => handleUpdateSiembraField(siembra.id, 'area', Number(e.target.value))} />
+                  </div>
+                </div>
+
+                <h4 className={styles.sectionTitleModal}><SvgIcon name="clipboard" /> Tareas ({tareasSiembra.length})</h4>
+                <div className={styles.tareasEditList}>
+                  {tareasSiembra.map(t => (
+                    <div key={t.id} className={styles.tareaEditCard}>
+                      {editingTaskModal === t.id ? (
+                        <div className={styles.tareaEditFormInline}>
+                          <div className={styles.inlineFieldRow}>
+                             <input type="text" className={styles.input} style={{ flex: 1 }} value={editingTaskData.titulo} onChange={e => setEditingTaskData({...editingTaskData, titulo: e.target.value})} placeholder="Título de la tarea" autoFocus />
+                             <select className={styles.select} style={{ width: '150px' }} value={editingTaskData.tipo} onChange={e => setEditingTaskData({...editingTaskData, tipo: e.target.value})}>
+                               <option value="fertilizacion">Fertilización</option>
+                               <option value="poda">Poda</option>
+                               <option value="control_plagas">Plagas</option>
+                               <option value="riego">Riego</option>
+                               <option value="clipboard">Otra</option>
+                             </select>
+                          </div>
+                          <input type="text" className={styles.input} value={editingTaskData.descripcion} onChange={e => setEditingTaskData({...editingTaskData, descripcion: e.target.value})} placeholder="Descripción (opcional)" />
+                          <div className={styles.inlineFieldActions}>
+                            <input 
+                              type="date" 
+                              className={styles.inputDateSmall} 
+                              value={editingTaskData.fechaSugerida ? editingTaskData.fechaSugerida.split('T')[0] : ''} 
+                              onChange={e => setEditingTaskData({...editingTaskData, fechaSugerida: new Date(e.target.value).toISOString()})}
+                            />
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button type="button" className={styles.btnSecondary} style={{ padding: '4px 12px', height: '32px' }} onClick={async () => {
+                                try {
+                                  await updateDoc(doc(db, 'tareas', t.id), {
+                                    titulo: editingTaskData.titulo,
+                                    descripcion: editingTaskData.descripcion,
+                                    tipo: editingTaskData.tipo,
+                                    fechaSugerida: editingTaskData.fechaSugerida
+                                  });
+                                  setEditingTaskModal(null);
+                                } catch(e) { console.error(e); }
+                              }}>OK</button>
+                              <button type="button" className={styles.btnIcon} onClick={() => deleteDoc(doc(db, 'tareas', t.id))} title="Eliminar tarea">
+                                <SvgIcon name="trash" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className={styles.tareaEditIcon}>{tipoIcon(t.tipo)}</div>
+                          <div className={styles.tareaEditInfo}>
+                            <strong className={styles.tareaEditTitulo}>{t.titulo}</strong>
+                            <p className={styles.tareaEditDesc}>{t.descripcion}</p>
+                          </div>
+                          <div className={styles.tareaEditActions}>
+                            <input 
+                              type="date" 
+                              className={styles.inputDateSmall} 
+                              value={t.fechaSugerida ? t.fechaSugerida.split('T')[0] : ''} 
+                              onChange={e => updateDoc(doc(db, 'tareas', t.id), { fechaSugerida: new Date(e.target.value).toISOString() })}
+                            />
+                            <button type="button" className={styles.btnIcon} onClick={() => { setEditingTaskModal(t.id); setEditingTaskData(t); }} title="Editar detalle">
+                              <SvgIcon name="edit" />
+                            </button>
+                            <button className={styles.btnIcon} onClick={() => deleteDoc(doc(db, 'tareas', t.id))} title="Eliminar tarea">
+                              <SvgIcon name="trash" />
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                  {tareasSiembra.length === 0 && (
+                    <div className={styles.empty}>Esta siembra no tiene tareas generadas</div>
+                  )}
+                  <button type="button" className={styles.btnSecondary} onClick={async () => {
+                    try {
+                      await addDoc(collection(db, 'tareas'), {
+                        siembraId: siembra.id,
+                        tipo: 'clipboard',
+                        titulo: 'Nueva tarea',
+                        descripcion: '',
+                        fechaSugerida: new Date().toISOString(),
+                        estado: 'Generado',
+                        createdAt: serverTimestamp(),
+                        cultivo: siembra.cultivo,
+                      });
+                    } catch(err) { console.error(err); }
+                  }} style={{ alignSelf: 'flex-start', marginTop: '4px' }}>
+                    <SvgIcon name="plus" /> Agregar tarea manual
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

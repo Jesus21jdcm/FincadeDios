@@ -114,10 +114,21 @@ export default function Usuarios() {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDesactivar = async () => {
     if (!deleteTarget) return;
     try {
       await updateDoc(doc(db, 'usuarios', deleteTarget.id), { activo: false });
+      setDeleteTarget(null);
+    } catch (err) {
+      alert(err.message);
+      setDeleteTarget(null);
+    }
+  };
+
+  const handleEliminarPermanente = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deleteDoc(doc(db, 'usuarios', deleteTarget.id));
       setDeleteTarget(null);
     } catch (err) {
       alert(err.message);
@@ -204,7 +215,7 @@ export default function Usuarios() {
     }
   };
 
-  const rolLabel = { superadmin: 'Super Admin', admin: 'Administrador', encargado: 'Encargado', empleado: 'Empleado' };
+  const rolLabel = { superadmin: 'Super Admin', admin: 'Administrador', encargado: 'Encargado', empleado: 'Empleado', pendiente: 'Pendiente de Aprobación' };
 
   const activos = usuarios.filter(u => u.activo !== false);
   const inactivos = usuarios.filter(u => u.activo === false);
@@ -277,16 +288,16 @@ export default function Usuarios() {
                   </td>
                   <td className={styles.cellEmail}>{u.email || '—'}</td>
                   <td>
-                    <select
-                      className={styles.rolSelect}
-                      value={u.rol}
-                      onChange={e => handleRolChange(u.id, e.target.value)}
-                      disabled={u.rol === 'superadmin'}
-                    >
-                      {Object.entries(rolLabel).map(([key, label]) => (
-                        <option key={key} value={key} disabled={key === 'superadmin'}>{label}</option>
-                      ))}
-                    </select>
+                      <select
+                        className={`${styles.rolSelect} ${u.rol === 'pendiente' ? styles.rolPendiente : ''}`}
+                        value={u.rol}
+                        onChange={e => handleRolChange(u.id, e.target.value)}
+                        disabled={u.rol === 'superadmin'}
+                      >
+                        {Object.entries(rolLabel).map(([key, label]) => (
+                          <option key={key} value={key} disabled={key === 'superadmin' || key === 'pendiente'}>{label}</option>
+                        ))}
+                      </select>
                   </td>
                   <td>
                     <div className={styles.actionBtns}>
@@ -414,13 +425,14 @@ export default function Usuarios() {
                 <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
             </div>
-            <h3 className={styles.modalTitle}>Desactivar usuario</h3>
+            <h3 className={styles.modalTitle}>Gestionar acceso</h3>
             <p className={styles.modalText}>
-              Se desactivara <strong>{deleteTarget.nombre}</strong>. El usuario dejara de tener acceso al sistema.
+              Selecciona qué acción deseas realizar con <strong>{deleteTarget.nombre}</strong>.
             </p>
-            <div className={styles.modalActions}>
+            <div className={styles.modalActionsCol}>
               <button className={styles.btnSecondary} onClick={() => setDeleteTarget(null)}>Cancelar</button>
-              <button className={styles.btnDanger} onClick={handleDelete}>Desactivar</button>
+              <button className={styles.btnWarning} onClick={handleDesactivar}>Desactivar temporalmente</button>
+              <button className={styles.btnDanger} onClick={handleEliminarPermanente}>Eliminar permanentemente</button>
             </div>
           </div>
         </div>

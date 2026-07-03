@@ -4,9 +4,9 @@ import styles from './Sidebar.module.css';
 
 const navItems = [
   { id: 'dashboard', label: 'Inicio', icon: HomeIcon },
-  { id: 'monitoreo', label: 'Monitoreo', icon: DevicesIcon },
-  { id: 'lotes', label: 'Lotes', icon: SecurityIcon },
-  { id: 'inventario', label: 'Inventario', icon: GlobalIcon },
+  { id: 'lotes', label: 'Lotes', icon: MountainIcon },
+  { id: 'siembras', label: 'Siembras', icon: SiembraIcon },
+  { id: 'inventario', label: 'Inventario', icon: BoxIcon },
   { id: 'usuarios', label: 'Usuarios', icon: MembersIcon },
 ];
 
@@ -14,7 +14,7 @@ export default function Sidebar({ onNavigate, currentPage }) {
   const { userRole } = useAppContext();
 
   // Filter items based on user role
-  const empleadoOnly = ['dashboard', 'inventario', 'lotes', 'monitoreo'];
+  const empleadoOnly = ['dashboard', 'inventario', 'lotes', 'siembras'];
   const visibleItems = userRole === 'empleado' 
     ? navItems.filter(item => empleadoOnly.includes(item.id))
     : navItems;
@@ -48,24 +48,14 @@ export default function Sidebar({ onNavigate, currentPage }) {
         ))}
       </div>
 
-      {/* Settings at the bottom */}
-      <div className={styles.settingsContainer}>
-        <button className={styles.navItem} onClick={() => onNavigate('dashboard')}>
-          <div className={styles.iconWrapper}>
-            <SettingsIcon />
-          </div>
-          <span>Ajustes</span>
-        </button>
-      </div>
     </aside>
   );
 }
 
-// Minimal SVG Icons matching the aesthetic
 function HomeIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 10l8-7 8 7v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10z" />
     </svg>
   );
 }
@@ -80,27 +70,27 @@ function DevicesIcon() {
   );
 }
 
-function SecurityIcon() {
+function MountainIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="4 20, 10 9, 14 15, 18 6, 22 20" />
     </svg>
   );
 }
 
-function GlobalIcon() {
+function BoxIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <circle cx="12" cy="12" r="10" />
-      <path d="M2 12h20" />
-      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+      <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+      <line x1="12" y1="22.08" x2="12" y2="12" />
     </svg>
   );
 }
 
 function MembersIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
       <circle cx="9" cy="7" r="4" />
       <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -114,6 +104,17 @@ function SettingsIcon() {
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
       <circle cx="12" cy="12" r="3" />
       <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  );
+}
+
+function SiembraIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 21V3" />
+      <path d="M7 8v3c0 2.8 2.2 5 5 5" />
+      <path d="M17 8v3c0 2.8-2.2 5-5 5" />
+      <path d="M9 21h6" />
     </svg>
   );
 }

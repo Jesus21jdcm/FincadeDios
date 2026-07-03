@@ -1,7 +1,6 @@
 .container {
   padding: 24px;
-  max-width: 900px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .headerRow {
@@ -14,15 +13,15 @@
 
 .title {
   font-size: 24px;
-  font-weight: 700;
-  color: var(--color-foreground);
+  font-weight: 600;
+  color: #334155;
   margin: 0 0 4px;
-  font-family: 'Fira Code', monospace;
+  font-family: inherit;
 }
 
 .subtitle {
   font-size: 14px;
-  color: var(--color-muted-foreground);
+  color: #94a3b8;
   margin: 0;
 }
 
@@ -101,11 +100,11 @@
   padding: 0 24px;
   border: none;
   border-radius: 8px;
-  background: var(--color-accent);
-  color: var(--color-on-primary);
+  background: #6366f1;
+  color: #ffffff;
   font-size: 14px;
   font-weight: 600;
-  font-family: 'Fira Sans', sans-serif;
+  font-family: inherit;
   cursor: pointer;
   transition: opacity 0.2s;
   white-space: nowrap;
@@ -145,7 +144,7 @@
 
 .tableContainer {
   border-radius: 12px;
-  border: 1px solid var(--color-border);
+  border: 1px solid #f1f5f9;
   overflow-x: auto;
 }
 
@@ -156,23 +155,23 @@
 }
 
 .table th {
-  padding: 10px 14px;
+  padding: 14px;
   text-align: left;
   font-size: 11px;
   font-weight: 600;
-  color: var(--color-muted-foreground);
+  color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .table td {
-  padding: 12px 14px;
+  padding: 16px 14px;
   font-size: 13px;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-foreground);
+  border-bottom: 1px solid #f1f5f9;
+  background: #ffffff;
+  color: #334155;
   vertical-align: middle;
 }
 
@@ -189,17 +188,16 @@
 }
 
 .avatar {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--color-accent) 20%, transparent);
-  color: var(--color-accent);
+  background: #e0e7ff;
+  color: #4f46e5;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 14px;
-  font-family: 'Fira Code', monospace;
+  font-weight: 600;
+  font-size: 15px;
   flex-shrink: 0;
 }
 
@@ -214,20 +212,21 @@
 }
 
 .rolSelect {
-  height: 34px;
-  padding: 0 28px 0 10px;
-  border-radius: 6px;
-  border: 1px solid var(--color-border);
-  background: var(--color-background);
-  color: var(--color-foreground);
-  font-size: 12px;
-  font-family: 'Fira Sans', sans-serif;
-  outline: none;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  padding: 0 12px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
   cursor: pointer;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 8px center;
+  background-position: right 10px center;
+  min-width: 130px;
 }
 
 .rolSelect:focus {
@@ -237,6 +236,12 @@
 .rolSelect:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.rolPendiente {
+  background: #FEF3C7;
+  color: #B45309;
+  border-color: #FDE68A;
 }
 
 .rolTag {
@@ -258,14 +263,14 @@
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: var(--color-muted-foreground);
+  color: #94a3b8;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btnIcon:hover {
-  background: color-mix(in srgb, var(--color-destructive) 15%, transparent);
-  color: var(--color-destructive);
+  background: #f1f5f9;
+  color: #475569;
 }
 
 .btnActivate {
@@ -299,7 +304,6 @@
   border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 28px;
-  max-width: 440px;
   width: 90%;
 }
 
@@ -359,6 +363,13 @@
   justify-content: flex-end;
 }
 
+.modalActionsCol {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
 .btnSecondary {
   height: 40px;
   padding: 0 20px;
@@ -383,7 +394,7 @@
   border: none;
   border-radius: 8px;
   background: var(--color-destructive);
-  color: #fff;
+  color: white;
   font-size: 14px;
   font-weight: 600;
   font-family: 'Fira Sans', sans-serif;
@@ -392,6 +403,24 @@
 }
 
 .btnDanger:hover {
+  opacity: 0.9;
+}
+
+.btnWarning {
+  height: 40px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 8px;
+  background: #F59E0B;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Fira Sans', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btnWarning:hover {
   opacity: 0.9;
 }
 

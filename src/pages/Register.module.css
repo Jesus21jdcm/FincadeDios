@@ -151,23 +151,12 @@
   color: #4B5563;
 }
 
-.optionsRow {
+.formOptions {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: -8px;
-  margin-bottom: 8px;
-}
-
-.forgotLink {
-  color: #1A5F44;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.forgotLink:hover {
-  text-decoration: underline;
+  margin-top: -4px;
+  margin-bottom: 4px;
 }
 
 .checkboxLabel {
@@ -263,11 +252,6 @@
   border-color: #D1D5DB;
 }
 
-.footerLinks {
-  margin-top: 16px;
-  text-align: center;
-}
-
 .backToHomeBtn {
   display: flex;
   align-items: center;
@@ -283,7 +267,7 @@
   font-family: 'Inter', sans-serif;
   cursor: pointer;
   transition: all 0.2s;
-  width: 100%;
+  margin-top: 8px;
 }
 
 .backToHomeBtn:hover {

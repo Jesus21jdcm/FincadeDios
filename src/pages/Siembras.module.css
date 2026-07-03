@@ -428,125 +428,90 @@
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .siembraCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
   border-radius: 12px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  overflow: hidden;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .siembraCard:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 4px 16px rgba(22, 163, 74, 0.08);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
 }
 
-.cardImage {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  mix-blend-mode: multiply;
-  opacity: 0.35;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.siembraCard > *:not(.cardImage) {
-  position: relative;
-  z-index: 1;
-}
-
-.cardTop {
+.leftSection {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 16px 12px;
+  gap: 16px;
 }
 
-.cardIconWrap {
+.imgWrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
   flex-shrink: 0;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardIconWrap {
   color: var(--color-accent);
 }
 
 .cardInfo {
-  flex: 1;
-  min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .cardCultivo {
   font-size: 15px;
   font-weight: 700;
   color: var(--color-foreground);
-  margin: 0;
+  margin: 0 0 2px;
   font-family: 'Inter', sans-serif;
 }
 
 .cardLote {
   font-size: 12px;
   color: var(--color-muted-foreground);
-  margin: 2px 0 0;
+  margin: 0;
 }
 
-.badgeEstado {
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.badgeActiva {
-  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
-  color: var(--color-accent);
-}
-
-.badgeFinalizada {
-  background: color-mix(in srgb, var(--color-muted-foreground) 15%, transparent);
-  color: var(--color-muted-foreground);
-}
-
-.btnDeleteCard {
+.rightSection {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--color-muted-foreground);
-  cursor: pointer;
-  transition: all 0.2s;
-  flex-shrink: 0;
+  gap: 24px;
 }
 
-.btnDeleteCard:hover {
-  background: color-mix(in srgb, var(--color-destructive) 12%, transparent);
-  color: var(--color-destructive);
-}
-
-.cardDates {
-  display: flex;
-  gap: 20px;
-  padding: 0 16px 12px;
-  flex-wrap: wrap;
+@media (max-width: 800px) {
+  .siembraCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .rightSection {
+    flex-wrap: wrap;
+  }
 }
 
 .dateItem {
@@ -557,42 +522,50 @@
   color: var(--color-muted-foreground);
 }
 
-.dateItem strong {
-  color: var(--color-foreground);
-  font-weight: 600;
+.badgeEstado {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.cardFooter {
-  padding: 10px 16px;
+.badgeActiva {
+  background: #E8DDFF;
+  color: #7E4FF6;
+}
+
+.badgeFinalizada {
+  background: var(--color-muted);
+  color: var(--color-muted-foreground);
+}
+
+.cardActions {
   display: flex;
+  gap: 8px;
 }
 
-.btnTareas {
-  display: inline-flex;
+.btnIcon {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  width: 100%;
-  height: 36px;
   justify-content: center;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
   background: transparent;
   color: var(--color-muted-foreground);
-  font-size: 12px;
-  font-weight: 600;
-  font-family: 'Inter', sans-serif;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.btnTareas:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-  background: color-mix(in srgb, var(--color-accent) 5%, transparent);
+.btnIcon:hover {
+  background: var(--color-muted);
+  color: var(--color-foreground);
 }
 
 .empty {
-  grid-column: 1 / -1;
   text-align: center;
   padding: 48px;
   color: var(--color-muted-foreground);
@@ -760,4 +733,142 @@
 
 .selectAsignar:focus {
   border-color: var(--color-accent);
+}
+
+.modalFull {
+  background: #F8F9FA;
+  border-radius: 12px;
+  max-width: 720px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+
+.modalBodyFull {
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.editFormGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.sectionTitleModal {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tareasEditList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tareaEditCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 12px 16px;
+}
+
+.tareaEditIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #F0E6FF;
+  color: #7E4FF6;
+  flex-shrink: 0;
+}
+
+.tareaEditInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.tareaEditTitulo {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-foreground);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.tareaEditDesc {
+  font-size: 11px;
+  color: var(--color-muted-foreground);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tareaEditActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inputDateSmall {
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: #F8F9FA;
+  color: var(--color-foreground);
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+}
+.inputDateSmall:focus {
+  border-color: var(--color-accent);
+}
+
+.actionsRowSticky {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  position: sticky;
+  bottom: 0;
+  padding: 16px 0;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  margin-top: 16px;
+  z-index: 10;
+}
+
+.tareaEditFormInline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.inlineFieldRow {
+  display: flex;
+  gap: 8px;
+}
+
+.inlineFieldActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }

@@ -95,7 +95,7 @@
   gap: 6px;
 }
 
-.btnPrimary {
+.btnNuevo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -104,31 +104,103 @@
   padding: 0 22px;
   border: none;
   border-radius: 10px;
-  background: var(--color-accent);
-  color: var(--color-on-primary);
+  background: #7E4FF6;
+  color: white;
   font-size: 14px;
   font-weight: 600;
   font-family: 'Fira Sans', sans-serif;
   cursor: pointer;
   transition: all 0.2s;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.2);
+  box-shadow: 0 4px 12px rgba(126, 79, 246, 0.3);
 }
 
-.btnPrimary:hover {
-  opacity: 0.92;
-  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
-  transform: translateY(-1px);
+.btnNuevo:hover {
+  background: #6A3DE8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(126, 79, 246, 0.4);
 }
 
-.btnPrimary:active {
-  transform: translateY(0);
+.btnCancelarTop {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 22px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-muted-foreground);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Fira Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.btnPrimary:disabled {
-  opacity: 0.5;
+.btnCancelarTop:hover {
+  background: var(--color-muted);
+  color: var(--color-destructive);
+  border-color: var(--color-destructive);
+}
+
+.btnSubmit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 10px;
+  background: #34D399;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Fira Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(52, 211, 153, 0.3);
+}
+
+.btnSubmit:hover {
+  background: #2EBC89;
+  transform: translateY(-2px);
+}
+
+.btnSubmit:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
-  box-shadow: none;
+  transform: none;
+}
+
+.btnSubmitEdit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 10px;
+  background: #FF9F1C;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Fira Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(255, 159, 28, 0.3);
+}
+
+.btnSubmitEdit:hover {
+  background: #E88F19;
+  transform: translateY(-2px);
+}
+
+.btnSubmitEdit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
   transform: none;
 }
 
@@ -148,55 +220,46 @@
 }
 
 .loteCard {
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  transition: transform 0.2s, box-shadow 0.2s;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  transition: border-color 0.2s, box-shadow 0.2s;
-  position: relative;
 }
 
 .loteCard:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 4px 16px rgba(22, 163, 74, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
 }
 
-.loteCardImg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  mix-blend-mode: multiply;
-  opacity: 0.35;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.loteCard > *:not(.loteCardImg) {
-  position: relative;
-  z-index: 1;
-}
-
-.loteHeader {
+.cardTop {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 16px 0;
+  padding: 16px;
+  gap: 16px;
 }
 
-.loteIcon {
+.imgWrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+.loteCardImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.loteIconPlaceholder {
   color: var(--color-accent);
-  flex-shrink: 0;
 }
 
 .loteInfo {
@@ -205,10 +268,10 @@
 }
 
 .loteName {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--color-foreground);
-  margin: 0 0 2px;
+  margin: 0 0 4px;
   font-family: 'Fira Code', monospace;
 }
 
@@ -219,23 +282,22 @@
 
 .loteActions {
   display: flex;
-  gap: 4px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
 .editBtn, .deleteBtn {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 6px;
   background: transparent;
   color: var(--color-muted-foreground);
   cursor: pointer;
   transition: all 0.2s;
-  flex-shrink: 0;
+  border-radius: 6px;
 }
 
 .editBtn:hover {
@@ -248,14 +310,6 @@
   color: var(--color-destructive);
 }
 
-.mapSmall {
-  height: 150px;
-  margin: 12px 16px 0;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-}
-
 .map {
   height: 100%;
   width: 100%;
@@ -264,12 +318,12 @@
 
 .loteMeta {
   display: flex;
-  gap: 16px;
+  gap: 20px;
   padding: 12px 16px;
   font-size: 12px;
+  font-weight: 500;
   color: var(--color-muted-foreground);
   border-top: 1px solid var(--color-border);
-  margin-top: 12px;
 }
 
 .loteMeta span {
@@ -396,7 +450,7 @@
   padding: 0 24px;
   border: none;
   border-radius: 8px;
-  background: var(--color-destructive);
+  background: #FF5A5F;
   color: #fff;
   font-size: 14px;
   font-weight: 600;
@@ -406,9 +460,17 @@
   box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
 }
 
-.btnConfirmDelete:hover {
+.btnConfirmDelete:hover:not(:disabled) {
   opacity: 0.9;
+  background: #E0484D;
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btnConfirmDelete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .empty {

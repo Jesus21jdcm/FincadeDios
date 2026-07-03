@@ -46,7 +46,16 @@ const SvgTrash = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" str
 const SvgImage = <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>;
 const SvgAlertCircle = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>;
 const SvgCheck = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
-const SvgBox = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>;
+const SvgMountain = <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3l4 8 5-5 5 15H2L8 3z"/></svg>;
+
+const getCultivoImage = (cultivo) => {
+  const norm = cultivo?.toLowerCase() || '';
+  if (norm.includes('cacao')) return '/cacao.perfil.jpg';
+  if (norm.includes('maíz') || norm.includes('maiz')) return '/maiz.perfil.jpg';
+  if (norm.includes('plátano') || norm.includes('platano')) return '/platano.perfil.jpg';
+  if (norm.includes('yuca')) return '/yuca.perfil.jpg';
+  return null;
+};
 
 export default function Lotes() {
   const { userRole } = useAppContext();
@@ -57,6 +66,7 @@ export default function Lotes() {
   const [subiendo, setSubiendo] = useState(false);
   const [error, setError] = useState('');
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
 
   useEffect(() => {
     const unsub = onSnapshot(query(collection(db, 'lotes')), snap => {
@@ -129,11 +139,14 @@ export default function Lotes() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
+      setEliminando(true);
       await deleteDoc(doc(db, 'lotes', deleteTarget.id));
       setDeleteTarget(null);
     } catch (err) {
       alert(err.message);
       setDeleteTarget(null);
+    } finally {
+      setEliminando(false);
     }
   };
 
@@ -145,7 +158,10 @@ export default function Lotes() {
           <p className={styles.subtitle}>{lotes.length} lotes registrados</p>
         </div>
         {userRole !== 'empleado' && (
-          <button className={styles.btnPrimary} onClick={() => { setShowForm(!showForm); setEditLote(null); setForm({ nombre: '', cultivo: '', area: '', ubicacion: null, foto: null }); }}>
+          <button 
+            className={showForm ? styles.btnCancelarTop : styles.btnNuevo} 
+            onClick={() => { setShowForm(!showForm); setEditLote(null); setForm({ nombre: '', cultivo: '', area: '', ubicacion: null, foto: null }); }}
+          >
             {showForm ? 'Cancelar' : <>{SvgPlus} Nuevo lote</>}
           </button>
         )}
@@ -188,7 +204,12 @@ export default function Lotes() {
             </div>
           </div>
           <p className={styles.formHint}>{SvgMapPin} La ubicacion se asigna desde el mapa al crear o editar el lote.</p>
-          <button className={styles.btnPrimary} type="submit" disabled={subiendo} style={{ width: '100%' }}>
+          <button 
+            className={editLote ? styles.btnSubmitEdit : styles.btnSubmit} 
+            type="submit" 
+            disabled={subiendo} 
+            style={{ width: '100%' }}
+          >
             {subiendo ? 'Guardando...' : <>{editLote ? 'Actualizar lote' : 'Guardar lote'}</>}
           </button>
         </form>
@@ -197,11 +218,14 @@ export default function Lotes() {
       <div className={styles.grid}>
         {lotes.map(lote => (
           <div key={lote.id} className={styles.loteCard}>
-            {lote.fotoUrl && (
-              <img src={lote.fotoUrl} alt="" className={styles.loteCardImg} aria-hidden="true" />
-            )}
-            <div className={styles.loteHeader}>
-              <div className={styles.loteIcon}>{SvgBox}</div>
+            <div className={styles.cardTop}>
+              <div className={styles.imgWrapper}>
+                {lote.fotoUrl || getCultivoImage(lote.cultivo) ? (
+                  <img src={lote.fotoUrl || getCultivoImage(lote.cultivo)} alt="" className={styles.loteCardImg} />
+                ) : (
+                  <div className={styles.loteIconPlaceholder}>{SvgMountain}</div>
+                )}
+              </div>
               <div className={styles.loteInfo}>
                 <h3 className={styles.loteName}>{lote.nombre}</h3>
                 <span className={styles.loteCultivo}>{lote.cultivo}</span>
@@ -212,9 +236,6 @@ export default function Lotes() {
                   <button className={styles.deleteBtn} onClick={() => confirmDelete(lote)} title="Eliminar">{SvgTrash}</button>
                 </div>
               )}
-            </div>
-            <div className={styles.mapSmall}>
-              <LoteMap lote={lote} />
             </div>
             <div className={styles.loteMeta}>
               <span>{SvgMapPin} {lote.area || '—'} ha</span>
@@ -242,8 +263,10 @@ export default function Lotes() {
               Se eliminara <strong>{deleteTarget.nombre}</strong> y todos sus datos. Esta accion no se puede deshacer.
             </p>
             <div className={styles.modalActions}>
-              <button className={styles.btnCancel} onClick={() => setDeleteTarget(null)}>Cancelar</button>
-              <button className={styles.btnConfirmDelete} onClick={handleDelete}>Eliminar</button>
+              <button className={styles.btnCancel} onClick={() => setDeleteTarget(null)} disabled={eliminando}>Cancelar</button>
+              <button className={styles.btnConfirmDelete} onClick={handleDelete} disabled={eliminando}>
+                {eliminando ? 'Eliminando...' : 'Eliminar'}
+              </button>
             </div>
           </div>
         </div>

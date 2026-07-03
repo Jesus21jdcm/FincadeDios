@@ -13,6 +13,8 @@ export default function Inventario() {
   const [form, setForm] = useState({ nombre: '', tipo: '', unidad: '', cantidad: '', fechaVencimiento: '' });
   const [error, setError] = useState('');
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [filterTipo, setFilterTipo] = useState('');
+  const [filterStock, setFilterStock] = useState('');
 
   useEffect(() => {
     const unsub = onSnapshot(query(collection(db, 'inventario')), snap => {
@@ -91,18 +93,51 @@ export default function Inventario() {
     return new Date(fecha) < today;
   };
 
+  const getTypeTheme = (tipo) => {
+    const colors = {
+      Semilla: { border: '#34D399', bg: 'rgba(52, 211, 153, 0.1)', color: '#10B981' },
+      Herbicida: { border: '#A78BFA', bg: 'rgba(167, 139, 250, 0.1)', color: '#8B5CF6' },
+      Fertilizante: { border: '#FB923C', bg: 'rgba(251, 146, 60, 0.1)', color: '#F97316' },
+      Fungicida: { border: '#38BDF8', bg: 'rgba(56, 189, 248, 0.1)', color: '#0EA5E9' },
+      Insecticida: { border: '#F87171', bg: 'rgba(248, 113, 113, 0.1)', color: '#EF4444' },
+    };
+    return colors[tipo] || { border: '#9CA3AF', bg: '#F3F4F6', color: '#6B7280' };
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.headerRow}>
         <div>
-          <h1 className={styles.title}>📦 Inventario</h1>
+          <h1 className={styles.title}>Inventario</h1>
           <p className={styles.subtitle}>{insumos.length} insumos registrados</p>
         </div>
         {userRole !== 'empleado' && (
-          <button className={styles.btnPrimary} onClick={() => { if (showForm) resetForm(); else { resetForm(); setShowForm(true); } }}>
+          <button className={styles.btnNuevo} onClick={() => { if (showForm) resetForm(); else { resetForm(); setShowForm(true); } }}>
             {showForm ? 'Cancelar' : '+ Nuevo insumo'}
           </button>
         )}
+      </div>
+
+      <div className={styles.filtersRow}>
+        <div className={styles.filterWrap}>
+          <select className={styles.filterSelect} value={filterTipo} onChange={e => setFilterTipo(e.target.value)}>
+            <option value="">Todos los tipos</option>
+            <option value="Fertilizante">Fertilizante</option>
+            <option value="Herbicida">Herbicida</option>
+            <option value="Fungicida">Fungicida</option>
+            <option value="Insecticida">Insecticida</option>
+            <option value="Semilla">Semilla</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+        <div className={styles.filterWrap}>
+          <select className={styles.filterSelect} value={filterStock} onChange={e => setFilterStock(e.target.value)}>
+            <option value="">Todos los stocks</option>
+            <option value="conStock">Con stock</option>
+            <option value="stockBajo">Stock bajo</option>
+            <option value="sinStock">Sin stock</option>
+          </select>
+        </div>
       </div>
 
       {showForm && (
@@ -146,64 +181,51 @@ export default function Inventario() {
               <input className={styles.input} type="date" value={form.fechaVencimiento} onChange={e => setForm(f => ({ ...f, fechaVencimiento: e.target.value }))} />
             </div>
           </div>
-          <button className={styles.btnPrimary} type="submit">{editing ? 'Guardar cambios' : 'Guardar insumo'}</button>
+          <button className={styles.btnNuevo} type="submit">{editing ? 'Guardar cambios' : 'Guardar insumo'}</button>
         </form>
       )}
 
-      <div className={styles.tableContainer}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Insumo</th>
-              <th>Tipo</th>
-              <th>Stock</th>
-              <th>Fecha de vencimiento</th>
-              {userRole !== 'empleado' && <th>Acciones</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {insumos.map(i => (
-              <tr key={i.id}>
-                <td className={styles.cellName}>{i.nombre}</td>
-                <td><span className={`${styles.tipoBadge} ${styles[i.tipo] || ''}`}>{i.tipo}</span></td>
-                <td className={styles.cellStock}>
-                  <span className={i.stock <= 0 ? styles.stockEmpty : ''}>{i.stock} {i.unidad}</span>
-                </td>
-                <td className={styles.cellFecha}>
-                  {i.fechaVencimiento ? (
-                    <span className={vencido(i.fechaVencimiento) ? styles.vencido : ''}>
-                      {new Date(i.fechaVencimiento).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
-                      {vencido(i.fechaVencimiento) && <span className={styles.vencidoTag}>VENCIDO</span>}
-                    </span>
-                  ) : '—'}
-                </td>
-                {userRole !== 'empleado' && (
-                  <td>
-                    <div className={styles.actionBtns}>
-                      <button className={styles.btnEdit} onClick={() => handleEdit(i)}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                        </svg>
-                      </button>
-                      <button className={styles.btnDelete} onClick={() => confirmDelete(i)}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="3 6 5 6 21 6" />
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                          <line x1="10" y1="11" x2="10" y2="17" />
-                          <line x1="14" y1="11" x2="14" y2="17" />
-                        </svg>
-                      </button>
+      <div className={styles.cardsContainer}>
+        {insumos.filter(i => {
+           if (filterTipo && i.tipo !== filterTipo) return false;
+           if (filterStock === 'conStock' && i.stock <= 0) return false;
+           if (filterStock === 'stockBajo' && (i.stock > (i.stockMinimo || 5) || i.stock <= 0)) return false;
+           if (filterStock === 'sinStock' && i.stock > 0) return false;
+           return true;
+        }).map(i => {
+           const theme = getTypeTheme(i.tipo);
+           return (
+              <div key={i.id} className={styles.insumoCard} style={{ borderLeftColor: theme.border }}>
+                <div className={styles.cardMain}>
+                  <div className={styles.cardIconBox} style={{ background: theme.bg, color: theme.color }}>
+                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" /></svg>
+                  </div>
+                  <div className={styles.cardDetails}>
+                    <div className={styles.cardTitle}>{i.nombre}</div>
+                    <div className={styles.cardTags}>
+                      <span className={styles.badge} style={{ background: theme.bg, color: theme.color }}>{i.tipo}</span>
+                      <span className={styles.stockAmount}>{i.stock} {i.unidad}</span>
                     </div>
-                  </td>
-                )}
-              </tr>
-            ))}
-            {insumos.length === 0 && (
-              <tr><td colSpan={userRole !== 'empleado' ? 5 : 4} className={styles.empty}>No hay insumos registrados</td></tr>
-            )}
-          </tbody>
-        </table>
+                  </div>
+                  {userRole !== 'empleado' && (
+                    <div className={styles.cardActions}>
+                       <button className={styles.btnIcon} onClick={() => handleEdit(i)} title="Editar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg></button>
+                       <button className={styles.btnIcon} onClick={() => confirmDelete(i)} title="Eliminar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg></button>
+                    </div>
+                  )}
+                </div>
+                <div className={styles.cardFooter}>
+                   <span className={styles.fechaText}>
+                     Vence: {i.fechaVencimiento ? new Date(i.fechaVencimiento).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                   </span>
+                   {vencido(i.fechaVencimiento) && <span className={styles.vencidoTag}>VENCIDO</span>}
+                </div>
+              </div>
+           );
+        })}
+        {insumos.length === 0 && (
+          <div className={styles.empty}>No hay insumos registrados</div>
+        )}
       </div>
 
       {deleteTarget && (

@@ -3,6 +3,9 @@ import { useAppContext } from './context/AppContext';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Login from './pages/Login';
+import Register from './pages/Register';
+import Landing from './pages/Landing';
+import PendingApproval from './pages/PendingApproval';
 import Dashboard from './pages/Dashboard';
 import ApplyInput from './pages/ApplyInput';
 import Inventario from './pages/Inventario';
@@ -15,11 +18,13 @@ import Usuarios from './pages/Usuarios';
 import PanelAdmin from './pages/PanelAdmin';
 import PanelEncargado from './pages/PanelEncargado';
 import PanelEmpleado from './pages/PanelEmpleado';
+import { auth } from './firebase';
 import './styles/global.css';
 
 export default function App() {
   const { user, loading, userRole } = useAppContext();
   const [page, setPage] = useState('dashboard');
+  const [unauthRoute, setUnauthRoute] = useState('landing');
 
   if (loading) {
     return (
@@ -30,7 +35,13 @@ export default function App() {
   }
 
   if (!user) {
-    return <Login />;
+    if (unauthRoute === 'landing') return <Landing onGoToLogin={() => setUnauthRoute('login')} onGoToRegister={() => setUnauthRoute('register')} />;
+    if (unauthRoute === 'login') return <Login onGoToLanding={() => setUnauthRoute('landing')} onGoToRegister={() => setUnauthRoute('register')} />;
+    if (unauthRoute === 'register') return <Register onBack={() => setUnauthRoute('landing')} onGoToLogin={() => setUnauthRoute('login')} />;
+  }
+
+  if (userRole === 'pendiente') {
+    return <PendingApproval userData={user} onLogout={() => auth.signOut()} />;
   }
 
   const empleadoOnly = ['dashboard', 'elempleado', 'inventario', 'lotes', 'monitoreo'];

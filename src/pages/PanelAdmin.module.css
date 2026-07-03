@@ -1,6 +1,7 @@
 .container {
   padding: 32px;
-  max-width: 1280px;
+  width: 100%;
+  box-sizing: border-box;
   margin: 0 auto;
 }
 
@@ -440,6 +441,7 @@
 
 .tableContainer {
   overflow-x: auto;
+  padding-bottom: 4px;
 }
 
 .table {
@@ -790,4 +792,169 @@
   max-height: 90vh;
   width: auto;
   height: auto;
+}
+
+.table { width: 100%; border-collapse: collapse; }
+.table th { padding: 16px; font-size: 11px; font-weight: 800; color: #8C99A8; text-transform: uppercase; border-bottom: 1px solid #EAEEF2; text-align: left; }
+.table td { padding: 16px; border-bottom: none; font-size: 13px; vertical-align: middle; }
+.table tbody tr:hover { background: #FAFBFC; }
+.rowRojo td { background: #FFF4F4; }
+.textRojo { color: #DC2626; font-weight: 600; }
+
+.estadoText { font-weight: 800; font-size: 11px; letter-spacing: 0.5px; }
+.estadoText.Validado { color: #16A34A; }
+.estadoText.Asignado { color: #2563EB; }
+.estadoText.Ejecutado { color: #D97706; }
+.estadoText.Generado { color: #64748B; }
+
+.cellTitulo strong { display: block; font-size: 13px; font-weight: 700; color: #1F2937; margin-bottom: 4px; }
+.cellDesc { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #9CA3AF; }
+
+.cellFecha { font-weight: 600; color: #4B5563; }
+
+.cellUbicacion { display: flex; gap: 8px; align-items: center; }
+.badgeCultivo { background: #FFF3E0; color: #E65100; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; border: 1px solid #FFE0B2; }
+.badgeLote { background: #EBF5FF; color: #2563EB; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; border: 1px solid #BFDBFE; }
+
+.cellAcciones { text-align: right; }
+.btnIconList { background: #F9FAFB; border: 1px solid #E5E7EB; color: #6B7280; width: 32px; height: 32px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+.btnIconList:hover { background: #E5E7EB; color: #1F2937; }
+.btnAprobar { background: #16A34A; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.btnAprobar:hover { background: #15803D; }
+
+.asignadorInline { display: flex; gap: 4px; align-items: center; justify-content: flex-end; }
+.selectSmall { padding: 4px 8px; font-size: 12px; border: 1px solid #D1D5DB; border-radius: 6px; }
+
+/* Tabs UI */
+.tabsContainer {
+  display: flex;
+  gap: 8px;
+  background: #F3F4F6;
+  padding: 6px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  width: max-content;
+}
+
+.tabBtn {
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4B5563;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.tabBtn:hover {
+  background: #E5E7EB;
+}
+
+.tabActive {
+  background: white;
+  color: #111827;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.tabBadge {
+  background: #E5E7EB;
+  color: #374151;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 11px;
+}
+
+.tabActive .tabBadge {
+  background: #F3F4F6;
+}
+
+.tabDangerAlert {
+  color: #DC2626;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tabsContainer {
+  display: inline-flex;
+  gap: 4px;
+  background: white;
+  padding: 6px;
+  border-radius: 99px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.tabBtn {
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6B7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.tabBtn:hover {
+  background: #F9FAFB;
+}
+
+.tabActive {
+  background: white;
+  color: #111827;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.tabBadge {
+  background: #E5E7EB;
+  color: #374151;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 11px;
+}
+
+.tabBadgeActive {
+  background: #3B82F6;
+  color: white;
+}
+
+.sectionCard {
+  background: white;
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  padding: 0;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.btnAsignarBlue {
+  background: #1E3A8A;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnAsignarBlue:hover {
+  background: #172554;
+}
+
+.sinAsignar {
+  color: #9CA3AF;
 }
