@@ -1,20 +1,48 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { db, auth } from '../firebase';
 import { collection, query, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, orderBy } from 'firebase/firestore';
 import { useAppContext } from '../context/AppContext';
 import styles from './Inventario.module.css';
 
-export default function Inventario() {
+const comprimirImagen = (file, maxW = 800, calidad = 0.7) => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.onerror = () => reject(new Error('Error al leer la imagen'));
+  reader.onload = e => {
+    const img = new Image();
+    img.onerror = () => reject(new Error('Error al cargar la imagen'));
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let { width, height } = img;
+      if (width > maxW) { height = Math.round(height * maxW / width); width = maxW; }
+      canvas.width = width; canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      const timeout = setTimeout(() => reject(new Error('Tiempo de espera agotado al comprimir')), 10000);
+      canvas.toBlob(blob => { clearTimeout(timeout); resolve(blob); }, 'image/jpeg', calidad);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+export default function Inventario({ autoOpenForm }) {
   const { userRole } = useAppContext();
   const [insumos, setInsumos] = useState([]);
   const [compras, setCompras] = useState([]);
   const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    if (autoOpenForm) setShowForm(true);
+  }, [autoOpenForm]);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ nombre: '', tipo: '', unidad: '', cantidad: '', fechaVencimiento: '' });
+  const [form, setForm] = useState({ nombre: '', tipo: '', unidad: '', cantidad: '', fechaVencimiento: '', evidencia: '' });
   const [error, setError] = useState('');
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [filterTipo, setFilterTipo] = useState('');
   const [filterStock, setFilterStock] = useState('');
+  const [subiendo, setSubiendo] = useState(false);
+  const [evidenciaPreview, setEvidenciaPreview] = useState(null);
+  const fileRef = useRef(null);
 
   useEffect(() => {
     const unsub = onSnapshot(query(collection(db, 'inventario')), snap => {
@@ -27,26 +55,52 @@ export default function Inventario() {
   }, []);
 
   const resetForm = () => {
-    setForm({ nombre: '', tipo: '', unidad: '', cantidad: '', fechaVencimiento: '' });
+    setForm({ nombre: '', tipo: '', unidad: '', cantidad: '', fechaVencimiento: '', evidencia: '' });
     setEditing(null);
     setShowForm(false);
     setError('');
+    setEvidenciaPreview(null);
+    if (fileRef.current) fileRef.current.value = '';
   };
 
   const handleCrearInsumo = async (e) => {
     e.preventDefault();
     setError('');
     if (!form.nombre || !form.tipo || !form.unidad) {
-      setError('Completa todos los campos');
+      setError('Completa todos los campos obligatorios');
       return;
     }
     try {
+      setSubiendo(true);
+      let url = form.evidencia || null;
+      const file = fileRef.current?.files?.[0];
+
+      if (file) {
+        const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+        const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+        if (!cloudName || !uploadPreset) throw new Error('Credenciales de Cloudinary no configuradas en .env');
+
+        const blob = await comprimirImagen(file);
+        const formData = new FormData();
+        formData.append('file', blob);
+        formData.append('upload_preset', uploadPreset);
+        
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error.message);
+        url = data.secure_url;
+      }
+
       const data = {
         nombre: form.nombre,
         tipo: form.tipo,
         unidad: form.unidad,
         stock: Number(form.cantidad) || 0,
         fechaVencimiento: form.fechaVencimiento || null,
+        evidencia: url,
         ultimaActualizacion: serverTimestamp(),
       };
       if (editing) {
@@ -57,6 +111,8 @@ export default function Inventario() {
       resetForm();
     } catch (err) {
       setError(err.message);
+    } finally {
+      setSubiendo(false);
     }
   };
 
@@ -67,8 +123,10 @@ export default function Inventario() {
       unidad: insumo.unidad || '',
       cantidad: insumo.stock?.toString() || '',
       fechaVencimiento: insumo.fechaVencimiento ? insumo.fechaVencimiento.split('T')[0] : '',
+      evidencia: insumo.evidencia || ''
     });
     setEditing(insumo);
+    setEvidenciaPreview(insumo.evidencia || null);
     setShowForm(true);
   };
 
@@ -111,11 +169,9 @@ export default function Inventario() {
           <h1 className={styles.title}>Inventario</h1>
           <p className={styles.subtitle}>{insumos.length} insumos registrados</p>
         </div>
-        {userRole !== 'empleado' && (
-          <button className={styles.btnNuevo} onClick={() => { if (showForm) resetForm(); else { resetForm(); setShowForm(true); } }}>
-            {showForm ? 'Cancelar' : '+ Nuevo insumo'}
-          </button>
-        )}
+        <button className={styles.btnNuevo} onClick={() => { if (showForm) resetForm(); else { resetForm(); setShowForm(true); } }}>
+          {showForm ? 'Cancelar' : '+ Nuevo insumo'}
+        </button>
       </div>
 
       <div className={styles.filtersRow}>
@@ -180,8 +236,20 @@ export default function Inventario() {
               <label className={styles.label}>Fecha de vencimiento</label>
               <input className={styles.input} type="date" value={form.fechaVencimiento} onChange={e => setForm(f => ({ ...f, fechaVencimiento: e.target.value }))} />
             </div>
+            <div className={styles.field} style={{ gridColumn: '1 / -1' }}>
+              <label className={styles.label}>Foto del producto (opcional)</label>
+              <div className={styles.fileInputWrapper}>
+                <input ref={fileRef} type="file" accept="image/*" capture="environment" className={styles.fileInputHidden} style={{ display: 'none' }}
+                  onChange={e => { if (e.target.files[0]) setEvidenciaPreview(URL.createObjectURL(e.target.files[0])); }} />
+                <button type="button" className={styles.btnFile} onClick={() => fileRef.current?.click()} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', height: '40px', padding: '0 16px', border: '1px dashed var(--color-border)', borderRadius: '8px', background: 'transparent', color: 'var(--color-muted-foreground)', cursor: 'pointer', transition: 'all 0.2s' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  {evidenciaPreview ? 'Cambiar foto' : 'Seleccionar foto'}
+                </button>
+              </div>
+              {evidenciaPreview && <img src={evidenciaPreview} alt="Preview" style={{ marginTop: '10px', maxHeight: '160px', width: '100%', objectFit: 'cover', borderRadius: '8px' }} />}
+            </div>
           </div>
-          <button className={styles.btnNuevo} type="submit">{editing ? 'Guardar cambios' : 'Guardar insumo'}</button>
+          <button className={styles.btnNuevo} type="submit" disabled={subiendo}>{subiendo ? 'Subiendo...' : (editing ? 'Guardar cambios' : 'Guardar insumo')}</button>
         </form>
       )}
 
@@ -206,6 +274,11 @@ export default function Inventario() {
                       <span className={styles.badge} style={{ background: theme.bg, color: theme.color }}>{i.tipo}</span>
                       <span className={styles.stockAmount}>{i.stock} {i.unidad}</span>
                     </div>
+                    {i.evidencia && (
+                      <div style={{ marginTop: '10px', height: '100px', width: '100%', borderRadius: '6px', overflow: 'hidden' }}>
+                        <img src={i.evidencia} alt={i.nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </div>
+                    )}
                   </div>
                   {userRole !== 'empleado' && (
                     <div className={styles.cardActions}>

@@ -3,6 +3,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianG
 import { db, auth } from '../firebase';
 import { collection, query, onSnapshot, where } from 'firebase/firestore';
 import { useAppContext } from '../context/AppContext';
+import { useWeather } from '../hooks/useWeather';
 import styles from './Dashboard.module.css';
 
 // Using simple SVG icons that match the minimal aesthetic
@@ -45,6 +46,9 @@ export default function Dashboard({ onNavigate }) {
   const [activeMembers, setActiveMembers] = useState([]);
 
   const [chartData, setChartData] = useState([]);
+  const [cropDistribution, setCropDistribution] = useState([]);
+
+  const { weather, loading: loadingWeather } = useWeather();
 
   const userId = userData?.id || user?.uid;
 
@@ -55,8 +59,8 @@ export default function Dashboard({ onNavigate }) {
 
     const buildChartData = (apps, tareas, excepciones) => {
       const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-      
-      const weeklyData = Array.from({length: 7}).map((_, i) => {
+
+      const weeklyData = Array.from({ length: 7 }).map((_, i) => {
         const d = new Date();
         d.setDate(d.getDate() - (6 - i));
         return {
@@ -77,8 +81,8 @@ export default function Dashboard({ onNavigate }) {
 
       apps.forEach(app => {
         if (app.fecha) {
-           const date = app.fecha.toDate ? app.fecha.toDate() : new Date(app.fecha);
-           addConsumo(date, app.cantidad);
+          const date = app.fecha.toDate ? app.fecha.toDate() : new Date(app.fecha);
+          addConsumo(date, app.cantidad);
         }
       });
 
@@ -87,11 +91,11 @@ export default function Dashboard({ onNavigate }) {
           addConsumo(new Date(tarea.fechaEjecucion), tarea.cantidadConsumida);
         }
       });
-      
+
       excepciones.forEach(exc => {
         if (exc.fechaReporte) {
-           const date = exc.fechaReporte.toDate ? exc.fechaReporte.toDate() : new Date(exc.fechaReporte);
-           addConsumo(date, exc.cantidad);
+          const date = exc.fechaReporte.toDate ? exc.fechaReporte.toDate() : new Date(exc.fechaReporte);
+          addConsumo(date, exc.cantidad);
         }
       });
 
@@ -100,6 +104,31 @@ export default function Dashboard({ onNavigate }) {
 
     const unsubLotes = onSnapshot(query(collection(db, 'lotes')), snapshot => {
       setStats(prev => ({ ...prev, lotes: snapshot.size }));
+      const docs = snapshot.docs.map(d => d.data());
+      const dist = {};
+      let total = 0;
+      docs.forEach(d => {
+        if (d.cultivo) {
+          const c = d.cultivo.toLowerCase().trim();
+          const key = c.charAt(0).toUpperCase() + c.slice(1);
+          dist[key] = (dist[key] || 0) + 1;
+          total++;
+        }
+      });
+      const distArr = Object.entries(dist).map(([name, count]) => ({
+        name,
+        count,
+        percent: Math.round((count / total) * 100)
+      })).sort((a, b) => b.count - a.count);
+      
+      // Fix potential rounding issue (total percentage != 100)
+      if (distArr.length > 0) {
+        const sum = distArr.reduce((acc, curr) => acc + curr.percent, 0);
+        if (sum !== 100) {
+          distArr[0].percent += (100 - sum);
+        }
+      }
+      setCropDistribution(distArr);
     });
     const unsubInsumos = onSnapshot(query(collection(db, 'inventario')), snapshot => {
       const docs = snapshot.docs;
@@ -139,7 +168,7 @@ export default function Dashboard({ onNavigate }) {
   }, [userId]);
 
   const userName = auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'Usuario';
-  
+
   const rolePanels = {
     superadmin: { id: 'paneladmin', label: 'Panel Admin' },
     admin: { id: 'paneladmin', label: 'Panel Admin' },
@@ -156,7 +185,7 @@ export default function Dashboard({ onNavigate }) {
     { id: 'historial', label: 'Reportes', icon: Iconos.historial },
     { id: 'monitoreo', label: 'Monitoreo', icon: Iconos.monitoreo },
     { id: rolePanel.id, label: rolePanel.label, icon: Iconos.usuarios },
-  ];
+  ].filter(m => !(userRole === 'empleado' && m.id === 'historial'));
 
   const quickAccessItems = [
     { id: 'inventario', label: 'Inventario', icon: Iconos.inventario },
@@ -169,7 +198,7 @@ export default function Dashboard({ onNavigate }) {
     <div className={styles.container}>
       {/* Left Column */}
       <div className={styles.leftCol}>
-        
+
         {/* Welcome Section */}
         <div className={styles.welcomeText}>
           <h2>Hola, <strong>{userName.toUpperCase()} !</strong></h2>
@@ -178,80 +207,88 @@ export default function Dashboard({ onNavigate }) {
 
         {/* Stats Row (White Cards with Heavy Shadows) */}
         <div className={styles.statsRow}>
-          
+
           <div className={`${styles.statCard} white-card`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div className={styles.statHeader} style={{ color: '#8BA3B8', fontWeight: 500 }}>
-              <span>Clima Local</span>
-            </div>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', margin: '10px 0' }}>
-              <svg width="64" height="64" viewBox="0 0 100 100">
-                <defs>
-                  <linearGradient id="sunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#FFD166" />
-                    <stop offset="100%" stopColor="#FF9F1C" />
-                  </linearGradient>
-                  <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#FFFFFF" />
-                    <stop offset="100%" stopColor="#D1E1EF" />
-                  </linearGradient>
-                  <filter id="cloudShadow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feDropShadow dx="0" dy="6" stdDeviation="4" floodColor="#633AF8" floodOpacity="0.15" />
-                  </filter>
-                </defs>
-                <circle cx="65" cy="35" r="18" fill="url(#sunGrad)" />
-                <path d="M75 75 H25 C12 75 12 55 25 55 C25 35 50 35 55 48 C60 30 85 40 80 55 C95 55 95 75 75 75 Z" fill="url(#cloudGrad)" filter="url(#cloudShadow)" />
-              </svg>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '36px', fontWeight: '700', color: '#1A1A24', lineHeight: 1 }}>+30°C</span>
-                <span style={{ fontSize: '12px', color: '#8BA3B8', fontWeight: 600 }}>Mayormente Soleado</span>
-              </div>
+              <span>Clima Local (La Yuca)</span>
             </div>
 
-            <div className={styles.statSlider} style={{ marginTop: '10px' }}>
-              <div className={styles.sliderTrack} style={{ background: '#E8EAF3', height: '8px', borderRadius: '4px' }}>
-                <div className={styles.sliderThumb} style={{ left: '70%', background: '#FF9F1C', width: '20px', height: '20px', top: '-6px' }}></div>
-              </div>
-            </div>
+            {loadingWeather ? (
+              <div style={{ padding: '40px 0', color: '#8BA3B8', fontSize: '13px' }}>Cargando clima...</div>
+            ) : weather ? (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', margin: '10px 0' }}>
+                  <span style={{ fontSize: '56px', lineHeight: 1 }}>{weather.emoji}</span>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontSize: '36px', fontWeight: '700', color: '#1A1A24', lineHeight: 1 }}>{weather.temperatura}°C</span>
+                    <span style={{ fontSize: '12px', color: '#8BA3B8', fontWeight: 600 }}>{weather.condicion}</span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', marginTop: '14px', background: '#f8fafc', borderRadius: '8px', padding: '8px' }}>
+                  {weather.probabilidades && weather.probabilidades.map((diaInfo, idx) => (
+                    <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '11px', color: '#8BA3B8', fontWeight: 600 }}>
+                      <span>{diaInfo.dia}</span>
+                      <div style={{ color: '#14C2F4', fontWeight: 700, marginTop: '2px' }}>{diaInfo.prob}% 🌧️</div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div style={{ padding: '40px 0', color: '#8BA3B8', fontSize: '13px' }}>Sin datos del clima</div>
+            )}
           </div>
 
           <div className={`${styles.statCard} white-card`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div className={styles.statHeader} style={{ color: '#8BA3B8', fontWeight: 500, marginBottom: '8px' }}>
               <span>Distribución de Siembras</span>
             </div>
-            
+
             <div style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: '20px', flex: 1 }}>
-              
+
               {/* Donut Chart */}
               <div style={{
                 width: '80px', height: '80px', borderRadius: '50%',
-                background: `conic-gradient(
-                  #FFD166 0% 35%, 
-                  #34D399 35% 60%, 
-                  #14C2F4 60% 80%, 
-                  #7E4FF6 80% 100%
-                )`,
+                background: cropDistribution.length > 0 
+                  ? (() => {
+                      let currentPercent = 0;
+                      const colors = ['#FFD166', '#34D399', '#14C2F4', '#7E4FF6', '#FF5A5F', '#A78BFA'];
+                      const segments = cropDistribution.map((item, i) => {
+                        const start = currentPercent;
+                        currentPercent += item.percent;
+                        return `${colors[i % colors.length]} ${start}% ${currentPercent}%`;
+                      });
+                      return `conic-gradient(${segments.join(', ')})`;
+                    })()
+                  : '#E8EAF3',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 boxShadow: 'var(--shadow-sm)'
               }}>
                 <div style={{ width: '50px', height: '50px', backgroundColor: '#FFFFFF', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#1A1A24', fontSize: '14px', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)' }}>
-                  100%
+                  {cropDistribution.length > 0 ? '100%' : '0%'}
                 </div>
               </div>
 
               {/* Legend */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '11px', fontWeight: 600, color: '#8BA3B8' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#FFD166' }}></span> Maíz (35%)</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#34D399' }}></span> Yuca (25%)</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#14C2F4' }}></span> Plátano (20%)</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#7E4FF6' }}></span> Cacao (20%)</div>
+                {cropDistribution.length > 0 ? cropDistribution.map((item, i) => {
+                  const colors = ['#FFD166', '#34D399', '#14C2F4', '#7E4FF6', '#FF5A5F', '#A78BFA'];
+                  const color = colors[i % colors.length];
+                  return (
+                    <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: color }}></span> {item.name} ({item.percent}%)
+                    </div>
+                  );
+                }) : (
+                  <div>Sin lotes registrados</div>
+                )}
               </div>
 
             </div>
           </div>
 
         </div>
-        
+
         {/* Consumed / Chart Row */}
         <div className={styles.chartSection}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -264,38 +301,38 @@ export default function Dashboard({ onNavigate }) {
                 <AreaChart data={chartData} margin={{ top: 25, right: 20, left: 0, bottom: 20 }}>
                   <defs>
                     <linearGradient id="colorConsumo" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#7E4FF6" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#7E4FF6" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#7E4FF6" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#7E4FF6" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid vertical={false} stroke="#F0F0F5" strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="name" 
-                    tick={{fontSize: 12, fill: '#8BA3B8', fontWeight: 600}} 
-                    axisLine={false} 
-                    tickLine={false} 
-                    dy={10} 
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fontSize: 12, fill: '#8BA3B8', fontWeight: 600 }}
+                    axisLine={false}
+                    tickLine={false}
+                    dy={10}
                     label={{ value: 'Día de la semana', position: 'insideBottom', offset: -15, fill: '#8BA3B8', fontSize: 12, fontWeight: 700 }}
                   />
-                  <YAxis 
-                    tick={{fontSize: 12, fill: '#8BA3B8'}} 
-                    axisLine={false} 
-                    tickLine={false} 
+                  <YAxis
+                    tick={{ fontSize: 12, fill: '#8BA3B8' }}
+                    axisLine={false}
+                    tickLine={false}
                     dx={-10}
                     label={{ value: 'Cantidad de Insumos', angle: -90, position: 'insideLeft', offset: 10, fill: '#8BA3B8', fontSize: 12, fontWeight: 700 }}
                   />
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: 'var(--shadow-sm)' }}
                     itemStyle={{ color: '#7E4FF6', fontWeight: 600 }}
                     formatter={(value) => [`${value} unidades`, 'Consumo']}
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="consumo" 
-                    stroke="#7E4FF6" 
-                    strokeWidth={3} 
-                    fillOpacity={1} 
-                    fill="url(#colorConsumo)" 
+                  <Area
+                    type="monotone"
+                    dataKey="consumo"
+                    stroke="#7E4FF6"
+                    strokeWidth={3}
+                    fillOpacity={1}
+                    fill="url(#colorConsumo)"
                     dot={{ stroke: '#7E4FF6', strokeWidth: 3, r: 4, fill: '#fff' }}
                     activeDot={{ stroke: '#7E4FF6', strokeWidth: 3, r: 6, fill: '#fff' }}
                     label={{ position: 'top', fill: '#7E4FF6', fontSize: 13, fontWeight: 'bold', offset: 10 }}
@@ -314,7 +351,7 @@ export default function Dashboard({ onNavigate }) {
 
       {/* Right Column */}
       <div className={styles.rightCol}>
-        
+
         {/* At Home Now */}
         <div className={styles.membersSection}>
           <h3 className={styles.sectionTitle}>Miembros Activos</h3>
@@ -339,12 +376,9 @@ export default function Dashboard({ onNavigate }) {
           <h3 className={styles.sectionTitle}>Mis Módulos</h3>
           <div className={styles.modulesGrid}>
             {mainModules.map((item, idx) => (
-              <div key={item.id} className={styles.moduleCard} style={{background: moduleColors[idx]}} onClick={() => onNavigate(item.id)}>
+              <div key={item.id} className={styles.moduleCard} style={{ background: moduleColors[idx] }} onClick={() => onNavigate(item.id)}>
                 <div className={styles.moduleHeader}>
                   <item.icon />
-                  <div className={styles.toggleSwitch}>
-                    <div className={styles.toggleKnob}></div>
-                  </div>
                 </div>
                 <span className={styles.moduleName}>{item.label}</span>
               </div>
@@ -353,19 +387,25 @@ export default function Dashboard({ onNavigate }) {
         </div>
 
         {/* Shortcuts */}
-        <div className={styles.shortcutsSection}>
-          <h3 className={styles.sectionTitle}>Atajos</h3>
-          <div className={styles.shortcutsRow}>
-            {['A', 'B', 'C', '+'].map((label, idx) => (
-              <div key={idx} className={styles.shortcutWrapper}>
-                <button className={styles.shortcutBtn}>
-                  {label}
-                </button>
-                <span>Acción {idx+1}</span>
-              </div>
-            ))}
+        {userRole !== 'empleado' && (
+          <div className={styles.shortcutsSection}>
+            <h3 className={styles.sectionTitle}>Atajos</h3>
+            <div className={styles.shortcutsRow}>
+              {[
+                { id: 'lotes', label: 'Nuevo Lote' },
+                { id: 'siembras', label: 'Nueva Siembra' },
+                { id: 'inventario', label: 'Nuevo Insumo' }
+              ].map((item, idx) => (
+                <div key={idx} className={styles.shortcutWrapper}>
+                  <button className={styles.shortcutBtn} onClick={() => onNavigate(item.id, { autoOpenForm: true })}>
+                    +
+                  </button>
+                  <span className={styles.shortcutLabel}>{item.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
 

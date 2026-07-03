@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
 import { collection, query, onSnapshot, addDoc, updateDoc, doc, deleteDoc, getDocs, where, serverTimestamp, orderBy } from 'firebase/firestore';
 import { analizarCultivo, getCultivos } from '../utils/analisisSiembra';
+import { useAppContext } from '../context/AppContext';
 import cacaoImg from '../assets/Cacao.jpg';
 import platanoImg from '../assets/platano.jpg';
 import maizImg from '../assets/maiz.jpg';
@@ -34,12 +35,17 @@ const SvgIcon = ({ name, size = 16 }) => {
   return icons[name] || null;
 };
 
-export default function Siembras() {
+export default function Siembras({ autoOpenForm }) {
+  const { userRole } = useAppContext();
   const [lotes, setLotes] = useState([]);
   const [siembras, setSiembras] = useState([]);
   const [tareas, setTareas] = useState([]);
   const [empleados, setEmpleados] = useState([]);
   const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    if (autoOpenForm) setShowForm(true);
+  }, [autoOpenForm]);
   const [analisis, setAnalisis] = useState(null);
   const [paso, setPaso] = useState('form');
   const [form, setForm] = useState({ loteId: '', cultivo: '', fechaSiembra: new Date().toISOString().split('T')[0], area: '' });
@@ -260,13 +266,15 @@ export default function Siembras() {
           <select className={styles.filterSelect} value={filtroCultivo} onChange={e => setFiltroCultivo(e.target.value)}>
             <option value="">Todos los cultivos</option>
             <option value="Cacao">Cacao</option>
-            <option value="Pl\u00e1tano">Pl\u00e1tano</option>
-            <option value="Ma\u00edz">Ma\u00edz</option>
+            <option value="Plátano">Plátano</option>
+            <option value="Maíz">Maíz</option>
             <option value="Yuca">Yuca</option>
           </select>
-          <button className={styles.btnPrimary} style={{ background: '#006B3C' }} onClick={() => { setShowForm(!showForm); setPaso('form'); setAnalisis(null); }}>
-            {showForm ? 'Cancelar' : <><SvgIcon name="plus" /> Nueva siembra</>}
-          </button>
+          {userRole !== 'empleado' && (
+            <button className={styles.btnPrimary} style={{ background: '#006B3C' }} onClick={() => { setShowForm(!showForm); setPaso('form'); setAnalisis(null); }}>
+              {showForm ? 'Cancelar' : <><SvgIcon name="plus" /> Nueva siembra</>}
+            </button>
+          )}
         </div>
       </div>
 
@@ -439,14 +447,16 @@ export default function Siembras() {
                   {s.estado}
                 </span>
                 
-                <div className={styles.cardActions}>
-                  <button className={styles.btnIcon} onClick={() => setModalTareas(s.id)} title="Editar tareas">
-                    <SvgIcon name="edit" />
-                  </button>
-                  <button className={styles.btnIcon} onClick={() => eliminarSiembra(s.id)} title="Eliminar siembra">
-                    <SvgIcon name="trash" />
-                  </button>
-                </div>
+                {userRole !== 'empleado' && (
+                  <div className={styles.cardActions}>
+                    <button className={styles.btnIcon} onClick={() => setModalTareas(s.id)} title="Editar tareas">
+                      <SvgIcon name="edit" />
+                    </button>
+                    <button className={styles.btnIcon} onClick={() => eliminarSiembra(s.id)} title="Eliminar siembra">
+                      <SvgIcon name="trash" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           );

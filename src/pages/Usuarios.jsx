@@ -215,7 +215,11 @@ export default function Usuarios() {
     }
   };
 
-  const rolLabel = { superadmin: 'Super Admin', admin: 'Administrador', encargado: 'Encargado', empleado: 'Empleado', pendiente: 'Pendiente de Aprobación' };
+  const getRolLabel = (rolValue) => {
+    if (rolValue === 'superadmin') return 'Administrador';
+    const found = ROLES_OPTS.find(r => r.value === rolValue);
+    return found ? found.label : rolValue;
+  };
 
   const activos = usuarios.filter(u => u.activo !== false);
   const inactivos = usuarios.filter(u => u.activo === false);
@@ -290,12 +294,12 @@ export default function Usuarios() {
                   <td>
                       <select
                         className={`${styles.rolSelect} ${u.rol === 'pendiente' ? styles.rolPendiente : ''}`}
-                        value={u.rol}
+                        value={u.rol === 'superadmin' ? 'admin' : u.rol}
                         onChange={e => handleRolChange(u.id, e.target.value)}
                         disabled={u.rol === 'superadmin'}
                       >
-                        {Object.entries(rolLabel).map(([key, label]) => (
-                          <option key={key} value={key} disabled={key === 'superadmin' || key === 'pendiente'}>{label}</option>
+                        {ROLES_OPTS.map(r => (
+                          <option key={r.value} value={r.value}>{r.label}</option>
                         ))}
                       </select>
                   </td>
@@ -346,7 +350,7 @@ export default function Usuarios() {
                       </div>
                     </td>
                     <td className={styles.cellEmail}>{u.email || '—'}</td>
-                    <td><span className={styles.rolTag}>{rolLabel[u.rol]}</span></td>
+                    <td><span className={styles.rolTag}>{getRolLabel(u.rol)}</span></td>
                     <td>
                       <button className={styles.btnActivate} onClick={() => handleActivate(u)}>
                         <SvgIcon name="userCheck" size={14} /> Reactivar
@@ -384,9 +388,9 @@ export default function Usuarios() {
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>Rol</label>
-                <select className={styles.select} value={modalForm.rol} onChange={e => setModalForm(f => ({ ...f, rol: e.target.value }))}>
-                  {Object.entries(rolLabel).map(([key, label]) => (
-                    <option key={key} value={key} disabled={key === 'superadmin'}>{label}</option>
+                <select className={styles.select} value={modalForm.rol === 'superadmin' ? 'admin' : modalForm.rol} onChange={e => setModalForm(f => ({ ...f, rol: e.target.value }))} disabled={modalUser?.rol === 'superadmin'}>
+                  {ROLES_OPTS.map(r => (
+                    <option key={r.value} value={r.value}>{r.label}</option>
                   ))}
                 </select>
               </div>
@@ -417,22 +421,22 @@ export default function Usuarios() {
       {/* Modal eliminar */}
       {deleteTarget && !modalUser && (
         <div className={styles.overlay} onClick={() => setDeleteTarget(null)}>
-          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+          <div className={`${styles.modal} ${styles.modalSmall}`} onClick={e => e.stopPropagation()}>
             <div className={styles.modalIcon}>
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
               </svg>
             </div>
-            <h3 className={styles.modalTitle}>Gestionar acceso</h3>
-            <p className={styles.modalText}>
-              Selecciona qué acción deseas realizar con <strong>{deleteTarget.nombre}</strong>.
+            <h3 className={styles.modalTitle} style={{ textAlign: 'center', marginBottom: '8px', justifyContent: 'center' }}>Gestionar acceso</h3>
+            <p className={styles.modalText} style={{ textAlign: 'center', marginBottom: '24px' }}>
+              ¿Qué deseas hacer con el usuario <strong>{deleteTarget.nombre}</strong>?
             </p>
             <div className={styles.modalActionsCol}>
-              <button className={styles.btnSecondary} onClick={() => setDeleteTarget(null)}>Cancelar</button>
               <button className={styles.btnWarning} onClick={handleDesactivar}>Desactivar temporalmente</button>
               <button className={styles.btnDanger} onClick={handleEliminarPermanente}>Eliminar permanentemente</button>
+              <button className={styles.btnSecondary} onClick={() => setDeleteTarget(null)} style={{ marginTop: '8px', border: 'none', background: '#F8FAFC' }}>Cancelar</button>
             </div>
           </div>
         </div>

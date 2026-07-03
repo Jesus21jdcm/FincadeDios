@@ -24,6 +24,7 @@ import './styles/global.css';
 export default function App() {
   const { user, loading, userRole } = useAppContext();
   const [page, setPage] = useState('dashboard');
+  const [pageProps, setPageProps] = useState({});
   const [unauthRoute, setUnauthRoute] = useState('landing');
 
   if (loading) {
@@ -44,12 +45,15 @@ export default function App() {
     return <PendingApproval userData={user} onLogout={() => auth.signOut()} />;
   }
 
-  const empleadoOnly = ['dashboard', 'elempleado', 'inventario', 'lotes', 'monitoreo'];
+  const empleadoOnly = ['dashboard', 'elempleado', 'inventario', 'lotes', 'monitoreo', 'apply', 'siembras'];
   const canAccess = (target) => userRole !== 'empleado' || empleadoOnly.includes(target);
   const safePage = canAccess(page) ? page : 'dashboard';
 
-  const navigate = (target) => {
-    if (canAccess(target)) setPage(target);
+  const navigate = (target, props = {}) => {
+    if (canAccess(target)) {
+      setPage(target);
+      setPageProps(props);
+    }
   };
 
   const renderPage = () => {
@@ -57,15 +61,15 @@ export default function App() {
       case 'apply':
         return <ApplyInput />;
       case 'inventario':
-        return <Inventario />;
+        return <Inventario {...pageProps} />;
       case 'lotes':
-        return <Lotes />;
+        return <Lotes {...pageProps} />;
       case 'monitoreo':
         return <Monitoreo />;
       case 'alertas':
         return <Alertas />;
       case 'siembras':
-        return <Siembras />;
+        return <Siembras {...pageProps} />;
       case 'historial':
         return <Historial />;
       case 'usuarios':

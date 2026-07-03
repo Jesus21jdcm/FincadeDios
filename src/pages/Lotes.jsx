@@ -57,10 +57,14 @@ const getCultivoImage = (cultivo) => {
   return null;
 };
 
-export default function Lotes() {
+export default function Lotes({ autoOpenForm }) {
   const { userRole } = useAppContext();
   const [lotes, setLotes] = useState([]);
   const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    if (autoOpenForm) setShowForm(true);
+  }, [autoOpenForm]);
   const [form, setForm] = useState({ nombre: '', cultivo: '', area: '', ubicacion: null, foto: null });
   const [editLote, setEditLote] = useState(null);
   const [subiendo, setSubiendo] = useState(false);

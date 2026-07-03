@@ -305,6 +305,13 @@
   border-radius: 16px;
   padding: 28px;
   width: 90%;
+  max-width: 420px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.modalSmall {
+  max-width: 360px;
+  padding: 32px 24px;
 }
 
 .modalHeader {
@@ -366,19 +373,19 @@
 .modalActionsCol {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
 }
 
 .btnSecondary {
-  height: 40px;
+  height: 44px;
   padding: 0 20px;
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: 10px;
   background: transparent;
   color: var(--color-foreground);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   font-family: 'Fira Sans', sans-serif;
   cursor: pointer;
   transition: all 0.2s;
@@ -389,17 +396,17 @@
 }
 
 .btnDanger {
-  height: 40px;
+  height: 44px;
   padding: 0 20px;
   border: none;
-  border-radius: 8px;
-  background: var(--color-destructive);
-  color: white;
+  border-radius: 10px;
+  background: #FEF2F2;
+  color: #DC2626;
   font-size: 14px;
   font-weight: 600;
   font-family: 'Fira Sans', sans-serif;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.2s;
 }
 
 .btnDanger:hover {

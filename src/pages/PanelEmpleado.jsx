@@ -35,8 +35,7 @@ export default function PanelEmpleado() {
   const [evidenciaPreview, setEvidenciaPreview] = useState(null);
   const [subiendo, setSubiendo] = useState(false);
   const [progresoSubida, setProgresoSubida] = useState(0);
-  const [insumoUsado, setInsumoUsado] = useState('');
-  const [cantidadUsada, setCantidadUsada] = useState('');
+  const [insumosUsados, setInsumosUsados] = useState([{ id: '', cantidad: '' }]);
   const [adHocActivo, setAdHocActivo] = useState(false);
   const [adHocNombre, setAdHocNombre] = useState('');
   const [adHocCantidad, setAdHocCantidad] = useState('');
@@ -48,8 +47,12 @@ export default function PanelEmpleado() {
   useEffect(() => {
     if (!userId) return;
     const unsub = onSnapshot(
-      query(collection(db, 'tareas'), where('idEmpleado', '==', userId), orderBy('fechaSugerida', 'asc')),
-      snap => setTareas(snap.docs.map(d => ({ id: d.id, ...d.data() })))
+      query(collection(db, 'tareas'), where('idEmpleado', '==', userId)),
+      snap => {
+        const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        docs.sort((a, b) => new Date(a.fechaSugerida || 0) - new Date(b.fechaSugerida || 0));
+        setTareas(docs);
+      }
     );
     return unsub;
   }, [userId]);
@@ -76,47 +79,61 @@ export default function PanelEmpleado() {
 
   const finalizarTarea = async (tareaId) => {
     try {
-      setConfirmando(null);
-      setEvidenciaPreview(null);
-      setInsumoUsado('');
-      setCantidadUsada('');
-      setAdHocActivo(false);
-      setAdHocNombre('');
-      setAdHocCantidad('');
       setSubiendo(true);
-
+      const validInsumos = insumosUsados.filter(i => i.id && i.cantidad);
       const file = fileRef.current?.files?.[0];
 
+      // 1. Update basic fields to trigger instant UI update
+      await updateDoc(doc(db, 'tareas', tareaId), {
+        estado: 'Ejecutado',
+        fechaEjecucion: new Date().toISOString(),
+        insumosConsumidos: validInsumos.length > 0 ? validInsumos : null,
+      });
+
+      // 2. Close modal instantly for the user
+      if (fileRef.current) fileRef.current.value = '';
+      setConfirmando(null);
+      setEvidenciaPreview(null);
+      setInsumosUsados([{ id: '', cantidad: '' }]);
+      
+      // 3. Process image upload in background if present
       if (file) {
-        const blob = await comprimirImagen(file);
-        const resultado = await uploadBytes(storageRef(storage, `evidencias/${tareaId}/${Date.now()}.jpg`), blob);
-        const url = await getDownloadURL(resultado.ref);
-        await updateDoc(doc(db, 'tareas', tareaId), {
-          estado: 'Ejecutado',
-          fechaEjecucion: new Date().toISOString(),
-          evidencia: url,
-          insumoConsumido: insumoUsado || null,
-          cantidadConsumida: cantidadUsada ? Number(cantidadUsada) : 0,
-        });
-      } else {
-        await updateDoc(doc(db, 'tareas', tareaId), {
-          estado: 'Ejecutado',
-          fechaEjecucion: new Date().toISOString(),
-          insumoConsumido: insumoUsado || null,
-          cantidadConsumida: cantidadUsada ? Number(cantidadUsada) : 0,
-        });
+        const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+        const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+        if (cloudName && uploadPreset) {
+          comprimirImagen(file).then(blob => {
+            const formData = new FormData();
+            formData.append('file', blob);
+            formData.append('upload_preset', uploadPreset);
+            return fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+              method: 'POST',
+              body: formData
+            });
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.secure_url) {
+              updateDoc(doc(db, 'tareas', tareaId), { evidencia: data.secure_url });
+            }
+          })
+          .catch(err => console.error('Error subiendo imagen en background:', err));
+        }
       }
 
-      if (insumoUsado && cantidadUsada) {
-        runTransaction(db, async (tx) => {
-          const d = doc(db, 'inventario', insumoUsado);
-          const s = await tx.get(d);
-          if (s.exists) tx.update(d, { stock: s.data().stock - Number(cantidadUsada), ultimaActualizacion: Timestamp.now() });
-        }).catch(() => {});
+      // 4. Update inventory in background
+      for (const item of validInsumos) {
+        try {
+          await runTransaction(db, async (tx) => {
+            const d = doc(db, 'inventario', item.id);
+            const s = await tx.get(d);
+            if (s.exists) tx.update(d, { stock: s.data().stock - Number(item.cantidad), ultimaActualizacion: Timestamp.now() });
+          });
+        } catch(e) {}
       }
 
+      // 5. Register Ad-hoc exceptions and notify admins in background
       if (adHocActivo && adHocNombre && adHocCantidad) {
-        await addDoc(collection(db, 'excepciones'), {
+        addDoc(collection(db, 'excepciones'), {
           tareaId,
           insumoNombre: adHocNombre,
           cantidad: Number(adHocCantidad),
@@ -124,23 +141,25 @@ export default function PanelEmpleado() {
           nombreEmpleado: userData?.nombre || 'Empleado',
           fecha: new Date().toISOString(),
           estado: 'pendiente',
-        });
+        }).catch(() => {});
 
         const qAdmin = query(collection(db, 'usuarios'), where('rol', '==', 'admin'));
-        const admins = await getDocs(qAdmin);
-        admins.forEach(d => {
-          if (d.data().telefono) {
-            notificarExcepcionAdHoc({
-              adminTelefono: d.data().telefono,
-              empleadoNombre: userData?.nombre || 'Empleado',
-              insumoNombre: adHocNombre,
-              cantidad: adHocCantidad,
-              loteNombre: tareas.find(x => x.id === tareaId)?.cultivo || '—',
-            });
-          }
-        });
+        getDocs(qAdmin).then(admins => {
+          admins.forEach(d => {
+            if (d.data().telefono) {
+              notificarExcepcionAdHoc({
+                adminTelefono: d.data().telefono,
+                empleadoNombre: userData?.nombre || 'Empleado',
+                insumoNombre: adHocNombre,
+                cantidad: adHocCantidad,
+                loteNombre: tareas.find(x => x.id === tareaId)?.cultivo || '?',
+              });
+            }
+          });
+        }).catch(() => {});
       }
 
+      // 6. Notify supervisor in background
       const t = tareas.find(x => x.id === tareaId);
       if (t?.idEncargado) {
         getDoc(doc(db, 'usuarios', t.idEncargado)).then(d => {
@@ -148,7 +167,9 @@ export default function PanelEmpleado() {
         }).catch(() => {});
       }
 
-      if (fileRef.current) fileRef.current.value = '';
+      setAdHocActivo(false);
+      setAdHocNombre('');
+      setAdHocCantidad('');
     } catch (err) {
       alert('Error al finalizar tarea: ' + (err.message || 'desconocido'));
     } finally {
@@ -198,25 +219,46 @@ export default function PanelEmpleado() {
                       <span>Finalizar esta tarea</span>
                     </div>
                     <div className={styles.field}>
-                      <label className={styles.label}>{SvgBox} Insumo utilizado (opcional)</label>
-                      <div className={styles.insumoRow}>
-                        <select className={styles.select} value={insumoUsado} onChange={e => { setInsumoUsado(e.target.value); if (e.target.value) setAdHocActivo(false); }}>
-                          <option value="">Seleccionar insumo</option>
-                          {insumos.filter(i => i.stock > 0).map(i => (
-                            <option key={i.id} value={i.id}>{i.nombre} — {i.stock} {i.unidad}</option>
-                          ))}
-                        </select>
-                        <button className={styles.btnAdHoc} onClick={() => { setAdHocActivo(!adHocActivo); setInsumoUsado(''); }} title="Insumo no inventariado">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                      <label className={styles.label}>{SvgBox} Insumos utilizados (opcional)</label>
+                      {insumosUsados.map((item, idx) => (
+                        <div key={idx} className={styles.insumoRowMulti} style={{ display: 'flex', gap: '8px', marginBottom: '8px', alignItems: 'center' }}>
+                          <select className={styles.select} value={item.id} onChange={e => {
+                            const newInsumos = [...insumosUsados];
+                            newInsumos[idx].id = e.target.value;
+                            setInsumosUsados(newInsumos);
+                          }} style={{ flex: 1 }}>
+                            <option value="">Seleccionar insumo</option>
+                            {insumos.filter(i => i.stock > 0).map(i => (
+                              <option key={i.id} value={i.id}>{i.nombre} — {i.stock} {i.unidad}</option>
+                            ))}
+                          </select>
+                          {item.id && (
+                            <input className={styles.input} type="number" value={item.cantidad} onChange={e => {
+                              const newInsumos = [...insumosUsados];
+                              newInsumos[idx].cantidad = e.target.value;
+                              setInsumosUsados(newInsumos);
+                            }} placeholder="Cant." min="0.1" step="0.1" style={{ width: '80px' }} />
+                          )}
+                          {idx > 0 && (
+                            <button className={styles.btnRemove} style={{ background: 'transparent', border: 'none', color: '#EF4444', cursor: 'pointer', padding: '0 4px' }} onClick={() => {
+                              const newInsumos = [...insumosUsados];
+                              newInsumos.splice(idx, 1);
+                              setInsumosUsados(newInsumos);
+                            }}>
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                        <button className={styles.btnAdHoc} style={{ width: 'fit-content', padding: '0 12px' }} onClick={() => setInsumosUsados([...insumosUsados, { id: '', cantidad: '' }])}>
+                          + Agregar otro
+                        </button>
+                        <button className={styles.btnAdHoc} style={{ width: 'fit-content', padding: '0 12px' }} onClick={() => setAdHocActivo(!adHocActivo)}>
+                          + Insumo externo
                         </button>
                       </div>
                     </div>
-                    {insumoUsado && (
-                      <div className={styles.field}>
-                        <label className={styles.label}>Cantidad utilizada</label>
-                        <input className={styles.input} type="number" value={cantidadUsada} onChange={e => setCantidadUsada(e.target.value)} placeholder="0" min="0.1" step="0.1" />
-                      </div>
-                    )}
                     {adHocActivo && (
                       <div className={styles.adHocBox}>
                         <div className={styles.adHocHeader}>
@@ -241,15 +283,15 @@ export default function PanelEmpleado() {
                     </div>
                     {evidenciaPreview && <img src={evidenciaPreview} alt="Preview" className={styles.previewImg} />}
                     <div className={styles.confirmActions}>
-                      <button className={styles.btnSecondary} onClick={() => { setConfirmando(null); setEvidenciaPreview(null); setInsumoUsado(''); setCantidadUsada(''); setAdHocActivo(false); setAdHocNombre(''); setAdHocCantidad(''); }}>Cancelar</button>
-                      <button className={styles.btnPrimary} onClick={() => finalizarTarea(t.id)} disabled={subiendo}>
+                      <button className={styles.btnSecondary} onClick={() => { setConfirmando(null); setEvidenciaPreview(null); setInsumosUsados([{ id: '', cantidad: '' }]); setAdHocActivo(false); setAdHocNombre(''); setAdHocCantidad(''); }}>Cancelar</button>
+                      <button className={styles.btnPrimary} style={{ background: 'var(--color-primary)', color: 'white', border: 'none', fontWeight: 600 }} onClick={() => finalizarTarea(t.id)} disabled={subiendo}>
                         {subiendo ? `Subiendo ${progresoSubida}%` : SvgCheck}
                         {subiendo ? '' : ' Finalizar'}
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <button className={styles.btnFinalizar} onClick={() => setConfirmando(t.id)}>
+                  <button className={styles.btnFinalizar} style={{ background: 'var(--color-primary)', color: 'white', border: 'none', fontWeight: 600 }} onClick={() => setConfirmando(t.id)}>
                     {SvgCheck} Finalizar Tarea
                   </button>
                 )}
