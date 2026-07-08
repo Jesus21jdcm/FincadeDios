@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
+import { sendPasswordResetEmail } from 'firebase/auth';
 import { collection, query, onSnapshot, setDoc, updateDoc, doc, deleteDoc, orderBy } from 'firebase/firestore';
 import { useAppContext } from '../context/AppContext';
 import styles from './Usuarios.module.css';
@@ -167,6 +168,21 @@ export default function Usuarios() {
       setModalSuccess('Cambios guardados exitosamente');
     } catch (err) {
       setModalError(err.message);
+    }
+  };
+
+  const enviarCorreoRestablecimiento = async () => {
+    if (!modalUser) return;
+    setEnviandoReset(true);
+    setModalError('');
+    setModalSuccess('');
+    try {
+      await sendPasswordResetEmail(auth, modalUser.email);
+      setModalSuccess(`Se ha enviado un correo de restablecimiento de contraseña a ${modalUser.email}`);
+    } catch (err) {
+      setModalError('Error al enviar el correo: ' + err.message);
+    } finally {
+      setEnviandoReset(false);
     }
   };
 
@@ -404,14 +420,13 @@ export default function Usuarios() {
             <div className={styles.modalDivider} />
 
             <div className={styles.modalResetSection}>
-              <p className={styles.modalResetLabel}>Cambiar contrasena</p>
-              <div className={styles.field}>
-                <label className={styles.label}>Nueva contrasena</label>
-                <input className={styles.input} type="password" value={modalForm.newPassword} onChange={e => setModalForm(f => ({ ...f, newPassword: e.target.value }))} placeholder="Min. 6 caracteres" />
-              </div>
-              <button className={styles.btnResetPass} onClick={handleActualizarPassword} disabled={enviandoReset || !modalForm.newPassword}>
-                <SvgIcon name="refreshCw" size={16} />
-                {enviandoReset ? 'Actualizando...' : 'Actualizar contrasena'}
+              <p className={styles.modalResetLabel}>Cambiar contraseña por correo</p>
+              <p className={styles.modalResetHint}>
+                Se enviará un correo a <strong>{modalUser.email}</strong> con un enlace seguro para que el usuario pueda restablecer su propia contraseña.
+              </p>
+              <button className={styles.btnResetPass} onClick={enviarCorreoRestablecimiento} disabled={enviandoReset} style={{ background: '#633AF8', color: '#fff', border: 'none', width: '100%', height: '40px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '13px', fontWeight: '600' }}>
+                <SvgIcon name="mail" size={16} />
+                {enviandoReset ? 'Enviando...' : 'Enviar correo de cambio de contraseña'}
               </button>
             </div>
           </div>

@@ -47,7 +47,7 @@
 .filterSelect {
   height: 44px;
   padding: 0 32px 0 12px;
-  border-radius: 10px;
+  border-radius: 0;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-foreground);
@@ -89,7 +89,7 @@
 
 .formCard {
   padding: 24px;
-  border-radius: 14px;
+  border-radius: 0;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   margin-bottom: 24px;
@@ -125,7 +125,7 @@
 .input, .select {
   height: 44px;
   padding: 0 12px;
-  border-radius: 8px;
+  border-radius: 0;
   border: 1px solid var(--color-border);
   background: var(--color-background);
   color: var(--color-foreground);
@@ -155,7 +155,7 @@
   height: 44px;
   padding: 0 24px;
   border: none;
-  border-radius: 10px;
+  border-radius: 0;
   background: var(--color-accent);
   color: var(--color-on-primary);
   font-size: 15px;
@@ -177,7 +177,7 @@
   height: 44px;
   padding: 0 24px;
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: 0;
   background: transparent;
   color: var(--color-foreground);
   font-size: 15px;
@@ -193,7 +193,7 @@
 
 .error {
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 0;
   background: color-mix(in srgb, var(--color-destructive) 15%, transparent);
   color: var(--color-destructive);
   font-size: 13px;
@@ -205,7 +205,7 @@
   gap: 20px;
   flex-wrap: wrap;
   padding: 14px 18px;
-  border-radius: 10px;
+  border-radius: 0;
   background: var(--color-muted);
   font-size: 13px;
   color: var(--color-muted-foreground);
@@ -218,7 +218,7 @@
 
 .descBox {
   padding: 14px 18px;
-  border-radius: 10px;
+  border-radius: 0;
   background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
   border: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
   font-size: 14px;
@@ -244,7 +244,7 @@
 
 .etapaCard {
   padding: 14px;
-  border-radius: 10px;
+  border-radius: 0;
   border: 1px solid var(--color-border);
   background: var(--color-background);
 }
@@ -292,7 +292,7 @@
 
 .tareaCard {
   padding: 14px 16px;
-  border-radius: 10px;
+  border-radius: 0;
   border: 1px solid var(--color-border);
   background: var(--color-background);
   transition: border-color 0.2s;
@@ -315,7 +315,7 @@
   width: 32px;
   height: 32px;
   flex-shrink: 0;
-  border-radius: 8px;
+  border-radius: 0;
   background: color-mix(in srgb, var(--color-accent) 12%, transparent);
   color: var(--color-accent);
 }
@@ -372,7 +372,7 @@
   align-items: center;
   gap: 12px;
   padding: 48px 32px;
-  border-radius: 16px;
+  border-radius: 0;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   max-width: 500px;
@@ -412,7 +412,7 @@
   height: 44px;
   padding: 0 28px;
   border: none;
-  border-radius: 10px;
+  border-radius: 0;
   background: var(--color-accent);
   color: var(--color-on-primary);
   font-size: 15px;
@@ -438,7 +438,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
-  border-radius: 12px;
+  border-radius: 0;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   box-shadow: 0 1px 3px rgba(0,0,0,0.03);
@@ -459,7 +459,7 @@
 .imgWrapper {
   width: 44px;
   height: 44px;
-  border-radius: 10px;
+  border-radius: 0;
   overflow: hidden;
   background: color-mix(in srgb, var(--color-accent) 12%, transparent);
   display: flex;
@@ -524,7 +524,7 @@
 
 .badgeEstado {
   padding: 4px 12px;
-  border-radius: 20px;
+  border-radius: 0;
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
@@ -553,7 +553,7 @@
   width: 32px;
   height: 32px;
   border: none;
-  border-radius: 6px;
+  border-radius: 0;
   background: transparent;
   color: var(--color-muted-foreground);
   cursor: pointer;
@@ -569,7 +569,7 @@
   text-align: center;
   padding: 48px;
   color: var(--color-muted-foreground);
-  border-radius: 12px;
+  border-radius: 0;
   border: 1px dashed var(--color-border);
 }
 
@@ -586,7 +586,7 @@
 
 .modal {
   background: var(--color-background);
-  border-radius: 14px;
+  border-radius: 0;
   max-width: 640px;
   width: 100%;
   max-height: 80vh;
@@ -619,7 +619,7 @@
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 6px;
+  border-radius: 0;
   background: transparent;
   color: var(--color-muted-foreground);
   font-size: 16px;
@@ -639,7 +639,7 @@
 
 .modalTarea {
   padding: 14px;
-  border-radius: 10px;
+  border-radius: 0;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
 }
@@ -658,7 +658,7 @@
   width: 28px;
   height: 28px;
   flex-shrink: 0;
-  border-radius: 8px;
+  border-radius: 0;
   background: color-mix(in srgb, var(--color-accent) 12%, transparent);
   color: var(--color-accent);
 }
@@ -702,7 +702,7 @@
 
 .estadoTag {
   padding: 3px 10px;
-  border-radius: 6px;
+  border-radius: 0;
   font-size: 10px;
   font-weight: 600;
   white-space: nowrap;
@@ -716,7 +716,7 @@
 .selectAsignar {
   height: 30px;
   padding: 0 24px 0 8px;
-  border-radius: 6px;
+  border-radius: 0;
   border: 1px solid var(--color-border);
   background: var(--color-background);
   color: var(--color-foreground);
@@ -737,7 +737,7 @@
 
 .modalFull {
   background: #F8F9FA;
-  border-radius: 12px;
+  border-radius: 0;
   max-width: 720px;
   width: 100%;
   max-height: 85vh;
@@ -783,7 +783,7 @@
   gap: 16px;
   background: #FFFFFF;
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: 0;
   padding: 12px 16px;
 }
 
@@ -793,7 +793,7 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: 0;
   background: #F0E6FF;
   color: #7E4FF6;
   flex-shrink: 0;
@@ -830,7 +830,7 @@
 .inputDateSmall {
   height: 32px;
   padding: 0 8px;
-  border-radius: 6px;
+  border-radius: 0;
   border: 1px solid var(--color-border);
   background: #F8F9FA;
   color: var(--color-foreground);
@@ -878,7 +878,7 @@
     height: 48px !important;
     width: 100% !important;
     font-size: 16px !important;
-    border-radius: 12px !important;
+    border-radius: 0 !important;
     justify-content: center !important;
     display: flex !important;
     align-items: center !important;

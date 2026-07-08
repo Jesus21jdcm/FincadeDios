@@ -181,19 +181,20 @@ export default function PanelAdmin() {
           <h1 className={styles.title}>Panel de Control</h1>
           <p className={styles.subtitle}>Gestión operativa y seguimiento en tiempo real</p>
         </div>
-      </div>
-
-      <div className={styles.tabsContainer}>
-        {stages.map((stage) => (
-          <button
-            key={stage.id}
-            className={`${styles.tabBtn} ${filter === stage.id ? styles.tabActive : ''}`}
-            onClick={() => setFilter(stage.id)}
+        <div className={styles.selectFilterContainer}>
+          <label className={styles.filterLabel}>Filtrar por etapa:</label>
+          <select
+            className={styles.filterSelect}
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
           >
-            {stage.label}
-            <span className={`${styles.tabBadge} ${filter === stage.id ? styles.tabBadgeActive : ''}`}>{conteo[stage.id] || 0}</span>
-          </button>
-        ))}
+            {stages.map((stage) => (
+              <option key={stage.id} value={stage.id}>
+                {stage.label} ({conteo[stage.id] || 0})
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {alertas.length > 0 && (
@@ -252,94 +253,107 @@ export default function PanelAdmin() {
       )}
 
       {filtradas.length > 0 && (
-        <div className={styles.sectionCard} style={{ padding: 0, overflow: 'hidden' }}>
-          <div className={styles.tableContainer}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>ESTADO</th>
-                  <th>DETALLE TAREA</th>
-                  <th>FECHA LÍMITE</th>
-                  <th>UBICACIÓN</th>
-                  <th style={{ textAlign: 'right' }}>ACCIONES</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtradas.map(t => {
-                  const siembra = siembras.find(s => s.id === t.siembraId);
-                  const lote = lotes.find(l => l.id === siembra?.loteId);
-                  return (
-                    <tr key={t.id} className={isVencida(t) ? styles.rowRojo : ''}>
-                      <td className={styles.cellEstado}>
-                        <span className={`${styles.estadoText} ${styles[t.estado] || ''}`}>
-                          #{t.estado.toUpperCase()}
-                        </span>
-                      </td>
-                      <td>
-                        <div className={styles.cellTitulo}>
-                          <strong>{t.titulo}</strong>
-                          <span className={styles.cellDesc}>
-                             {t.idEmpleado ? (
-                                <>
-                                  <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg> {t.nombreEmpleado}
-                                </>
-                             ) : (
-                               <span className={styles.sinAsignar}>Sin asignar</span>
-                             )}
-                          </span>
-                        </div>
-                      </td>
-                      <td className={`${styles.cellFecha} ${isVencida(t) ? styles.textRojo : ''}`}>
-                        {new Date(t.fechaSugerida).toLocaleDateString('es-ES', { day: 'numeric', month: 'numeric', year: 'numeric' })}
-                      </td>
-                      <td>
-                        <div className={styles.cellUbicacion}>
-                          <span className={styles.badgeCultivo}>{siembra?.cultivo || t.cultivo}</span>
-                          <span className={styles.badgeLote}>{lote?.nombre || siembra?.loteId || '—'}</span>
-                        </div>
-                      </td>
-                      <td className={styles.cellAcciones}>
-                        {t.evidencia && (
-                          <button className={styles.btnIconList} onClick={() => setEvidenciaModal(t.evidencia)} title="Ver evidencia">
-                            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
-                          </button>
-                        )}
-                        {t.estado !== 'Validado' && t.estado !== 'Ejecutado' && t.idEmpleado && (
-                          <button className={styles.btnIconList} onClick={() => reasignar(t.id)} title="Reasignar/Desasignar">
-                            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg> 
-                          </button>
-                        )}
-                        {!t.idEmpleado && t.estado !== 'Validado' && t.estado !== 'Ejecutado' && (
-                           asignando === t.id ? (
-                              <div className={styles.asignadorInline}>
-                                <select className={styles.selectSmall} onChange={e => asignar(t.id, e.target.value)} defaultValue="">
-                                  <option value="" disabled>Seleccionar empleado</option>
-                                  {empleados.map(e => (
-                                    <option key={e.id} value={e.id}>{e.nombre}</option>
-                                  ))}
-                                </select>
-                                <button className={styles.btnIconList} onClick={() => setAsignando(null)}>
-                                  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-                                </button>
-                              </div>
-                           ) : (
-                             <button className={styles.btnAsignarBlue} onClick={() => setAsignando(t.id)}>
-                               Asignar
-                             </button>
-                           )
-                        )}
-                        {t.estado === 'Ejecutado' && (
-                          <button className={styles.btnAprobar} onClick={() => updateDoc(doc(db, 'tareas', t.id), { estado: 'Validado' })}>
-                            Aprobar
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+        <div className={styles.taskList}>
+          {filtradas.map(t => {
+            const siembra = siembras.find(s => s.id === t.siembraId);
+            const lote = lotes.find(l => l.id === siembra?.loteId);
+            const vencida = isVencida(t);
+
+            return (
+              <div key={t.id} className={`${styles.taskCard} ${vencida ? styles.taskCardVencida : ''}`}>
+                
+                {/* Contenedor Izquierdo: Estado, Título y Descripción */}
+                <div className={styles.taskCardMain}>
+                  <span className={`${styles.estadoBadge} ${styles[t.estado] || ''}`}>
+                    {t.estado.toUpperCase()}
+                  </span>
+                  <div className={styles.taskCardContent}>
+                    <h4 className={styles.taskCardTitle}>{t.titulo}</h4>
+                    {t.descripcion && <p className={styles.taskCardDesc}>{t.descripcion}</p>}
+                  </div>
+                </div>
+
+                {/* Contenedor Centro: Ubicación, Cultivo, Fecha límite */}
+                <div className={styles.taskCardMeta}>
+                  <div className={styles.taskCardUbicacion}>
+                    <span className={styles.badgeCultivo}>{siembra?.cultivo || t.cultivo}</span>
+                    <span className={styles.badgeLote}>{lote?.nombre || siembra?.loteId || '—'}</span>
+                  </div>
+
+                  <div className={`${styles.metaItem} ${vencida ? styles.metaItemVencida : ''}`}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.metaIcon}>
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                    <span>
+                      {new Date(t.fechaSugerida).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {vencida && <span className={styles.vencidaLabel}> (Vencida)</span>}
+                    </span>
+                  </div>
+
+                  <div className={styles.metaItem}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.metaIcon}>
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    <span>
+                      {t.idEmpleado ? (
+                        <span className={styles.empleadoAsignado}>{t.nombreEmpleado}</span>
+                      ) : (
+                        <span className={styles.sinAsignar}>Sin asignar</span>
+                      )}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Contenedor Derecho: Acciones (Evidencia, Reasignar, Asignar, Aprobar) */}
+                <div className={styles.taskCardActions}>
+                  {t.evidencia && (
+                    <button className={styles.btnIconAction} onClick={() => setEvidenciaModal(t.evidencia)} title="Ver evidencia">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
+                      <span>Evidencia</span>
+                    </button>
+                  )}
+                  
+                  {t.estado !== 'Validado' && t.estado !== 'Ejecutado' && t.idEmpleado && (
+                    <button className={styles.btnReasignar} onClick={() => reasignar(t.id)} title="Reasignar">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
+                      <span>Reasignar</span>
+                    </button>
+                  )}
+                  
+                  {!t.idEmpleado && t.estado !== 'Validado' && t.estado !== 'Ejecutado' && (
+                    asignando === t.id ? (
+                      <div className={styles.asignadorInline}>
+                        <select className={styles.selectSmall} onChange={e => asignar(t.id, e.target.value)} defaultValue="">
+                          <option value="" disabled>Asignar a...</option>
+                          {empleados.map(e => (
+                            <option key={e.id} value={e.id}>{e.nombre}</option>
+                          ))}
+                        </select>
+                        <button className={styles.btnCancelAsignar} onClick={() => setAsignando(null)}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <button className={styles.btnAsignarBlue} onClick={() => setAsignando(t.id)}>
+                        Asignar
+                      </button>
+                    )
+                  )}
+                  
+                  {t.estado === 'Ejecutado' && (
+                    <button className={styles.btnAprobar} onClick={() => updateDoc(doc(db, 'tareas', t.id), { estado: 'Validado' })}>
+                      Aprobar Tarea
+                    </button>
+                  )}
+                </div>
+
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -347,7 +361,7 @@ export default function PanelAdmin() {
         <div className={styles.modalOverlay} onClick={() => setEvidenciaModal(null)}>
           <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
             <button className={styles.modalClose} onClick={() => setEvidenciaModal(null)}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
             <img src={evidenciaModal} alt="Evidencia" className={styles.evidenciaFull} />
           </div>

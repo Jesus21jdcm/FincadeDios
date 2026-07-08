@@ -40,6 +40,7 @@ export default function PanelEmpleado() {
   const [adHocNombre, setAdHocNombre] = useState('');
   const [adHocCantidad, setAdHocCantidad] = useState('');
   const [showFinalConfirm, setShowFinalConfirm] = useState(null);
+  const [imagenAmpliada, setImagenAmpliada] = useState(null);
   const [lotes, setLotes] = useState([]);
   const [siembras, setSiembras] = useState([]);
   const fileRef = useRef(null);
@@ -288,15 +289,21 @@ export default function PanelEmpleado() {
                     )}
                     <div className={styles.field}>
                       <label className={styles.label}>{SvgCamera} Foto de evidencia (opcional)</label>
-                      <div className={styles.fileInputWrapper}>
-                        <input ref={fileRef} type="file" accept="image/*" capture="environment" className={styles.fileInputHidden}
+                      <div className={styles.fileInputWrapper} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <input ref={fileRef} type="file" accept="image/*" className={styles.fileInputHidden} style={{ display: 'none' }}
                           onChange={e => { if (e.target.files[0]) setEvidenciaPreview(URL.createObjectURL(e.target.files[0])); }} />
                         <button className={styles.btnFile} onClick={() => fileRef.current?.click()}>
                           {SvgCamera} {evidenciaPreview ? 'Cambiar foto' : 'Seleccionar foto'}
                         </button>
+                        {evidenciaPreview && (
+                          <img 
+                            src={evidenciaPreview} 
+                            alt="Preview" 
+                            style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '0', border: '1px solid var(--color-border)' }} 
+                          />
+                        )}
                       </div>
                     </div>
-                    {evidenciaPreview && <img src={evidenciaPreview} alt="Preview" className={styles.previewImg} />}
                     <div className={styles.confirmActions}>
                       <button className={styles.btnSecondary} onClick={() => { setConfirmando(null); setEvidenciaPreview(null); setInsumosUsados([{ id: '', cantidad: '' }]); setAdHocActivo(false); setAdHocNombre(''); setAdHocCantidad(''); }}>Cancelar</button>
                       <button className={styles.btnPrimary} style={{ background: 'var(--color-primary)', color: 'white', border: 'none', fontWeight: 600 }} onClick={() => setShowFinalConfirm(t.id)} disabled={subiendo}>
@@ -344,10 +351,15 @@ export default function PanelEmpleado() {
                     </div>
                   </div>
                   <span className={`${styles.estadoTag} ${styles[t.estado]}`}>{t.estado}</span>
+                  {t.evidencia && (
+                    <img 
+                      src={t.evidencia} 
+                      alt="Evidencia" 
+                      className={styles.evidenciaThumb} 
+                      onClick={() => setImagenAmpliada(t.evidencia)} 
+                    />
+                  )}
                 </div>
-                {t.evidencia && (
-                  <img src={t.evidencia} alt="Evidencia" className={styles.evidenciaThumb} />
-                )}
               </div>
             ))}
           </div>
@@ -366,6 +378,17 @@ export default function PanelEmpleado() {
                 Sí, finalizar
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {imagenAmpliada && (
+        <div className={styles.modalOverlay} onClick={() => setImagenAmpliada(null)}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <button className={styles.modalClose} onClick={() => setImagenAmpliada(null)}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <img src={imagenAmpliada} alt="Vista ampliada" className={styles.fotoFull} />
           </div>
         </div>
       )}

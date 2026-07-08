@@ -50,7 +50,7 @@
   min-width: 22px;
   height: 22px;
   padding: 0 7px;
-  border-radius: 20px;
+  border-radius: 0;
   background: var(--color-accent);
   color: var(--color-on-primary);
   font-size: 11px;
@@ -66,7 +66,7 @@
 
 .card {
   padding: 16px;
-  border-radius: 12px;
+  border-radius: 0;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   box-shadow: 0 1px 3px rgba(0,0,0,0.04);
@@ -101,7 +101,7 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: 0;
   background: color-mix(in srgb, var(--color-accent) 12%, transparent);
   color: var(--color-accent);
   flex-shrink: 0;
@@ -152,7 +152,7 @@
   color: var(--color-accent);
   background: color-mix(in srgb, var(--color-accent) 12%, transparent);
   padding: 2px 8px;
-  border-radius: 6px;
+  border-radius: 0;
 }
 
 .cardDesc {
@@ -172,7 +172,7 @@
   color: var(--color-destructive);
   background: color-mix(in srgb, var(--color-destructive) 10%, transparent);
   padding: 4px 10px;
-  border-radius: 6px;
+  border-radius: 0;
   width: fit-content;
 }
 
@@ -184,7 +184,7 @@
   width: 100%;
   height: 44px;
   border: none;
-  border-radius: 10px;
+  border-radius: 0;
   background: var(--color-accent);
   color: var(--color-on-primary);
   font-size: 14px;
@@ -210,7 +210,7 @@
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  border-radius: 10px;
+  border-radius: 0;
   background: var(--color-muted);
   border: 1px solid var(--color-border);
 }
@@ -246,7 +246,7 @@
 .select, .input {
   height: 40px;
   padding: 0 12px;
-  border-radius: 8px;
+  border-radius: 0;
   border: 1px solid var(--color-border);
   background: var(--color-background);
   color: var(--color-foreground);
@@ -285,7 +285,7 @@
   width: 100%;
   height: 40px;
   border: 1px dashed var(--color-border);
-  border-radius: 8px;
+  border-radius: 0;
   background: transparent;
   color: var(--color-muted-foreground);
   font-size: 13px;
@@ -304,7 +304,7 @@
   width: 100%;
   max-height: 160px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 0;
   border: 1px solid var(--color-border);
 }
 
@@ -322,7 +322,7 @@
   gap: 4px;
   height: 40px;
   border: none;
-  border-radius: 8px;
+  border-radius: 0;
   background: var(--color-accent);
   color: var(--color-on-primary);
   font-size: 14px;
@@ -348,7 +348,7 @@
   flex: 1;
   height: 40px;
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: 0;
   background: transparent;
   color: var(--color-muted-foreground);
   font-size: 14px;
@@ -368,7 +368,7 @@
   display: inline-flex;
   align-items: center;
   padding: 3px 10px;
-  border-radius: 20px;
+  border-radius: 0;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.3px;
@@ -387,13 +387,14 @@
 }
 
 .evidenciaThumb {
-  width: 100%;
-  max-height: 140px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 0;
   border: 1px solid var(--color-border);
   cursor: pointer;
   transition: opacity 0.2s;
+  margin-top: 10px;
 }
 
 .evidenciaThumb:hover {
@@ -418,7 +419,7 @@
   align-items: center;
   justify-content: center;
   border: 1px dashed var(--color-border);
-  border-radius: 8px;
+  border-radius: 0;
   background: transparent;
   color: var(--color-muted-foreground);
   cursor: pointer;
@@ -434,7 +435,7 @@
 
 .adHocBox {
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 0;
   border: 1px solid #D97706;
   background: color-mix(in srgb, #D97706 6%, var(--color-surface));
 }
@@ -463,7 +464,7 @@
   padding: 48px 20px;
   color: var(--color-muted-foreground);
   font-size: 14px;
-  border-radius: 10px;
+  border-radius: 0;
   border: 1px dashed var(--color-border);
   background: var(--color-surface);
 }
@@ -513,4 +514,45 @@
 }
 .modalBtnConfirm {
   background: var(--color-primary); color: white; border: none;
+}
+
+.modalContent {
+  position: relative;
+  max-width: 92vw;
+  max-height: 92vh;
+  border-radius: 0;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.modalClose {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 0;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+.modalClose:hover {
+  background: rgba(0,0,0,0.8);
+}
+
+.fotoFull {
+  display: block;
+  max-width: 92vw;
+  max-height: 92vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }

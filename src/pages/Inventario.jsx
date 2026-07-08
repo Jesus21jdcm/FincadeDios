@@ -42,6 +42,7 @@ export default function Inventario({ autoOpenForm }) {
   const [filterStock, setFilterStock] = useState('');
   const [subiendo, setSubiendo] = useState(false);
   const [evidenciaPreview, setEvidenciaPreview] = useState(null);
+  const [imagenAmpliada, setImagenAmpliada] = useState(null);
   const fileRef = useRef(null);
 
   useEffect(() => {
@@ -169,9 +170,11 @@ export default function Inventario({ autoOpenForm }) {
           <h1 className={styles.title}>Inventario</h1>
           <p className={styles.subtitle}>{insumos.length} insumos registrados</p>
         </div>
-        <button className={styles.btnNuevo} onClick={() => { if (showForm) resetForm(); else { resetForm(); setShowForm(true); } }}>
-          {showForm ? 'Cancelar' : '+ Nuevo insumo'}
-        </button>
+        {userRole !== 'empleado' && (
+          <button className={styles.btnNuevo} onClick={() => { if (showForm) resetForm(); else { resetForm(); setShowForm(true); } }}>
+            {showForm ? 'Cancelar' : '+ Nuevo insumo'}
+          </button>
+        )}
       </div>
 
       <div className={styles.filtersRow}>
@@ -196,7 +199,7 @@ export default function Inventario({ autoOpenForm }) {
         </div>
       </div>
 
-      {showForm && (
+      {showForm && userRole !== 'empleado' && (
         <form className={styles.form} onSubmit={handleCrearInsumo}>
           {error && <div className={styles.error}>{error}</div>}
           <h3 className={styles.formTitle}>{editing ? `Editar: ${editing.nombre}` : 'Nuevo insumo'}</h3>
@@ -238,15 +241,21 @@ export default function Inventario({ autoOpenForm }) {
             </div>
             <div className={styles.field} style={{ gridColumn: '1 / -1' }}>
               <label className={styles.label}>Foto del producto (opcional)</label>
-              <div className={styles.fileInputWrapper}>
+              <div className={styles.fileInputWrapper} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <input ref={fileRef} type="file" accept="image/*" capture="environment" className={styles.fileInputHidden} style={{ display: 'none' }}
                   onChange={e => { if (e.target.files[0]) setEvidenciaPreview(URL.createObjectURL(e.target.files[0])); }} />
-                <button type="button" className={styles.btnFile} onClick={() => fileRef.current?.click()} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', height: '40px', padding: '0 16px', border: '1px dashed var(--color-border)', borderRadius: '8px', background: 'transparent', color: 'var(--color-muted-foreground)', cursor: 'pointer', transition: 'all 0.2s' }}>
+                <button type="button" className={styles.btnFile} onClick={() => fileRef.current?.click()} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', height: '40px', padding: '0 16px', border: '1px dashed var(--color-border)', borderRadius: '0', background: 'transparent', color: 'var(--color-muted-foreground)', cursor: 'pointer', transition: 'all 0.2s' }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                   {evidenciaPreview ? 'Cambiar foto' : 'Seleccionar foto'}
                 </button>
+                {evidenciaPreview && (
+                  <img 
+                    src={evidenciaPreview} 
+                    alt="Preview" 
+                    style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '0', border: '1px solid var(--color-border)' }} 
+                  />
+                )}
               </div>
-              {evidenciaPreview && <img src={evidenciaPreview} alt="Preview" style={{ marginTop: '10px', maxHeight: '160px', width: '100%', objectFit: 'cover', borderRadius: '8px' }} />}
             </div>
           </div>
           <button className={styles.btnNuevo} type="submit" disabled={subiendo}>{subiendo ? 'Subiendo...' : (editing ? 'Guardar cambios' : 'Guardar insumo')}</button>
@@ -265,8 +274,16 @@ export default function Inventario({ autoOpenForm }) {
            return (
               <div key={i.id} className={styles.insumoCard} style={{ borderLeftColor: theme.border }}>
                 <div className={styles.cardMain}>
-                  <div className={styles.cardIconBox} style={{ background: theme.bg, color: theme.color }}>
-                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" /></svg>
+                  <div 
+                    className={styles.cardIconBox} 
+                    style={{ background: theme.bg, color: theme.color, cursor: i.evidencia ? 'pointer' : 'default' }}
+                    onClick={() => { if (i.evidencia) setImagenAmpliada(i.evidencia); }}
+                  >
+                     {i.evidencia ? (
+                       <img src={i.evidencia} alt={i.nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                     ) : (
+                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" /></svg>
+                     )}
                   </div>
                   <div className={styles.cardDetails}>
                     <div className={styles.cardTitle}>{i.nombre}</div>
@@ -274,11 +291,6 @@ export default function Inventario({ autoOpenForm }) {
                       <span className={styles.badge} style={{ background: theme.bg, color: theme.color }}>{i.tipo}</span>
                       <span className={styles.stockAmount}>{i.stock} {i.unidad}</span>
                     </div>
-                    {i.evidencia && (
-                      <div style={{ marginTop: '10px', height: '100px', width: '100%', borderRadius: '6px', overflow: 'hidden' }}>
-                        <img src={i.evidencia} alt={i.nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      </div>
-                    )}
                   </div>
                   {userRole !== 'empleado' && (
                     <div className={styles.cardActions}>
@@ -319,6 +331,17 @@ export default function Inventario({ autoOpenForm }) {
               <button className={styles.btnCancel} onClick={() => setDeleteTarget(null)}>Cancelar</button>
               <button className={styles.btnConfirmDelete} onClick={handleDelete}>Eliminar</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {imagenAmpliada && (
+        <div className={styles.modalOverlay} onClick={() => setImagenAmpliada(null)}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <button className={styles.modalClose} onClick={() => setImagenAmpliada(null)}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <img src={imagenAmpliada} alt="Vista ampliada" className={styles.fotoFull} />
           </div>
         </div>
       )}

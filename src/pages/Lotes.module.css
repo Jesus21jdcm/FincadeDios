@@ -100,23 +100,55 @@
   justify-content: center;
   gap: 6px;
   height: 42px;
-  padding: 0 22px;
+  padding: 0 22px 0 40px;
   border: none;
-  border-radius: 10px;
-  background: #7E4FF6;
+  background: transparent;
   color: white;
   font-size: 14px;
   font-weight: 600;
   font-family: 'Fira Sans', sans-serif;
   cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(126, 79, 246, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1;
+}
+
+.btnNuevo::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #363636;
+  border-radius: 4px;
+  border-bottom: 4px solid #7E4FF6;
+  box-sizing: border-box;
+  z-index: -2;
+  transition: background 0.2s;
+}
+
+.btnNuevo::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: calc(100% - 4px);
+  background: #7E4FF6;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 24px;
+  z-index: -1;
 }
 
 .btnNuevo:hover {
-  background: #6A3DE8;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(126, 79, 246, 0.4);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.btnNuevo:hover::before {
+  background: #454545;
 }
 
 .btnCancelarTop {
@@ -219,7 +251,7 @@
 }
 
 .loteCard {
-  border-radius: 12px;
+  border-radius: 0;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   box-shadow: 0 4px 12px rgba(0,0,0,0.03);
@@ -242,7 +274,7 @@
 .imgWrapper {
   width: 64px;
   height: 64px;
-  border-radius: 10px;
+  border-radius: 0;
   overflow: hidden;
   background: color-mix(in srgb, var(--color-accent) 8%, transparent);
   flex-shrink: 0;
