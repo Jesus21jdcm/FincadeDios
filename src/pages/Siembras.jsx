@@ -55,6 +55,8 @@ export default function Siembras({ autoOpenForm }) {
   const [editingTaskModal, setEditingTaskModal] = useState(null);
   const [editingTaskData, setEditingTaskData] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [guardando, setGuardando] = useState(false);
+  const [successToast, setSuccessToast] = useState('');
 
   useEffect(() => {
     const unsubL = onSnapshot(query(collection(db, 'lotes')), snap => {
@@ -76,9 +78,22 @@ export default function Siembras({ autoOpenForm }) {
     e.preventDefault();
     setError('');
     if (!form.loteId || !form.cultivo || !form.fechaSiembra) {
-      setError('Completa todos los campos');
+      setError('Completa todos los campos obligatorios');
       return;
     }
+
+    const selectedLote = lotes.find(l => l.id === form.loteId);
+    const totalAreaLote = selectedLote?.area || 0;
+    const areaUsada = siembras
+      .filter(s => s.loteId === form.loteId)
+      .reduce((acc, s) => acc + (Number(s.area) || 0), 0);
+    const areaDisponible = Math.max(0, totalAreaLote - areaUsada);
+
+    if (form.area && Number(form.area) > areaDisponible) {
+      setError(`El área supera el espacio disponible. Solo quedan ${areaDisponible} hectáreas en este lote.`);
+      return;
+    }
+
     const resultado = analizarCultivo(form.cultivo, form.fechaSiembra);
     if (!resultado) {
       setError('Cultivo no reconocido');
@@ -123,6 +138,7 @@ export default function Siembras({ autoOpenForm }) {
   const handleConfirmar = async () => {
     if (!analisis) return;
     try {
+      setGuardando(true);
       const siembraRef = await addDoc(collection(db, 'siembras'), {
         loteId: form.loteId,
         cultivo: form.cultivo,
@@ -154,9 +170,13 @@ export default function Siembras({ autoOpenForm }) {
         cultivo: form.cultivo,
       });
 
-      setPaso('exito');
+      resetForm();
+      setSuccessToast('Siembra registrada con éxito');
+      setTimeout(() => setSuccessToast(''), 3500);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setGuardando(false);
     }
   };
 
@@ -239,31 +259,29 @@ export default function Siembras({ autoOpenForm }) {
     }
   };
 
-  if (paso === 'exito') {
-    return (
-      <div className={styles.container}>
-        <div className={styles.statusCard}>
-          <div className={styles.statusIconOk}>
-            <SvgIcon name="check" size={48} />
-          </div>
-          <h2 className={styles.statusTitle}>Siembra registrada con exito</h2>
-          <p className={styles.statusDesc}>
-            <strong>{form.cultivo}</strong> en lote {lotes.find(l => l.id === form.loteId)?.nombre}
-          </p>
-          <p className={styles.statusDesc}>
-            <SvgIcon name="calendar" /> Cosecha estimada: {analisis?.fechaCosechaLabel}
-          </p>
-          <p className={styles.statusDesc}>
-            <SvgIcon name="clipboard" /> {analisis?.tareas.length} tareas generadas automaticamente
-          </p>
-          <button className={styles.btn} onClick={resetForm}>Nueva siembra</button>
-        </div>
-      </div>
-    );
-  }
+
+
+  const getAreaDisponible = () => {
+    if (!form.loteId) return null;
+    const selectedLote = lotes.find(l => l.id === form.loteId);
+    const totalAreaLote = selectedLote?.area || 0;
+    const areaUsada = siembras
+      .filter(s => s.loteId === form.loteId)
+      .reduce((acc, s) => acc + (Number(s.area) || 0), 0);
+    return Math.max(0, totalAreaLote - areaUsada);
+  };
+  const areaDisponible = getAreaDisponible();
+
 
   return (
     <div className={styles.container}>
+      {successToast && (
+        <div style={{ position: 'fixed', top: '20px', right: '20px', background: '#10B981', color: 'white', padding: '12px 24px', borderRadius: '8px', zIndex: 9999, display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', fontWeight: '500', animation: 'fadeIn 0.3s ease' }}>
+          <SvgIcon name="check" size={18} />
+          {successToast}
+        </div>
+      )}
+
       <div className={styles.headerRow}>
         <div>
           <h1 className={styles.title}>Gestion de Siembras</h1>
@@ -294,14 +312,22 @@ export default function Siembras({ autoOpenForm }) {
               <div className={styles.formGrid}>
                 <div className={styles.field}>
                   <label className={styles.label}>Lote</label>
-                  <select className={styles.select} value={form.loteId} onChange={e => setForm(f => ({ ...f, loteId: e.target.value }))} required>
+                  <select className={styles.select} value={form.loteId} onChange={e => {
+                    const selectedLoteId = e.target.value;
+                    const selectedLote = lotes.find(l => l.id === selectedLoteId);
+                    setForm(f => ({ 
+                      ...f, 
+                      loteId: selectedLoteId, 
+                      cultivo: selectedLote ? selectedLote.cultivo : '' 
+                    }));
+                  }} required>
                     <option value="">Seleccionar lote</option>
                     {lotes.map(l => <option key={l.id} value={l.id}>{l.nombre}</option>)}
                   </select>
                 </div>
                 <div className={styles.field}>
                   <label className={styles.label}>Cultivo</label>
-                  <select className={styles.select} value={form.cultivo} onChange={e => setForm(f => ({ ...f, cultivo: e.target.value }))} required>
+                  <select className={styles.select} value={form.cultivo} onChange={e => setForm(f => ({ ...f, cultivo: e.target.value }))} required disabled={!!form.loteId}>
                     <option value="">Seleccionar</option>
                     {getCultivos().map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
@@ -311,8 +337,15 @@ export default function Siembras({ autoOpenForm }) {
                   <input className={styles.input} type="date" value={form.fechaSiembra} onChange={e => setForm(f => ({ ...f, fechaSiembra: e.target.value }))} required />
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>Area (ha) &mdash; opcional</label>
-                  <input className={styles.input} type="number" value={form.area} onChange={e => setForm(f => ({ ...f, area: e.target.value }))} placeholder="2.5" />
+                  <label className={styles.label}>
+                    Área (hectáreas)
+                    {areaDisponible !== null && (
+                      <span style={{ color: 'var(--color-muted-foreground)', fontSize: '13px', marginLeft: '6px', fontWeight: 'normal' }}>
+                        (Disponibles: <strong>{areaDisponible}</strong> ha)
+                      </span>
+                    )}
+                  </label>
+                  <input className={styles.input} type="number" step="any" min="0" max={areaDisponible !== null ? areaDisponible : undefined} value={form.area} onChange={e => setForm(f => ({ ...f, area: e.target.value }))} placeholder="2.5" />
                 </div>
               </div>
               <button className={styles.btnPrimary} type="submit" style={{ width: '100%', background: '#FF8A20' }}><SvgIcon name="search" /> Analizar y generar plan</button>
@@ -412,9 +445,9 @@ export default function Siembras({ autoOpenForm }) {
               </div>
 
               <div className={styles.actionsRowSticky}>
-                <button type="button" className={styles.btnSecondary} onClick={() => setPaso('form')}>Cancelar</button>
-                <button type="button" className={styles.btnPrimary} style={{ background: '#006B3C' }} onClick={handleConfirmar}>
-                  <SvgIcon name="check" /> Confirmar y registrar siembra
+                <button type="button" className={styles.btnSecondary} onClick={() => setPaso('form')} disabled={guardando}>Cancelar</button>
+                <button type="button" className={styles.btnPrimary} style={{ background: '#006B3C', opacity: guardando ? 0.7 : 1 }} onClick={handleConfirmar} disabled={guardando}>
+                  {guardando ? 'Guardando...' : <><SvgIcon name="check" /> Confirmar y registrar siembra</>}
                 </button>
               </div>
             </div>

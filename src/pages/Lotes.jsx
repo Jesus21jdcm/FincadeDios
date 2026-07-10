@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { db, storage } from '../firebase';
+import { db } from '../firebase';
 import { collection, query, onSnapshot, addDoc, doc, updateDoc, deleteDoc, where, getDocs } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -11,6 +10,27 @@ import maizPerfil from '../assets/images/maiz.perfil.webp';
 import platanoPerfil from '../assets/images/platano.perfil.webp';
 import yucaPerfil from '../assets/images/yuca.perfil.webp';
 import styles from './Lotes.module.css';
+
+const comprimirImagen = (file, maxW = 800, calidad = 0.7) => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.onerror = () => reject(new Error('Error al leer la imagen'));
+  reader.onload = e => {
+    const img = new Image();
+    img.onerror = () => reject(new Error('Error al cargar la imagen'));
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let { width, height } = img;
+      if (width > maxW) { height = Math.round(height * maxW / width); width = maxW; }
+      canvas.width = width; canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      const timeout = setTimeout(() => reject(new Error('Tiempo de espera agotado al comprimir')), 10000);
+      canvas.toBlob(blob => { clearTimeout(timeout); resolve(blob); }, 'image/jpeg', calidad);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+});
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -94,11 +114,22 @@ export default function Lotes({ autoOpenForm }) {
       setSubiendo(true);
       let fotoUrl = editLote?.fotoUrl || null;
       if (form.foto) {
-        const ext = form.foto.name.split('.').pop();
-        const fileName = `lotes/${Date.now()}.${ext}`;
-        const storageRef = ref(storage, fileName);
-        await uploadBytes(storageRef, form.foto);
-        fotoUrl = await getDownloadURL(storageRef);
+        const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+        const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+        if (!cloudName || !uploadPreset) throw new Error('Credenciales de Cloudinary no configuradas en .env');
+
+        const blob = await comprimirImagen(form.foto);
+        const formData = new FormData();
+        formData.append('file', blob);
+        formData.append('upload_preset', uploadPreset);
+        
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error.message);
+        fotoUrl = data.secure_url;
       }
       const data = {
         nombre: form.nombre,

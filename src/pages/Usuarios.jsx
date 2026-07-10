@@ -215,7 +215,7 @@ export default function Usuarios() {
         email: modalForm.email,
         rol: modalForm.rol,
       });
-      setModalSuccess('Cambios guardados exitosamente');
+      setModalUser(null);
     } catch (err) {
       setModalError(err.message);
     }

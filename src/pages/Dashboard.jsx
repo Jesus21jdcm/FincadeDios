@@ -167,7 +167,7 @@ export default function Dashboard({ onNavigate }) {
     return unsub;
   }, [userId]);
 
-  const userName = auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'Usuario';
+  const userName = userData?.nombre || auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'Usuario';
 
   const rolePanels = {
     superadmin: { id: 'eladmin', label: 'Panel Admin' },
