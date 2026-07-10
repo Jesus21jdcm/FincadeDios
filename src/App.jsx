@@ -18,6 +18,7 @@ import Usuarios from './pages/Usuarios';
 import PanelAdmin from './pages/PanelAdmin';
 import PanelEncargado from './pages/PanelEncargado';
 import PanelEmpleado from './pages/PanelEmpleado';
+import Perfil from './pages/Perfil';
 import { auth } from './firebase';
 import './styles/global.css';
 
@@ -45,7 +46,7 @@ export default function App() {
     return <PendingApproval userData={user} onLogout={() => auth.signOut()} />;
   }
 
-  const empleadoOnly = ['dashboard', 'elempleado', 'inventario', 'lotes', 'monitoreo', 'apply', 'siembras'];
+  const empleadoOnly = ['dashboard', 'elempleado', 'inventario', 'lotes', 'monitoreo', 'apply', 'siembras', 'perfil'];
   const canAccess = (target) => userRole !== 'empleado' || empleadoOnly.includes(target);
   const safePage = canAccess(page) ? page : 'dashboard';
 
@@ -80,6 +81,8 @@ export default function App() {
         return <PanelEncargado />;
       case 'elempleado':
         return <PanelEmpleado />;
+      case 'perfil':
+        return <Perfil />;
       default:
         return <Dashboard onNavigate={navigate} />;
     }

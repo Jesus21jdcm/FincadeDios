@@ -164,27 +164,34 @@ export default function ApplyInput() {
   if (step === 'exito') {
     return (
       <div className={styles.container}>
-        <div className={styles.statusCard}>
-          <div className={styles.statusIconOk}>
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          </div>
-          <h2 className={styles.statusTitle}>Aplicación registrada</h2>
-          <p className={styles.statusDesc}>
-            {formData.cantidad} {insumo?.unidad} de <strong>{insumo?.nombre}</strong> aplicados en <strong>{lote?.nombre}</strong>.
-          </p>
-          {clima && (
-            <div className={styles.climaInfo}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-              <span>{clima.condicion}</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-              <span>{clima.temp}°C</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V10"/><path d="M18 20v-4"/><path d="M6 20v-4"/></svg>
-              <span>Humedad {clima.humedad}%</span>
+        <div className={`${styles.statusCard} ${styles.successCard}`}>
+          <div className={styles.successBanner}>
+            <div className={styles.statusIconOkAlt}>
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
             </div>
-          )}
-          <button className={styles.btn} style={{ background: '#2AD7FF', color: '#000' }} onClick={resetForm}>Nueva aplicación</button>
+            <h2 className={styles.statusTitleAlt}>¡Verificado y Aplicado!</h2>
+          </div>
+          <div className={styles.successBody}>
+            <p className={styles.statusDesc}>
+              El sistema ha registrado exitosamente la aplicación de:<br/>
+              <strong className={styles.highlightText}>{formData.cantidad} {insumo?.unidad} de {insumo?.nombre}</strong><br/>
+              en el lote <strong>{lote?.nombre}</strong>.
+            </p>
+            {clima && (
+              <div className={styles.climaInfoBox}>
+                <div className={styles.climaHeader}>Condiciones registradas:</div>
+                <div className={styles.climaItems}>
+                  <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> {clima.condicion}</span>
+                  <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> {clima.temp}°C</span>
+                  <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V10"/><path d="M18 20v-4"/><path d="M6 20v-4"/></svg> Humedad {clima.humedad}%</span>
+                </div>
+              </div>
+            )}
+            <button className={`${styles.btn} ${styles.btnNewApp}`} onClick={resetForm}>Registrar nueva aplicación</button>
+          </div>
         </div>
       </div>
     );
@@ -247,8 +254,8 @@ export default function ApplyInput() {
             />
           </div>
 
-          <button type="submit" className={styles.btn} style={{ background: '#006B3C' }} disabled={procesando}>
-            {procesando ? <span className={styles.spinner} /> : 'Verificar y aplicar'}
+          <button type="submit" className={`${styles.btn} ${styles.btnSubmitSquare}`} disabled={procesando}>
+            {procesando ? <span className={styles.spinnerSmall} /> : 'Verificar y aplicar'}
           </button>
         </form>
       </div>

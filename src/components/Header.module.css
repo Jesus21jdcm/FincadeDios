@@ -7,6 +7,8 @@
   justify-content: space-between;
   padding: 0 40px;
   margin-top: 16px;
+  position: relative;
+  z-index: 50;
 }
 
 .headerRight {
@@ -33,12 +35,19 @@
 
 .badgeWarn {
   position: absolute;
-  top: -2px;
-  right: -2px;
+  top: -4px;
+  right: -6px;
   background: var(--color-orange);
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: #fff;
+  padding: 0 4px;
 }
 
 .timeDisplay {
@@ -48,9 +57,54 @@
   letter-spacing: 0.5px;
 }
 
+.notifWrapper {
+  position: relative;
+}
+
+.notifDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 12px;
+  width: 380px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  z-index: 100;
+  animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scrollbar for the dropdown */
+.notifDropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.notifDropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+.notifDropdown::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
 @media (max-width: 768px) {
   .header {
     padding: 0 20px;
     margin-top: 10px;
   }
-}
+  .notifDropdown {
+    position: fixed;
+    top: 70px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+    max-height: calc(100vh - 90px);
+  }
+}

@@ -5,12 +5,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 0;
+  padding: 30px 0;
   z-index: 10;
+  overflow-y: auto;
+}
+
+/* Ocultar barra de scroll para un aspecto más limpio */
+.sidebar::-webkit-scrollbar {
+  display: none;
+}
+.sidebar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 .avatarContainer {
-  margin-bottom: 50px;
+  margin-bottom: 40px;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -31,7 +41,7 @@
 .navContainer {
   display: flex;
   flex-direction: column;
-  gap: 36px;
+  gap: 28px;
   width: 100%;
   align-items: center;
   flex: 1;
@@ -53,18 +63,18 @@
 }
 
 .iconWrapper {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid transparent;
   transition: all 0.3s ease;
 }
 
 .navItem span {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.5px;
 }
@@ -92,6 +102,23 @@
   padding-bottom: 20px;
 }
 
+/* Ajustes para pantallas de laptop con poca altura */
+@media (max-height: 750px) {
+  .sidebar {
+    padding: 20px 0;
+  }
+  .avatarContainer {
+    margin-bottom: 24px;
+  }
+  .navContainer {
+    gap: 16px;
+  }
+  .avatarCircle {
+    width: 54px;
+    height: 54px;
+  }
+}
+
 @media (max-width: 768px) {
   .sidebar {
     width: 100%;
@@ -104,6 +131,7 @@
     top: auto;
     z-index: 50;
     border-radius: 0;
+    overflow-y: visible;
   }
   
   .avatarContainer, .settingsContainer {
@@ -121,7 +149,7 @@
   }
   
   .iconWrapper {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
   }
 }

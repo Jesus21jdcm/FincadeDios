@@ -1,107 +1,151 @@
 .container {
-  padding: 24px;
-  max-width: 800px;
+  padding: 32px 24px;
+  max-width: 860px;
   margin: 0 auto;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.dropdownContainer {
+  padding: 16px 12px;
+  max-width: 100%;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .headerRow {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .title {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--color-foreground);
-  margin: 0 0 4px;
-  font-family: 'Fira Code', monospace;
-}
-
-.subtitle {
-  font-size: 14px;
+  margin: 0 0 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}.subtitle {
+  font-size: 15px;
   color: var(--color-muted-foreground);
   margin: 0;
+  font-weight: 500;
 }
 
 .tabs {
   display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
+  gap: 10px;
+  margin-bottom: 28px;
   flex-wrap: wrap;
 }
 
 .tab {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border-radius: 20px;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 99px;
   border: 1px solid var(--color-border);
-  background: transparent;
+  background: var(--color-surface);
   color: var(--color-muted-foreground);
-  font-size: 13px;
-  font-weight: 500;
-  font-family: 'Fira Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
 .tab:hover {
   border-color: var(--color-accent);
   color: var(--color-foreground);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
 }
 
 .tabActive {
   background: var(--color-accent);
   color: var(--color-on-primary);
   border-color: var(--color-accent);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-accent) 40%, transparent);
 }
 
 .tabCount {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 10px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 11px;
   background: var(--color-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
+  color: var(--color-foreground);
+  transition: background 0.25s;
 }
 
 .tabActive .tabCount {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.25);
+  color: #fff;
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 32px;
 }
 
 .card {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  border-radius: 12px;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 16px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  transition: border-color 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 
-.card:hover {
-  border-color: var(--color-accent);
+.card.clickable {
+  cursor: pointer;
+}
+
+.card.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+  border-color: var(--color-border-hover, var(--color-accent));
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  border-radius: 4px 0 0 4px;
 }
 
 .cardIcon {
-  font-size: 24px;
+  font-size: 28px;
   line-height: 1;
   flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--color-muted) 50%, transparent);
+  border-radius: 12px;
 }
 
 .cardBody {
@@ -110,81 +154,86 @@
 }
 
 .cardTitle {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   color: var(--color-foreground);
-  margin: 0 0 2px;
+  margin: 0 0 4px;
+  letter-spacing: -0.01em;
 }
 
 .cardDesc {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--color-muted-foreground);
   margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.5;
 }
 
 .whatsappBtn {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   border-radius: 50%;
-  background: color-mix(in srgb, #25D366 15%, transparent);
+  background: color-mix(in srgb, #25D366 12%, transparent);
   color: #25D366;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s;
 }
 
 .whatsappBtn:hover {
   background: #25D366;
   color: #fff;
+  transform: scale(1.05);
 }
 
-.critico {
-  border-left: 3px solid var(--color-destructive);
-}
+.critico::before { background-color: var(--color-destructive); }
+.critico .cardIcon { background: color-mix(in srgb, var(--color-destructive) 10%, transparent); }
+.critico .cardTitle { color: var(--color-destructive); }
 
-.bajo {
-  border-left: 3px solid var(--color-warning);
-}
+.bajo::before { background-color: var(--color-warning); }
+.bajo .cardIcon { background: color-mix(in srgb, var(--color-warning) 15%, transparent); }
 
-.abono {
-  border-left: 3px solid var(--color-accent);
-}
+.abono::before { background-color: var(--color-accent); }
+.abono .cardIcon { background: color-mix(in srgb, var(--color-accent) 15%, transparent); }
 
-.cosecha {
-  border-left: 3px solid #8B5CF6;
-}
+.cosecha::before { background-color: #8B5CF6; }
+.cosecha .cardIcon { background: color-mix(in srgb, #8B5CF6 15%, transparent); }
+
+.tarea::before { background-color: #3B82F6; }
+.tarea .cardIcon { background: color-mix(in srgb, #3B82F6 15%, transparent); }
 
 .empty {
   text-align: center;
-  padding: 40px;
+  padding: 60px 20px;
   color: var(--color-muted-foreground);
-  font-size: 15px;
+  font-size: 16px;
+  font-weight: 500;
+  background: var(--color-surface);
+  border-radius: 16px;
+  border: 1px dashed var(--color-border);
 }
 
 .automationBanner {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  border-radius: 12px;
-  background: var(--color-surface);
+  gap: 20px;
+  padding: 24px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--color-surface) 95%, transparent);
   border: 1px dashed var(--color-border);
-  font-size: 13px;
+  font-size: 14px;
   color: var(--color-muted-foreground);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .automationBanner strong {
   color: var(--color-foreground);
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  font-size: 15px;
 }
 
 .automationBanner p {
@@ -193,14 +242,14 @@
 
 .btnSecondary {
   flex-shrink: 0;
-  height: 36px;
-  padding: 0 16px;
+  height: 40px;
+  padding: 0 20px;
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background: transparent;
+  border-radius: 10px;
+  background: var(--color-background);
   color: var(--color-foreground);
-  font-size: 13px;
-  font-family: 'Fira Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
@@ -208,11 +257,32 @@
 
 .btnSecondary:hover {
   background: var(--color-muted);
+  border-color: var(--color-muted-foreground);
 }
 
 @media (max-width: 640px) {
+  .container {
+    padding: 24px 16px;
+  }
+  
   .automationBanner {
     flex-direction: column;
     text-align: center;
+    padding: 20px;
+  }
+
+  .card {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .cardIcon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .title {
+    font-size: 24px;
   }
 }

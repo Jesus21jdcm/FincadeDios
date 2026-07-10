@@ -192,6 +192,147 @@
   animation: spin 0.6s linear infinite;
 }
 
+.btnSubmitSquare {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  border-radius: 8px; /* Casi cuadrado, esquinas muy ligeras para alta calidad */
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 15px;
+}
+
+.btnSubmitSquare:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  opacity: 1;
+}
+
+.spinnerSmall {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* --- Nuevos estilos para la tarjeta de éxito (Letrero de verificar) --- */
+.successCard {
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid #10B981;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.15);
+  animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.successBanner {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.statusIconOkAlt {
+  color: #fff;
+  background: rgba(255,255,255,0.2);
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.statusTitleAlt {
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.successBody {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.highlightText {
+  color: #10B981;
+  font-size: 16px;
+}
+
+.climaInfoBox {
+  width: 100%;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 10px;
+}
+
+.climaHeader {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted-foreground);
+  margin-bottom: 12px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.climaItems {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.climaItems span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--color-foreground);
+  font-weight: 500;
+}
+
+.climaItems svg {
+  color: #10B981;
+}
+
+.btnNewApp {
+  width: 100%;
+  background: #2AD7FF;
+  color: #000;
+  font-weight: 700;
+  border-radius: 8px;
+  margin-top: 10px;
+  transition: all 0.2s;
+}
+
+.btnNewApp:hover {
+  background: #1CB5DC;
+  transform: translateY(-1px);
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }

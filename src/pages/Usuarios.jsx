@@ -11,7 +11,6 @@ const AUTH_BASE = 'https://identitytoolkit.googleapis.com/v1';
 const ROLES_OPTS = [
   { value: 'empleado', label: 'Empleado', desc: 'Solo ve y finaliza sus tareas asignadas' },
   { value: 'encargado', label: 'Encargado', desc: 'Valida tareas, edita, aprueba' },
-  { value: 'admin', label: 'Administrador', desc: 'Asigna tareas, semaforo, gestiona cultivos' },
 ];
 
 const SvgIcon = ({ name, size = 16 }) => {
