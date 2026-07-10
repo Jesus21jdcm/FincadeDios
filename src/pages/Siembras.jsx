@@ -54,6 +54,7 @@ export default function Siembras({ autoOpenForm }) {
   const [filtroCultivo, setFiltroCultivo] = useState('');
   const [editingTaskModal, setEditingTaskModal] = useState(null);
   const [editingTaskData, setEditingTaskData] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   useEffect(() => {
     const unsubL = onSnapshot(query(collection(db, 'lotes')), snap => {
@@ -167,13 +168,19 @@ export default function Siembras({ autoOpenForm }) {
     setError('');
   };
 
-  const eliminarSiembra = async (id) => {
-    if (!window.confirm('Eliminar esta siembra? Tambien se eliminaran sus tareas.')) return;
+  const eliminarSiembra = (id) => {
+    setConfirmDelete(id);
+  };
+
+  const ejecutarEliminar = async () => {
+    if (!confirmDelete) return;
     try {
+      const id = confirmDelete;
       const tareasSnap = await getDocs(query(collection(db, 'tareas'), where('siembraId', '==', id)));
       const deleteOps = tareasSnap.docs.map(d => deleteDoc(doc(db, 'tareas', d.id)));
       await Promise.all(deleteOps);
       await deleteDoc(doc(db, 'siembras', id));
+      setConfirmDelete(null);
     } catch (err) {
       alert(err.message);
     }
@@ -594,6 +601,19 @@ export default function Siembras({ autoOpenForm }) {
           </div>
         );
       })()}
+
+      {confirmDelete && (
+        <div className={styles.modalOverlay} onClick={() => setConfirmDelete(null)}>
+          <div className={styles.confirmContent} onClick={e => e.stopPropagation()}>
+            <h3 className={styles.confirmTitle}>¿Eliminar siembra?</h3>
+            <p className={styles.confirmText}>Esta acción no se puede deshacer. Se eliminarán la siembra y todas sus tareas asociadas.</p>
+            <div className={styles.confirmActions}>
+              <button className={styles.btnSecondary} onClick={() => setConfirmDelete(null)}>Cancelar</button>
+              <button className={styles.btnDanger} onClick={ejecutarEliminar}>Eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

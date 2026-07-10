@@ -891,3 +891,50 @@
     flex-direction: column;
   }
 }
+
+.confirmContent {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 24px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  border-radius: 0;
+}
+
+.confirmTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 0 0 10px;
+}
+
+.confirmText {
+  font-size: 13px;
+  color: var(--color-muted-foreground);
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+
+.confirmActions {
+  display: flex;
+  gap: 12px;
+}
+
+.btnDanger {
+  flex: 1;
+  height: 40px;
+  border: none;
+  border-radius: 0;
+  background: var(--color-red);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btnDanger:hover {
+  opacity: 0.9;
+}

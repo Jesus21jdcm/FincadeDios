@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase';
-import { collection, query, where, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 const AppContext = createContext(null);
 
@@ -34,6 +34,15 @@ export function AppProvider({ children }) {
             }
           }
           if (userDoc) {
+            if (userDoc.rol === 'pendiente') {
+              const qAdmin = query(collection(db, 'usuarios'), where('rol', 'in', ['superadmin', 'admin']));
+              const snapAdmin = await getDocs(qAdmin);
+              const activeAdmins = snapAdmin.docs.filter(d => d.data().activo !== false);
+              if (activeAdmins.length === 0) {
+                await updateDoc(doc(db, 'usuarios', userDoc.id), { rol: 'superadmin' });
+                userDoc.rol = 'superadmin';
+              }
+            }
             setUserRole(userDoc.rol);
             setUserData({ id: userDoc.id, ...userDoc });
           } else {
@@ -45,8 +54,16 @@ export function AppProvider({ children }) {
               activo: true,
               createdAt: new Date().toISOString()
             };
+
+            const qAdmin = query(collection(db, 'usuarios'), where('rol', 'in', ['superadmin', 'admin']));
+            const snapAdmin = await getDocs(qAdmin);
+            const activeAdmins = snapAdmin.docs.filter(d => d.data().activo !== false);
+            if (activeAdmins.length === 0) {
+              newDoc.rol = 'superadmin';
+            }
+
             await setDoc(doc(db, 'usuarios', firebaseUser.uid), newDoc);
-            setUserRole('pendiente');
+            setUserRole(newDoc.rol);
             setUserData({ id: firebaseUser.uid, ...newDoc });
           }
         } catch {

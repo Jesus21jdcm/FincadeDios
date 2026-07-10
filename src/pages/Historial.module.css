@@ -1,6 +1,6 @@
 .container {
   padding: 24px;
-  max-width: 1100px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
@@ -59,8 +59,8 @@
   height: 40px;
   padding: 0 18px;
   border: none;
-  border-radius: 8px;
-  background: var(--color-accent);
+  border-radius: 0;
+  background: var(--color-primary);
   color: var(--color-on-primary);
   font-size: 13px;
   font-weight: 600;
@@ -88,7 +88,7 @@
   flex: 1;
   min-width: 160px;
   padding: 18px 20px;
-  border-radius: 12px;
+  border-radius: 0;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
 }
@@ -120,7 +120,7 @@
 }
 
 .tableContainer {
-  border-radius: 10px;
+  border-radius: 0;
   border: 1px solid var(--color-border);
   overflow-x: auto;
 }
@@ -201,8 +201,42 @@
   color: var(--color-accent);
 }
 
+.Saludable {
+  background: color-mix(in srgb, #16A34A 15%, transparent);
+  color: #16A34A;
+}
+
+.Alerta {
+  background: color-mix(in srgb, #D97706 15%, transparent);
+  color: #D97706;
+}
+
+.Critico {
+  background: color-mix(in srgb, #DC2626 15%, transparent);
+  color: #DC2626;
+}
+
 .empty {
   text-align: center;
   padding: 32px;
   color: var(--color-muted-foreground);
+}
+
+.btnDelete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: color-mix(in srgb, #EF4444 10%, transparent);
+  color: #EF4444;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnDelete:hover {
+  background: #EF4444;
+  color: white;
 }

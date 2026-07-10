@@ -50,20 +50,25 @@ export default function ApplyInput() {
     setProcesando(true);
 
     try {
-      const lat = lote?.ubicacion?.lat || -34.6037;
-      const lng = lote?.ubicacion?.lng || -58.3816;
-      const res = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${API_WEATHER}&lang=es`
-      );
-      const data = await res.json();
+      let climaData = null;
+      let lluvia = false;
+      
+      if (formData.loteId !== 'general') {
+        const lat = lote?.ubicacion?.lat || -34.6037;
+        const lng = lote?.ubicacion?.lng || -58.3816;
+        const res = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${API_WEATHER}&lang=es`
+        );
+        const data = await res.json();
 
-      const climaData = {
-        temp: data.main?.temp != null ? Math.round(data.main.temp - 273.15) : null,
-        humedad: data.main?.humidity ?? null,
-        condicion: data.weather?.[0]?.description ?? null,
-      };
-      const lluvia = ['Rain', 'Drizzle', 'Thunderstorm'].includes(data.weather?.[0]?.main);
-      setClima({ ...climaData, lluvia });
+        climaData = {
+          temp: data.main?.temp != null ? Math.round(data.main.temp - 273.15) : null,
+          humedad: data.main?.humidity ?? null,
+          condicion: data.weather?.[0]?.description ?? null,
+        };
+        lluvia = ['Rain', 'Drizzle', 'Thunderstorm'].includes(data.weather?.[0]?.main);
+        setClima({ ...climaData, lluvia });
+      }
 
       if (lluvia) {
         setStep('cancelado');
@@ -74,9 +79,14 @@ export default function ApplyInput() {
       setStep('registrando');
       await runTransaction(db, async (transaction) => {
         const insumoRef = doc(db, 'inventario', formData.insumoId);
-        const loteRef = doc(db, 'lotes', formData.loteId);
         const insumoSnap = await transaction.get(insumoRef);
-        const loteSnap = await transaction.get(loteRef);
+        
+        let loteSnap = null;
+        let loteRef = null;
+        if (formData.loteId !== 'general') {
+          loteRef = doc(db, 'lotes', formData.loteId);
+          loteSnap = await transaction.get(loteRef);
+        }
 
         if (!insumoSnap.exists()) throw new Error('Insumo no encontrado');
         const stockActual = insumoSnap.data().stock;
@@ -87,10 +97,12 @@ export default function ApplyInput() {
           ultimaActualizacion: Timestamp.now(),
         });
 
-        const appsPrev = loteSnap.data().aplicaciones || [];
-        transaction.update(loteRef, {
-          aplicaciones: [...appsPrev, { insumoId: formData.insumoId, cantidad, fecha: Timestamp.now() }],
-        });
+        if (loteSnap && loteSnap.exists()) {
+          const appsPrev = loteSnap.data().aplicaciones || [];
+          transaction.update(loteRef, {
+            aplicaciones: [...appsPrev, { insumoId: formData.insumoId, cantidad, fecha: Timestamp.now() }],
+          });
+        }
 
         const appRef = doc(collection(db, 'aplicaciones'));
         transaction.set(appRef, {
@@ -178,7 +190,7 @@ export default function ApplyInput() {
             <p className={styles.statusDesc}>
               El sistema ha registrado exitosamente la aplicación de:<br/>
               <strong className={styles.highlightText}>{formData.cantidad} {insumo?.unidad} de {insumo?.nombre}</strong><br/>
-              en el lote <strong>{lote?.nombre}</strong>.
+              {formData.loteId === 'general' ? 'para uso general.' : <>en el lote <strong>{lote?.nombre}</strong>.</>}
             </p>
             {clima && (
               <div className={styles.climaInfoBox}>
@@ -214,9 +226,10 @@ export default function ApplyInput() {
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
-            <label htmlFor="lote" className={styles.label}>Lote destino</label>
+            <label htmlFor="lote" className={styles.label}>Destino / Lote</label>
             <select id="lote" className={styles.select} value={formData.loteId} onChange={e => setFormData(f => ({ ...f, loteId: e.target.value }))} required>
-              <option value="">Seleccionar lote</option>
+              <option value="">Seleccionar destino</option>
+              <option value="general">Uso general (ningún lote específico)</option>
               {lotes.map(l => <option key={l.id} value={l.id}>{l.nombre} — {l.cultivo}</option>)}
             </select>
           </div>

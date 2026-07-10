@@ -193,21 +193,20 @@
 }
 
 .btnSubmitSquare {
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-  border-radius: 8px; /* Casi cuadrado, esquinas muy ligeras para alta calidad */
-  color: #fff;
-  font-weight: 700;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-size: 15px;
+  background: var(--color-primary);
+  border-radius: 0;
+  color: var(--color-on-primary);
+  font-weight: 600;
+  box-shadow: none;
+  border: none;
+  transition: opacity 0.2s ease;
+  font-size: 16px;
 }
 
 .btnSubmitSquare:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  opacity: 1;
+  opacity: 0.9;
+  transform: none;
+  box-shadow: none;
 }
 
 .spinnerSmall {

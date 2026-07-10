@@ -24,11 +24,12 @@ export async function notificarEncargado({ encargadoTelefono, empleadoNombre, ta
   await enviarMensaje({ to: encargadoTelefono, message });
 }
 
-export async function notificarAlertaCritica({ adminTelefono, loteNombre, cultivo, reportadoPor, fotoUrl }) {
+export async function notificarAlerta({ adminTelefono, loteNombre, cultivo, reportadoPor, fotoUrl, nivel }) {
   const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
   const enlaceFoto = fotoUrl || `${baseUrl}/monitoreo`;
   const enlaceAccion = `${baseUrl}/?action=correctiva&lote=${encodeURIComponent(loteNombre)}`;
-  const message = `🚨 *ALERTA CRÍTICA - Salud Vegetal*\n\n🌱 Lote: ${loteNombre}\n🌾 Cultivo: ${cultivo}\n👤 Reportó: ${reportadoPor}\n📸 Foto: ${enlaceFoto}\n\n🛠️ ¿Generar tarea correctiva?\n${enlaceAccion}`;
+  const titulo = nivel === 'Critico' ? '🚨 *ALERTA CRÍTICA' : '⚠️ *ALERTA';
+  const message = `${titulo} - Salud Vegetal*\n\n🌱 Lote: ${loteNombre}\n🌾 Cultivo: ${cultivo}\n👤 Reportó: ${reportadoPor}\n📸 Foto: ${enlaceFoto}\n\n🛠️ ¿Generar tarea correctiva?\n${enlaceAccion}`;
   await enviarMensaje({ to: adminTelefono, message });
 }
 

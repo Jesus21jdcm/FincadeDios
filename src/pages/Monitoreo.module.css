@@ -638,6 +638,48 @@
 .tagAlerta { background: #D97706; }
 .tagCritico { background: #DC2626; }
 
+.feedCardRevisionTag {
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  display: inline-block;
+  border: 1px solid var(--color-border);
+}
+
+.tagRevisado {
+  background: var(--color-muted);
+  color: var(--color-muted-foreground);
+  border-color: transparent;
+}
+
+.tagPendiente {
+  background: transparent;
+  color: var(--color-orange);
+  border-color: var(--color-orange);
+}
+
+.feedCardActionsBottom {
+  margin-top: 10px;
+  display: flex;
+}
+
+.btnReview {
+  flex: 1;
+  height: 36px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btnReview:hover {
+  opacity: 0.9;
+}
+
 .feedCardHeaderActions {
   display: flex;
   align-items: center;

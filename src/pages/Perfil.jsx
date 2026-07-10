@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { auth, db } from '../firebase';
-import { updateEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import { verifyBeforeUpdateEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useAppContext } from '../context/AppContext';
 import styles from './Perfil.module.css';
@@ -39,15 +39,11 @@ export default function Perfil() {
       let emailChanged = false;
       let passwordChanged = false;
 
-      // Actualizar Email
+      // Actualizar Email con Verificación
       if (newEmail && newEmail !== user.email) {
-        await updateEmail(user, newEmail);
-        // Actualizar en Firestore
-        if (userData?.id) {
-          await updateDoc(doc(db, 'usuarios', userData.id), {
-            email: newEmail
-          });
-        }
+        await verifyBeforeUpdateEmail(user, newEmail);
+        // Firebase enviará un correo. No actualizamos Firestore aún hasta que lo verifique,
+        // pero le avisaremos al usuario en el mensaje de éxito.
         emailChanged = true;
       }
 
@@ -60,7 +56,7 @@ export default function Perfil() {
         passwordChanged = true;
       }
 
-      setSuccess(`Actualización exitosa: ${emailChanged ? 'Correo actualizado.' : ''} ${passwordChanged ? 'Contraseña actualizada.' : ''}`);
+      setSuccess(`Actualización exitosa: ${emailChanged ? 'Se ha enviado un correo al nuevo email. Debes abrir el enlace en ese correo para verificar y aplicar el cambio. ' : ''}${passwordChanged ? 'Contraseña actualizada.' : ''}`);
       setCurrentPassword('');
       setNewEmail('');
       setNewPassword('');

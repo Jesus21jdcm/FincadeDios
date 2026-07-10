@@ -9,8 +9,9 @@ const API_KEY = import.meta.env.VITE_FIREBASE_API_KEY;
 const AUTH_BASE = 'https://identitytoolkit.googleapis.com/v1';
 
 const ROLES_OPTS = [
-  { value: 'empleado', label: 'Empleado', desc: 'Solo ve y finaliza sus tareas asignadas' },
+  { value: 'superadmin', label: 'Administrador', desc: 'Acceso total a todas las funciones' },
   { value: 'encargado', label: 'Encargado', desc: 'Valida tareas, edita, aprueba' },
+  { value: 'empleado', label: 'Empleado', desc: 'Solo ve y finaliza sus tareas asignadas' },
 ];
 
 const SvgIcon = ({ name, size = 16 }) => {
@@ -34,7 +35,7 @@ export default function Usuarios() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [modalUser, setModalUser] = useState(null);
-  const [modalForm, setModalForm] = useState({ nombre: '', rol: '', newPassword: '' });
+  const [modalForm, setModalForm] = useState({ nombre: '', email: '', rol: '', newPassword: '' });
   const [modalError, setModalError] = useState('');
   const [modalSuccess, setModalSuccess] = useState('');
   const [enviandoReset, setEnviandoReset] = useState(false);
@@ -146,7 +147,7 @@ export default function Usuarios() {
 
   const openModal = (usuario) => {
     setModalUser(usuario);
-    setModalForm({ nombre: usuario.nombre || '', rol: usuario.rol || '', newPassword: '' });
+    setModalForm({ nombre: usuario.nombre || '', email: usuario.email || '', rol: usuario.rol || '', newPassword: '' });
     setModalError('');
     setModalSuccess('');
   };
@@ -162,6 +163,7 @@ export default function Usuarios() {
     try {
       await updateDoc(doc(db, 'usuarios', modalUser.id), {
         nombre: modalForm.nombre,
+        email: modalForm.email,
         rol: modalForm.rol,
       });
       setModalSuccess('Cambios guardados exitosamente');
@@ -309,10 +311,10 @@ export default function Usuarios() {
                   <td>
                       <select
                         className={`${styles.rolSelect} ${u.rol === 'pendiente' ? styles.rolPendiente : ''}`}
-                        value={u.rol === 'superadmin' ? 'admin' : u.rol}
+                        value={u.rol}
                         onChange={e => handleRolChange(u.id, e.target.value)}
-                        disabled={u.rol === 'superadmin'}
                       >
+                        {u.rol === 'pendiente' && <option value="pendiente">Pendiente</option>}
                         {ROLES_OPTS.map(r => (
                           <option key={r.value} value={r.value}>{r.label}</option>
                         ))}
@@ -320,16 +322,14 @@ export default function Usuarios() {
                   </td>
                   <td>
                     <div className={styles.actionBtns}>
-                      {u.rol !== 'superadmin' && (
                         <>
                           <button className={styles.btnIcon} onClick={() => openModal(u)} title="Editar / Restablecer contrasena">
                             <SvgIcon name="edit" size={16} />
                           </button>
-                          <button className={styles.btnIcon} onClick={() => setDeleteTarget(u)} title="Desactivar">
+                          <button className={styles.btnIcon} onClick={() => setDeleteTarget(u)} title="Desactivar / Eliminar">
                             <SvgIcon name="trash" size={16} />
                           </button>
                         </>
-                      )}
                     </div>
                   </td>
                 </tr>
@@ -402,8 +402,13 @@ export default function Usuarios() {
                 <input className={styles.input} type="text" value={modalForm.nombre} onChange={e => setModalForm(f => ({ ...f, nombre: e.target.value }))} />
               </div>
               <div className={styles.field}>
+                <label className={styles.label}>Correo electrónico</label>
+                <input className={styles.input} type="email" value={modalForm.email} onChange={e => setModalForm(f => ({ ...f, email: e.target.value }))} />
+              </div>
+              <div className={styles.field}>
                 <label className={styles.label}>Rol</label>
-                <select className={styles.select} value={modalForm.rol === 'superadmin' ? 'admin' : modalForm.rol} onChange={e => setModalForm(f => ({ ...f, rol: e.target.value }))} disabled={modalUser?.rol === 'superadmin'}>
+                <select className={styles.select} value={modalForm.rol} onChange={e => setModalForm(f => ({ ...f, rol: e.target.value }))}>
+                  {modalForm.rol === 'pendiente' && <option value="pendiente">Pendiente</option>}
                   {ROLES_OPTS.map(r => (
                     <option key={r.value} value={r.value}>{r.label}</option>
                   ))}

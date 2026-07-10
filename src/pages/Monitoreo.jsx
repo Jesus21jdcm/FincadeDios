@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { db, storage, auth } from '../firebase';
-import { collection, query, onSnapshot, addDoc, orderBy, getDocs, where, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, onSnapshot, addDoc, orderBy, getDocs, where, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { notificarAlertaCritica } from '../utils/whatsapp';
+import { notificarAlerta } from '../utils/whatsapp';
 import { uploadImageToCloudinary } from '../utils/cloudinary';
 import { useAppContext } from '../context/AppContext';
 import styles from './Monitoreo.module.css';
@@ -162,32 +162,36 @@ export default function Monitoreo() {
         usuario: auth.currentUser.uid,
         comentario,
         salud,
+        estadoRevision: 'pendiente',
       });
 
-      if (salud === 'Critico') {
+      if (salud === 'Critico' || salud === 'Alerta') {
         const lote = lotes.find(l => l.id === loteSeleccionado);
         await addDoc(collection(db, 'alertas'), {
-          tipo: 'salud_critica',
+          tipo: salud === 'Critico' ? 'critico' : 'alerta',
+          titulo: `Problema de Salud: ${salud}`,
+          descripcion: comentario || `Se reportó estado de salud ${salud} en lote ${lote?.nombre}`,
           loteId: loteSeleccionado,
           loteNombre: lote?.nombre || loteSeleccionado,
           cultivo: lote?.cultivo || '—',
           fotoUrl: url,
-          comentario,
           reportadoPor: auth.currentUser.uid,
           fecha: new Date().toISOString(),
           estado: 'pendiente',
+          target: 'monitoreo'
         });
 
         const q = query(collection(db, 'usuarios'), where('rol', '==', 'admin'));
         const admins = await getDocs(q);
         admins.forEach(d => {
           if (d.data().telefono) {
-            notificarAlertaCritica({
+            notificarAlerta({
               adminTelefono: d.data().telefono,
               loteNombre: lote?.nombre || loteSeleccionado,
               cultivo: lote?.cultivo || '—',
               reportadoPor: auth.currentUser.email || 'Desconocido',
               fotoUrl: url,
+              nivel: salud
             });
           }
         });
@@ -204,6 +208,23 @@ export default function Monitoreo() {
   };
 
   const [confirmDelete, setConfirmDelete] = useState(null);
+
+  const marcarComoRevisado = async (loteId, fotoId, fotoUrl) => {
+    try {
+      await updateDoc(doc(db, 'lotes', loteId, 'fotos', fotoId), {
+        estadoRevision: 'revisado'
+      });
+      if (fotoUrl) {
+        const alertasQ = query(collection(db, 'alertas'), where('fotoUrl', '==', fotoUrl), where('estado', '==', 'pendiente'));
+        const alertasSnap = await getDocs(alertasQ);
+        alertasSnap.forEach(async (alertaDoc) => {
+          await updateDoc(doc(db, 'alertas', alertaDoc.id), { estado: 'revisado' });
+        });
+      }
+    } catch (err) {
+      alert('Error al marcar como revisado: ' + err.message);
+    }
+  };
 
   const iniciarEliminacion = (loteId, fotoId) => {
     setConfirmDelete({ loteId, fotoId });
@@ -286,6 +307,11 @@ export default function Monitoreo() {
                           }`}>
                             {foto.salud}
                           </span>
+                          <span className={`${styles.feedCardRevisionTag} ${
+                            foto.estadoRevision === 'revisado' ? styles.tagRevisado : styles.tagPendiente
+                          }`}>
+                            {foto.estadoRevision === 'revisado' ? 'Revisado' : 'Pendiente'}
+                          </span>
                           {userRole !== 'empleado' && (
                             <button
                               className={styles.deleteBtn}
@@ -313,6 +339,19 @@ export default function Monitoreo() {
                             {SvgClock} {new Date(foto.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
+                        {userRole !== 'empleado' && foto.estadoRevision !== 'revisado' && (
+                          <div className={styles.feedCardActionsBottom}>
+                             <button
+                               className={styles.btnReview}
+                               onClick={(e) => {
+                                 e.stopPropagation();
+                                 marcarComoRevisado(foto.loteId, foto.id, foto.url);
+                               }}
+                             >
+                               Marcar como Revisado
+                             </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -442,6 +481,11 @@ export default function Monitoreo() {
                               }`}>
                                 {f.salud}
                               </span>
+                              <span className={`${styles.feedCardRevisionTag} ${
+                                f.estadoRevision === 'revisado' ? styles.tagRevisado : styles.tagPendiente
+                              }`}>
+                                {f.estadoRevision === 'revisado' ? 'Revisado' : 'Pendiente'}
+                              </span>
                               {userRole !== 'empleado' && (
                                 <button
                                   className={styles.deleteBtn}
@@ -469,6 +513,19 @@ export default function Monitoreo() {
                                 {SvgClock} {new Date(f.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                               </span>
                             </div>
+                            {userRole !== 'empleado' && f.estadoRevision !== 'revisado' && (
+                              <div className={styles.feedCardActionsBottom}>
+                                <button
+                                  className={styles.btnReview}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    marcarComoRevisado(loteSeleccionado, f.id, f.url);
+                                  }}
+                                >
+                                  Marcar como Revisado
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
