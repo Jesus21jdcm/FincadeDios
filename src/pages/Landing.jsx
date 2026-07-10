@@ -1,14 +1,44 @@
 import React from 'react';
 import styles from './Landing.module.css';
 
-const SvgIcon = ({ name, size = 24 }) => {
+// Import images
+import heroBgField from '../assets/images/hero_bg_field.webp';
+import appMockup from '../assets/images/app_mockup.webp';
+
+const GrassSeparator = ({ flip = false, fill = "#ffffff" }) => (
+  <div className={styles.grassSeparator} style={{ transform: flip ? 'rotate(180deg)' : 'none' }}>
+    <svg viewBox="0 0 1200 60" preserveAspectRatio="none" style={{ width: '100%', height: '100%', display: 'block' }}>
+      <path fill={fill} d="M0,60 L0,30 Q10,15 20,30 T40,30 T60,30 T80,30 T100,30 T120,30 T140,30 T160,30 T180,30 T200,30 T220,30 T240,30 T260,30 T280,30 T300,30 T320,30 T340,30 T360,30 T380,30 T400,30 T420,30 T440,30 T460,30 T480,30 T500,30 T520,30 T540,30 T560,30 T580,30 T600,30 T620,30 T640,30 T660,30 T680,30 T700,30 T720,30 T740,30 T760,30 T780,30 T800,30 T820,30 T840,30 T860,30 T880,30 T900,30 T920,30 T940,30 T960,30 T980,30 T1000,30 T1020,30 T1040,30 T1060,30 T1080,30 T1100,30 T1120,30 T1140,30 T1160,30 T1180,30 T1200,30 L1200,60 Z" />
+      {/* Simple jagged pattern for grass */}
+      <path fill={fill} d="M0,60 L0,40 L10,20 L20,40 L30,10 L40,35 L50,15 L60,40 L70,5 L80,35 L90,10 L100,45 L110,20 L120,40 L130,15 L140,45 L150,10 L160,40 L170,25 L180,45 L190,15 L200,40 L210,10 L220,35 L230,20 L240,40 L250,5 L260,45 L270,15 L280,40 L290,20 L300,45 L310,10 L320,40 L330,25 L340,45 L350,15 L360,40 L370,10 L380,35 L390,20 L400,45 L410,5 L420,40 L430,25 L440,45 L450,15 L460,40 L470,10 L480,35 L490,20 L500,45 L510,15 L520,40 L530,5 L540,45 L550,20 L560,40 L570,10 L580,35 L590,25 L600,45 L610,15 L620,40 L630,5 L640,45 L650,20 L660,40 L670,10 L680,35 L690,25 L700,45 L710,15 L720,40 L730,5 L740,45 L750,20 L760,40 L770,10 L780,35 L790,25 L800,45 L810,15 L820,40 L830,10 L840,45 L850,20 L860,40 L870,5 L880,35 L890,15 L900,45 L910,20 L920,40 L930,10 L940,35 L950,25 L960,45 L970,15 L980,40 L990,5 L1000,45 L1010,20 L1020,40 L1030,10 L1040,35 L1050,25 L1060,45 L1070,15 L1080,40 L1090,5 L1100,45 L1110,20 L1120,40 L1130,10 L1140,35 L1150,25 L1160,45 L1170,15 L1180,40 L1190,5 L1200,45 L1200,60 Z" />
+    </svg>
+  </div>
+);
+
+const LogoSvg = () => (
+  <svg width="200" height="40" viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <text x="0" y="30" fontFamily="'Montserrat', sans-serif" fontWeight="900" fontSize="28" fill="#0D2E1C" letterSpacing="1">FINCA</text>
+    <text x="90" y="30" fontFamily="'Montserrat', sans-serif" fontWeight="900" fontSize="28" fill="#5EBC67" letterSpacing="1">DIGI</text>
+    <path d="M165 15 C 165 5, 175 0, 180 15 C 185 30, 175 35, 165 15 Z" fill="#5EBC67" />
+  </svg>
+);
+
+const FooterLogoSvg = () => (
+  <svg width="200" height="40" viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ margin: '0 auto' }}>
+    <text x="0" y="30" fontFamily="'Montserrat', sans-serif" fontWeight="900" fontSize="28" fill="#FFFFFF" letterSpacing="1">FINCA</text>
+    <text x="90" y="30" fontFamily="'Montserrat', sans-serif" fontWeight="900" fontSize="28" fill="#5EBC67" letterSpacing="1">DIGI</text>
+  </svg>
+);
+
+const SvgIcon = ({ name, size = 48 }) => {
   const icons = {
-    leaf: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 19 2c1 2 2 4.5 2 8 0 5.5-4.78 10-10 10Z" /><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" /></svg>,
-    check: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>,
-    arrowRight: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>,
-    activity: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>,
-    users: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>,
-    cloudRain: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" /><path d="M16 14v6" /><path d="M8 14v6" /><path d="M12 16v6" /></svg>
+    tractor: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#5EBC67" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11V19H5M7 19H17M19 19H21V15C21 13 19 11 17 11H13V7H7V11H3"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg>,
+    leaf: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#5EBC67" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>,
+    sun: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#5EBC67" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>,
+    home: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#5EBC67" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+    facebook: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3.81l.39-4h-4.2V7a1 1 0 0 1 1-1h3z"/></svg>,
+    instagram: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>,
+    twitter: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
   };
   return icons[name] || null;
 };
@@ -16,146 +46,135 @@ const SvgIcon = ({ name, size = 24 }) => {
 export default function Landing({ onGoToLogin, onGoToRegister }) {
   return (
     <div className={styles.landingContainer}>
-      {/* NAVEGACIÓN SUPERIOR */}
+      {/* NAVBAR */}
       <nav className={styles.navbar}>
-        <div className={styles.logo}>
-          <svg width="155" height="33" viewBox="0 0 140 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <g transform="translate(0, 0)">
-              <path d="M4 10C4 4.477 8.477 0 14 0H24.5C26.985 0 29 2.015 29 4.5C29 6.985 26.985 9 24.5 9H14.5C13.67 9 13 9.67 13 10.5V26.5C13 27.88 11.88 29 10.5 29H6.5C5.12 29 4 27.88 4 26.5V10Z" fill="url(#gradLogoLanding1)" />
-              <path d="M13 13H20.5C22.985 13 25 15.015 25 17.5C25 19.985 22.985 22 20.5 22H13V13Z" fill="url(#gradLogoLanding2)" />
-            </g>
-            <defs>
-              <linearGradient id="gradLogoLanding1" x1="4" y1="0" x2="29" y2="29" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#34D399" />
-                <stop offset="1" stopColor="#14C2F4" />
-              </linearGradient>
-              <linearGradient id="gradLogoLanding2" x1="13" y1="13" x2="25" y2="22" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#14C2F4" />
-                <stop offset="1" stopColor="#633AF8" />
-              </linearGradient>
-            </defs>
-            <text x="36" y="21" fontFamily="'Poppins', sans-serif" fontWeight="800" fontSize="17" fill="var(--color-foreground)" letterSpacing="0.5">FINCA</text>
-            <text x="86" y="21" fontFamily="'Poppins', sans-serif" fontWeight="800" fontSize="17" fill="var(--color-cyan)" letterSpacing="0.5">DIGI</text>
-          </svg>
+        <div className={styles.logoContainer}>
+          <LogoSvg />
         </div>
-        <div className={styles.navActions}>
-          <button className={styles.loginBtn} onClick={onGoToLogin}>
-            Iniciar Sesión
-          </button>
-          <button className={styles.registerBtn} onClick={onGoToRegister}>
-            Registrarse
-          </button>
-        </div>
+        <button className={styles.uiButton} onClick={onGoToLogin}>
+          ACCEDER
+          <div className={styles.uiIcon}>
+            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"></path><path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z" fill="currentColor"></path></svg>
+          </div>
+        </button>
       </nav>
 
       {/* HERO SECTION */}
-      <header className={styles.heroSection}>
+      <section className={styles.heroSection} style={{ backgroundImage: `url(${heroBgField})` }}>
+        <div className={styles.heroOverlay}></div>
         <div className={styles.heroContent}>
-          <span className={styles.heroBadge}>El futuro del agro</span>
-          <h1 className={styles.heroTitle}>Control total y gestión inteligente de tus cultivos</h1>
-          <p className={styles.heroSubtitle}>
-            Administra personal, monitorea clima, supervisa inventarios y realiza trazabilidad completa de tus siembras en tiempo real con la plataforma agrícola más intuitiva.
+          <p className={styles.heroPreTitle}>BIENVENIDO A</p>
+          <h1 className={styles.heroTitle}>Finca Digi<br/>Gestión Agrícola</h1>
+          <p className={styles.heroSlogan}>
+            Los cultivos hermosos no ocurren por casualidad — ocurren con cuidado.
           </p>
-          <div className={styles.heroActions}>
-            <button className={styles.primaryBtn} onClick={onGoToLogin}>
-              Acceder al Sistema <SvgIcon name="arrowRight" size={18} />
+        </div>
+        <GrassSeparator fill="#ffffff" />
+      </section>
+
+      {/* MAIN CONTENT SECTION */}
+      <section className={styles.contentSection}>
+        <div className={styles.textContent}>
+          <h2>
+            Estamos emocionados de ayudarte a mantener un cultivo limpio, <strong>sano y perfectamente monitoreado todo el año.</strong>
+          </h2>
+          <p>
+            Nuestro equipo profesional usa herramientas tecnológicas modernas y técnicas probadas para mantener tus terrenos siempre en su mejor estado.
+          </p>
+        </div>
+
+        {/* GRID CARDS */}
+        <div className={styles.gridContainer}>
+          <div className={styles.serviceCard}>
+            <div className={styles.iconWrapper}><SvgIcon name="leaf" /></div>
+            <h3>Yuca y Tubérculos</h3>
+          </div>
+          <div className={styles.serviceCard}>
+            <div className={styles.iconWrapper}><SvgIcon name="tractor" /></div>
+            <h3>Manejo de Plátano</h3>
+          </div>
+          <div className={styles.serviceCard}>
+            <div className={styles.iconWrapper}><SvgIcon name="sun" /></div>
+            <h3>Trazabilidad de Maíz</h3>
+          </div>
+          <div className={styles.serviceCard}>
+            <div className={styles.iconWrapper}><SvgIcon name="home" /></div>
+            <h3>Supervisión de Cacao</h3>
+          </div>
+        </div>
+
+        {/* SYSTEM SECTION */}
+        <div className={styles.systemSection}>
+          <div className={styles.systemHeader}>
+            <h3>Conoce Nuestro Sistema Integral</h3>
+            <p>Una plataforma completa diseñada específicamente para transformar la manera en que administras tu finca y aumentar tu rentabilidad.</p>
+          </div>
+          
+          <div className={styles.systemGrid}>
+            <div className={styles.systemCard}>
+              <div className={styles.systemIcon}><SvgIcon name="leaf" size={32}/></div>
+              <h4>Trazabilidad de Lotes</h4>
+              <p>Lleva un registro detallado de todas tus cosechas, desde la siembra hasta la distribución.</p>
+            </div>
+            <div className={styles.systemCard}>
+              <div className={styles.systemIcon}><SvgIcon name="tractor" size={32}/></div>
+              <h4>Gestión de Empleados</h4>
+              <p>Controla roles, asigna tareas específicas y haz seguimiento del rendimiento del personal.</p>
+            </div>
+            <div className={styles.systemCard}>
+              <div className={styles.systemIcon}><SvgIcon name="sun" size={32}/></div>
+              <h4>Alertas Climáticas</h4>
+              <p>Recibe notificaciones tempranas y monitorea el clima en tiempo real para proteger tus cultivos.</p>
+            </div>
+            <div className={styles.systemCard}>
+              <div className={styles.systemIcon}><SvgIcon name="home" size={32}/></div>
+              <h4>Decisiones con Datos</h4>
+              <p>Accede a reportes y estadísticas claras para optimizar tus recursos y reducir las mermas.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* APP SECTION */}
+        <div className={styles.appPromoSection}>
+          <div className={styles.appContentText}>
+            <h3>¿Gestión desde el campo?</h3>
+            <p>Descarga nuestra aplicación móvil y sincroniza datos sin conexión. Monitorea empleados, clima y rendimiento desde tu teléfono, en cualquier lugar.</p>
+            <button className={styles.uiButton}>
+              DESCARGAR APK
+              <div className={styles.uiIcon}>
+                <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"></path><path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z" fill="currentColor"></path></svg>
+              </div>
             </button>
           </div>
-        </div>
-
-        <div className={styles.heroGallery}>
-          <div className={styles.galleryCol}>
-            <img src="/cacao.perfil.jpg" alt="Cultivo de Cacao" className={`${styles.galleryImg} ${styles.slideUp}`} />
-            <img src="/platano.perfil.jpg" alt="Cultivo de Plátano" className={`${styles.galleryImg} ${styles.slideDown}`} />
-          </div>
-          <div className={styles.galleryCol} style={{ marginTop: '40px' }}>
-            <img src="/maiz.perfil.jpg" alt="Cultivo de Maíz" className={`${styles.galleryImg} ${styles.slideUpDelay}`} />
-            <img src="/yuca.perfil.jpg" alt="Cultivo de Yuca" className={`${styles.galleryImg} ${styles.slideDownDelay}`} />
-          </div>
-        </div>
-      </header>
-
-      {/* BENEFICIOS / CARACTERÍSTICAS */}
-      <section className={styles.featuresSection}>
-        <div className={styles.featuresHeader}>
-          <h2>Digitaliza el corazón de tu finca</h2>
-          <p>Toma el control de cada etapa del proceso agrícola con herramientas precisas.</p>
-        </div>
-
-        <div className={styles.featuresGrid}>
-          <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>
-              <SvgIcon name="activity" size={24} />
-            </div>
-            <h3>Trazabilidad de Siembras</h3>
-            <p>Monitorea cada lote desde la siembra hasta la cosecha, con historial completo y reportes al instante.</p>
-          </div>
-
-          <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>
-              <SvgIcon name="users" size={24} />
-            </div>
-            <h3>Gestión Operativa</h3>
-            <p>Asigna tareas a tus empleados, haz seguimiento de avances y valida el cumplimiento a través del panel de control.</p>
-          </div>
-
-          <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>
-              <SvgIcon name="cloudRain" size={24} />
-            </div>
-            <h3>Agro Inteligencia</h3>
-            <p>Datos en tiempo real, alertas críticas y monitoreo climatológico para que siempre tomes la mejor decisión.</p>
+          <div className={styles.appContentImage}>
+            <img src={appMockup} alt="App Móvil Finca Digi" className={styles.mockupImg} />
           </div>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className={styles.footer}>
+      <section className={styles.footerSection}>
+        <GrassSeparator fill="#0D2E1C" flip={true} />
         <div className={styles.footerContent}>
-          <div className={styles.footerMain}>
-            <div className={styles.logo}>
-              <svg width="155" height="33" viewBox="0 0 140 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g transform="translate(0, 0)">
-                  <path d="M4 10C4 4.477 8.477 0 14 0H24.5C26.985 0 29 2.015 29 4.5C29 6.985 26.985 9 24.5 9H14.5C13.67 9 13 9.67 13 10.5V26.5C13 27.88 11.88 29 10.5 29H6.5C5.12 29 4 27.88 4 26.5V10Z" fill="url(#gradLogoFooter1)" />
-                  <path d="M13 13H20.5C22.985 13 25 15.015 25 17.5C25 19.985 22.985 22 20.5 22H13V13Z" fill="url(#gradLogoFooter2)" />
-                </g>
-                <defs>
-                  <linearGradient id="gradLogoFooter1" x1="4" y1="0" x2="29" y2="29" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#34D399" />
-                    <stop offset="1" stopColor="#14C2F4" />
-                  </linearGradient>
-                  <linearGradient id="gradLogoFooter2" x1="13" y1="13" x2="25" y2="22" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#14C2F4" />
-                    <stop offset="1" stopColor="#633AF8" />
-                  </linearGradient>
-                </defs>
-                <text x="36" y="21" fontFamily="'Poppins', sans-serif" fontWeight="800" fontSize="17" fill="#ffffff" letterSpacing="0.5">FINCA</text>
-                <text x="86" y="21" fontFamily="'Poppins', sans-serif" fontWeight="800" fontSize="17" fill="var(--color-cyan)" letterSpacing="0.5">DIGI</text>
-              </svg>
-            </div>
-            <p className={styles.footerDesc}>
-              El ecosistema definitivo para la trazabilidad y gestión inteligente de tus proyectos agrícolas.
-            </p>
+          <FooterLogoSvg />
+          
+          <div className={styles.contactInfo}>
+            <p className={styles.contactLabel}>¿Tienes alguna duda? Escríbenos a:</p>
+            <p className={styles.contactEmail}>contacto@fincadigi.com</p>
           </div>
-          <div className={styles.footerLinks}>
-            <div className={styles.linkGroup}>
-              <h4>Plataforma</h4>
-              <a href="#">Trazabilidad</a>
-              <a href="#">Gestión Operativa</a>
-              <a href="#">Agro Inteligencia</a>
-            </div>
-            <div className={styles.linkGroup}>
-              <h4>Compañía</h4>
-              <a href="#">Sobre Nosotros</a>
-              <a href="#">Centro de Ayuda</a>
-              <a href="#">Términos de Servicio</a>
+
+          <div className={styles.socialInfo}>
+            <p className={styles.socialLabel}>CONÉCTATE CON NOSOTROS</p>
+            <div className={styles.socialIcons}>
+              <a href="#"><SvgIcon name="facebook" /></a>
+              <a href="#"><SvgIcon name="instagram" /></a>
+              <a href="#"><SvgIcon name="twitter" /></a>
             </div>
           </div>
+
+          <p className={styles.unsubscribeText}>Si no deseas recibir correos de nosotros, <a href="#">desuscríbete</a></p>
         </div>
-        <div className={styles.footerBottom}>
-          <p className={styles.copyright}>© {new Date().getFullYear()} Finca Digi. Todos los derechos reservados.</p>
-        </div>
-      </footer>
+      </section>
     </div>
   );
 }

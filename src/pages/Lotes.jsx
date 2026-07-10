@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { db, storage } from '../firebase';
-import { collection, query, onSnapshot, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, onSnapshot, addDoc, doc, updateDoc, deleteDoc, where, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useAppContext } from '../context/AppContext';
+import cacaoPerfil from '../assets/images/cacao.perfil.webp';
+import maizPerfil from '../assets/images/maiz.perfil.webp';
+import platanoPerfil from '../assets/images/platano.perfil.webp';
+import yucaPerfil from '../assets/images/yuca.perfil.webp';
 import styles from './Lotes.module.css';
 
 delete L.Icon.Default.prototype._getIconUrl;
@@ -48,14 +52,14 @@ const SvgAlertCircle = <svg width="16" height="16" viewBox="0 0 24 24" fill="non
 const SvgCheck = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
 const SvgMountain = <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3l4 8 5-5 5 15H2L8 3z"/></svg>;
 
-const getCultivoImage = (cultivo) => {
-  const norm = cultivo?.toLowerCase() || '';
-  if (norm.includes('cacao')) return '/cacao.perfil.jpg';
-  if (norm.includes('maíz') || norm.includes('maiz')) return '/maiz.perfil.jpg';
-  if (norm.includes('plátano') || norm.includes('platano')) return '/platano.perfil.jpg';
-  if (norm.includes('yuca')) return '/yuca.perfil.jpg';
-  return null;
-};
+export function getLoteImage(cultivo) {
+  const norm = (cultivo || '').toLowerCase();
+  if (norm.includes('cacao')) return cacaoPerfil;
+  if (norm.includes('maíz') || norm.includes('maiz')) return maizPerfil;
+  if (norm.includes('plátano') || norm.includes('platano')) return platanoPerfil;
+  if (norm.includes('yuca')) return yucaPerfil;
+  return 'https://images.unsplash.com/photo-1592982537447-6f23f05db0c6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
+}
 
 export default function Lotes({ autoOpenForm }) {
   const { userRole } = useAppContext();
@@ -144,6 +148,27 @@ export default function Lotes({ autoOpenForm }) {
     if (!deleteTarget) return;
     try {
       setEliminando(true);
+
+      const deleteOps = [];
+
+      // 1. Encontrar todas las siembras de este lote
+      const siembrasSnap = await getDocs(query(collection(db, 'siembras'), where('loteId', '==', deleteTarget.id)));
+      for (const siembraDoc of siembrasSnap.docs) {
+        // Encontrar todas las tareas de cada siembra
+        const tareasSnap = await getDocs(query(collection(db, 'tareas'), where('siembraId', '==', siembraDoc.id)));
+        tareasSnap.docs.forEach(t => deleteOps.push(deleteDoc(doc(db, 'tareas', t.id))));
+        // Eliminar la siembra
+        deleteOps.push(deleteDoc(doc(db, 'siembras', siembraDoc.id)));
+      }
+
+      // 2. Encontrar todas las alertas de este lote
+      const alertasSnap = await getDocs(query(collection(db, 'alertas'), where('loteId', '==', deleteTarget.id)));
+      alertasSnap.docs.forEach(a => deleteOps.push(deleteDoc(doc(db, 'alertas', a.id))));
+
+      // 3. Ejecutar eliminaciones en cascada
+      await Promise.all(deleteOps);
+
+      // 4. Eliminar el lote final
       await deleteDoc(doc(db, 'lotes', deleteTarget.id));
       setDeleteTarget(null);
     } catch (err) {
@@ -224,8 +249,8 @@ export default function Lotes({ autoOpenForm }) {
           <div key={lote.id} className={styles.loteCard}>
             <div className={styles.cardTop}>
               <div className={styles.imgWrapper}>
-                {lote.fotoUrl || getCultivoImage(lote.cultivo) ? (
-                  <img src={lote.fotoUrl || getCultivoImage(lote.cultivo)} alt="" className={styles.loteCardImg} />
+                {lote.fotoUrl || getLoteImage(lote.cultivo) ? (
+                  <img src={lote.fotoUrl || getLoteImage(lote.cultivo)} alt="" className={styles.loteCardImg} />
                 ) : (
                   <div className={styles.loteIconPlaceholder}>{SvgMountain}</div>
                 )}

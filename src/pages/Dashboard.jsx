@@ -120,7 +120,7 @@ export default function Dashboard({ onNavigate }) {
         count,
         percent: Math.round((count / total) * 100)
       })).sort((a, b) => b.count - a.count);
-      
+
       // Fix potential rounding issue (total percentage != 100)
       if (distArr.length > 0) {
         const sum = distArr.reduce((acc, curr) => acc + curr.percent, 0);
@@ -170,9 +170,9 @@ export default function Dashboard({ onNavigate }) {
   const userName = auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'Usuario';
 
   const rolePanels = {
-    superadmin: { id: 'paneladmin', label: 'Panel Admin' },
-    admin: { id: 'paneladmin', label: 'Panel Admin' },
-    encargado: { id: 'panelencargado', label: 'Panel Encargado' },
+    superadmin: { id: 'eladmin', label: 'Panel Admin' },
+    admin: { id: 'eladmin', label: 'Panel Admin' },
+    encargado: { id: 'elencargado', label: 'Panel Encargado' },
     empleado: { id: 'elempleado', label: 'Mis Tareas' },
   };
 
@@ -249,17 +249,17 @@ export default function Dashboard({ onNavigate }) {
               {/* Donut Chart */}
               <div style={{
                 width: '80px', height: '80px', borderRadius: '50%',
-                background: cropDistribution.length > 0 
+                background: cropDistribution.length > 0
                   ? (() => {
-                      let currentPercent = 0;
-                      const colors = ['#FFD166', '#34D399', '#14C2F4', '#7E4FF6', '#FF5A5F', '#A78BFA'];
-                      const segments = cropDistribution.map((item, i) => {
-                        const start = currentPercent;
-                        currentPercent += item.percent;
-                        return `${colors[i % colors.length]} ${start}% ${currentPercent}%`;
-                      });
-                      return `conic-gradient(${segments.join(', ')})`;
-                    })()
+                    let currentPercent = 0;
+                    const colors = ['#FFD166', '#34D399', '#14C2F4', '#7E4FF6', '#FF5A5F', '#A78BFA'];
+                    const segments = cropDistribution.map((item, i) => {
+                      const start = currentPercent;
+                      currentPercent += item.percent;
+                      return `${colors[i % colors.length]} ${start}% ${currentPercent}%`;
+                    });
+                    return `conic-gradient(${segments.join(', ')})`;
+                  })()
                   : '#E8EAF3',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 boxShadow: 'var(--shadow-sm)'

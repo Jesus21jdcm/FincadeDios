@@ -277,7 +277,7 @@ export default function PanelAdmin() {
                 <div className={styles.taskCardMeta}>
                   <div className={styles.taskCardUbicacion}>
                     <span className={styles.badgeCultivo}>{siembra?.cultivo || t.cultivo}</span>
-                    <span className={styles.badgeLote}>{lote?.nombre || siembra?.loteId || '—'}</span>
+                    <span className={styles.badgeLote}>{lote?.nombre || (siembra?.loteId ? 'Lote eliminado' : '—')}</span>
                   </div>
 
                   <div className={`${styles.metaItem} ${vencida ? styles.metaItemVencida : ''}`}>

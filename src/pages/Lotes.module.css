@@ -37,7 +37,7 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   margin-bottom: 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .formGrid {
@@ -59,7 +59,8 @@
   color: var(--color-foreground);
 }
 
-.input, .select {
+.input,
+.select {
   height: 44px;
   padding: 0 12px;
   border-radius: 8px;
@@ -80,7 +81,8 @@
   padding-right: 32px;
 }
 
-.input:focus, .select:focus {
+.input:focus,
+.select:focus {
   border-color: var(--color-accent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 20%, transparent);
 }
@@ -254,14 +256,14 @@
   border-radius: 0;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   transition: transform 0.2s, box-shadow 0.2s;
   overflow: hidden;
 }
 
 .loteCard:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
 }
 
 .cardTop {
@@ -317,7 +319,8 @@
   flex-shrink: 0;
 }
 
-.editBtn, .deleteBtn {
+.editBtn,
+.deleteBtn {
   width: 28px;
   height: 28px;
   display: flex;
@@ -411,7 +414,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -427,7 +430,7 @@
   max-width: 400px;
   width: 100%;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
 }
 
 .modalIcon {
@@ -525,17 +528,22 @@
   .container {
     padding: 16px;
   }
+
   .headerRow {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
   }
-  .btnNuevo, .btnCancelarTop {
+
+  .btnNuevo,
+  .btnCancelarTop {
     width: 100%;
   }
+
   .formGrid {
     grid-template-columns: 1fr;
   }
+
   .grid {
     grid-template-columns: 1fr;
   }
@@ -545,21 +553,28 @@
   .cardTop {
     position: relative;
     /* Ensure padding accommodates absolute actions if needed */
-    padding-right: 48px; 
+    padding-right: 48px;
   }
+
   .loteActions {
     position: absolute;
     top: 16px;
     right: 16px;
   }
+
   .loteMeta {
     flex-direction: column;
     gap: 8px;
   }
 }
+
 /* Standardize main buttons for mobile */
 @media (max-width: 768px) {
-  .btn, .btnNuevo, .btnPrimary, .btnCancelarTop {
+
+  .btn,
+  .btnNuevo,
+  .btnPrimary,
+  .btnCancelarTop {
     height: 48px !important;
     width: 100% !important;
     font-size: 16px !important;

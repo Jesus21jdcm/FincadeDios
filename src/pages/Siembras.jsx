@@ -3,9 +3,9 @@ import { db, auth } from '../firebase';
 import { collection, query, onSnapshot, addDoc, updateDoc, doc, deleteDoc, getDocs, where, serverTimestamp, orderBy } from 'firebase/firestore';
 import { analizarCultivo, getCultivos } from '../utils/analisisSiembra';
 import { useAppContext } from '../context/AppContext';
-import cacaoImg from '../assets/Cacao.jpg';
-import platanoImg from '../assets/platano.jpg';
-import maizImg from '../assets/maiz.jpg';
+import cacaoImg from '../assets/images/Cacao.webp';
+import platanoImg from '../assets/images/platano.webp';
+import maizImg from '../assets/images/maiz.webp';
 import yucaImg from '../assets/yuca.webp';
 import styles from './Siembras.module.css';
 
@@ -30,7 +30,7 @@ const SvgIcon = ({ name, size = 16 }) => {
     alert: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>,
     layers: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg>,
     trash: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>,
-    edit: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
+    edit: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>,
   };
   return icons[name] || null;
 };
@@ -248,7 +248,7 @@ export default function Siembras({ autoOpenForm }) {
           </div>
           <h2 className={styles.statusTitle}>Siembra registrada con exito</h2>
           <p className={styles.statusDesc}>
-                        <strong>{form.cultivo}</strong> en lote {lotes.find(l => l.id === form.loteId)?.nombre}
+            <strong>{form.cultivo}</strong> en lote {lotes.find(l => l.id === form.loteId)?.nombre}
           </p>
           <p className={styles.statusDesc}>
             <SvgIcon name="calendar" /> Cosecha estimada: {analisis?.fechaCosechaLabel}
@@ -356,21 +356,21 @@ export default function Siembras({ autoOpenForm }) {
                     {t.isEditing ? (
                       <div className={styles.tareaEditFormInline}>
                         <div className={styles.inlineFieldRow}>
-                           <input type="text" className={styles.input} style={{ flex: 1 }} value={t.titulo} onChange={e => handleEditTareaRevision(i, 'titulo', e.target.value)} placeholder="Título de la tarea" autoFocus />
-                           <select className={styles.select} style={{ width: '150px' }} value={t.tipo} onChange={e => handleEditTareaRevision(i, 'tipo', e.target.value)}>
-                             <option value="fertilizacion">Fertilización</option>
-                             <option value="poda">Poda</option>
-                             <option value="control_plagas">Plagas</option>
-                             <option value="riego">Riego</option>
-                             <option value="clipboard">Otra</option>
-                           </select>
+                          <input type="text" className={styles.input} style={{ flex: 1 }} value={t.titulo} onChange={e => handleEditTareaRevision(i, 'titulo', e.target.value)} placeholder="Título de la tarea" autoFocus />
+                          <select className={styles.select} style={{ width: '150px' }} value={t.tipo} onChange={e => handleEditTareaRevision(i, 'tipo', e.target.value)}>
+                            <option value="fertilizacion">Fertilización</option>
+                            <option value="poda">Poda</option>
+                            <option value="control_plagas">Plagas</option>
+                            <option value="riego">Riego</option>
+                            <option value="clipboard">Otra</option>
+                          </select>
                         </div>
                         <input type="text" className={styles.input} value={t.descripcion} onChange={e => handleEditTareaRevision(i, 'descripcion', e.target.value)} placeholder="Descripción (opcional)" />
                         <div className={styles.inlineFieldActions}>
-                          <input 
-                            type="date" 
-                            className={styles.inputDateSmall} 
-                            value={t.fechaSugerida ? t.fechaSugerida.split('T')[0] : ''} 
+                          <input
+                            type="date"
+                            className={styles.inputDateSmall}
+                            value={t.fechaSugerida ? t.fechaSugerida.split('T')[0] : ''}
                             onChange={e => handleEditTareaRevision(i, 'fechaSugerida', new Date(e.target.value).toISOString())}
                           />
                           <div style={{ display: 'flex', gap: '8px' }}>
@@ -389,10 +389,10 @@ export default function Siembras({ autoOpenForm }) {
                           <p className={styles.tareaEditDesc}>{t.descripcion}</p>
                         </div>
                         <div className={styles.tareaEditActions}>
-                          <input 
-                            type="date" 
-                            className={styles.inputDateSmall} 
-                            value={t.fechaSugerida ? t.fechaSugerida.split('T')[0] : ''} 
+                          <input
+                            type="date"
+                            className={styles.inputDateSmall}
+                            value={t.fechaSugerida ? t.fechaSugerida.split('T')[0] : ''}
                             onChange={e => handleEditTareaRevision(i, 'fechaSugerida', new Date(e.target.value).toISOString())}
                           />
                           <button type="button" className={styles.btnIcon} onClick={() => handleEditTareaRevision(i, 'isEditing', true)} title="Editar detalle">
@@ -453,7 +453,7 @@ export default function Siembras({ autoOpenForm }) {
                 <span className={`${styles.badgeEstado} ${s.estado === 'activa' ? styles.badgeActiva : styles.badgeFinalizada}`}>
                   {s.estado}
                 </span>
-                
+
                 {userRole !== 'empleado' && (
                   <div className={styles.cardActions}>
                     <button className={styles.btnIcon} onClick={() => setModalTareas(s.id)} title="Editar tareas">
@@ -476,7 +476,7 @@ export default function Siembras({ autoOpenForm }) {
       {modalTareas && (() => {
         const siembra = siembras.find(s => s.id === modalTareas);
         if (!siembra) return null;
-        const tareasSiembra = tareas.filter(t => t.siembraId === modalTareas).sort((a,b) => (a.orden || 0) - (b.orden || 0));
+        const tareasSiembra = tareas.filter(t => t.siembraId === modalTareas).sort((a, b) => (a.orden || 0) - (b.orden || 0));
 
         return (
           <div className={styles.modalOverlay} onClick={() => setModalTareas(null)}>
@@ -516,22 +516,22 @@ export default function Siembras({ autoOpenForm }) {
                       {editingTaskModal === t.id ? (
                         <div className={styles.tareaEditFormInline}>
                           <div className={styles.inlineFieldRow}>
-                             <input type="text" className={styles.input} style={{ flex: 1 }} value={editingTaskData.titulo} onChange={e => setEditingTaskData({...editingTaskData, titulo: e.target.value})} placeholder="Título de la tarea" autoFocus />
-                             <select className={styles.select} style={{ width: '150px' }} value={editingTaskData.tipo} onChange={e => setEditingTaskData({...editingTaskData, tipo: e.target.value})}>
-                               <option value="fertilizacion">Fertilización</option>
-                               <option value="poda">Poda</option>
-                               <option value="control_plagas">Plagas</option>
-                               <option value="riego">Riego</option>
-                               <option value="clipboard">Otra</option>
-                             </select>
+                            <input type="text" className={styles.input} style={{ flex: 1 }} value={editingTaskData.titulo} onChange={e => setEditingTaskData({ ...editingTaskData, titulo: e.target.value })} placeholder="Título de la tarea" autoFocus />
+                            <select className={styles.select} style={{ width: '150px' }} value={editingTaskData.tipo} onChange={e => setEditingTaskData({ ...editingTaskData, tipo: e.target.value })}>
+                              <option value="fertilizacion">Fertilización</option>
+                              <option value="poda">Poda</option>
+                              <option value="control_plagas">Plagas</option>
+                              <option value="riego">Riego</option>
+                              <option value="clipboard">Otra</option>
+                            </select>
                           </div>
-                          <input type="text" className={styles.input} value={editingTaskData.descripcion} onChange={e => setEditingTaskData({...editingTaskData, descripcion: e.target.value})} placeholder="Descripción (opcional)" />
+                          <input type="text" className={styles.input} value={editingTaskData.descripcion} onChange={e => setEditingTaskData({ ...editingTaskData, descripcion: e.target.value })} placeholder="Descripción (opcional)" />
                           <div className={styles.inlineFieldActions}>
-                            <input 
-                              type="date" 
-                              className={styles.inputDateSmall} 
-                              value={editingTaskData.fechaSugerida ? editingTaskData.fechaSugerida.split('T')[0] : ''} 
-                              onChange={e => setEditingTaskData({...editingTaskData, fechaSugerida: new Date(e.target.value).toISOString()})}
+                            <input
+                              type="date"
+                              className={styles.inputDateSmall}
+                              value={editingTaskData.fechaSugerida ? editingTaskData.fechaSugerida.split('T')[0] : ''}
+                              onChange={e => setEditingTaskData({ ...editingTaskData, fechaSugerida: new Date(e.target.value).toISOString() })}
                             />
                             <div style={{ display: 'flex', gap: '8px' }}>
                               <button type="button" className={styles.btnSecondary} style={{ padding: '4px 12px', height: '32px' }} onClick={async () => {
@@ -543,7 +543,7 @@ export default function Siembras({ autoOpenForm }) {
                                     fechaSugerida: editingTaskData.fechaSugerida
                                   });
                                   setEditingTaskModal(null);
-                                } catch(e) { console.error(e); }
+                                } catch (e) { console.error(e); }
                               }}>OK</button>
                               <button type="button" className={styles.btnIcon} onClick={() => deleteDoc(doc(db, 'tareas', t.id))} title="Eliminar tarea">
                                 <SvgIcon name="trash" />
@@ -559,10 +559,10 @@ export default function Siembras({ autoOpenForm }) {
                             <p className={styles.tareaEditDesc}>{t.descripcion}</p>
                           </div>
                           <div className={styles.tareaEditActions}>
-                            <input 
-                              type="date" 
-                              className={styles.inputDateSmall} 
-                              value={t.fechaSugerida ? t.fechaSugerida.split('T')[0] : ''} 
+                            <input
+                              type="date"
+                              className={styles.inputDateSmall}
+                              value={t.fechaSugerida ? t.fechaSugerida.split('T')[0] : ''}
                               onChange={e => updateDoc(doc(db, 'tareas', t.id), { fechaSugerida: new Date(e.target.value).toISOString() })}
                             />
                             <button type="button" className={styles.btnIcon} onClick={() => { setEditingTaskModal(t.id); setEditingTaskData(t); }} title="Editar detalle">
@@ -591,7 +591,7 @@ export default function Siembras({ autoOpenForm }) {
                         createdAt: serverTimestamp(),
                         cultivo: siembra.cultivo,
                       });
-                    } catch(err) { console.error(err); }
+                    } catch (err) { console.error(err); }
                   }} style={{ alignSelf: 'flex-start', marginTop: '4px' }}>
                     <SvgIcon name="plus" /> Agregar tarea manual
                   </button>

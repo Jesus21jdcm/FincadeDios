@@ -36,7 +36,7 @@
     width: 100%;
     flex-wrap: wrap;
   }
-  
+
   .headerActions select,
   .headerActions button {
     flex: 1;
@@ -122,7 +122,8 @@
   color: var(--color-foreground);
 }
 
-.input, .select {
+.input,
+.select {
   height: 44px;
   padding: 0 12px;
   border-radius: 0;
@@ -143,7 +144,8 @@
   padding-right: 32px;
 }
 
-.input:focus, .select:focus {
+.input:focus,
+.select:focus {
   border-color: var(--color-accent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 20%, transparent);
 }
@@ -441,12 +443,12 @@
   border-radius: 0;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .siembraCard:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   transform: translateY(-1px);
 }
 
@@ -509,6 +511,7 @@
     align-items: flex-start;
     gap: 16px;
   }
+
   .rightSection {
     flex-wrap: wrap;
   }
@@ -576,7 +579,7 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -593,7 +596,7 @@
   display: flex;
   flex-direction: column;
   border: 1px solid var(--color-border);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .modalHeader {
@@ -627,7 +630,10 @@
   transition: all 0.2s;
 }
 
-.modalClose:hover { background: var(--color-muted); color: var(--color-foreground); }
+.modalClose:hover {
+  background: var(--color-muted);
+  color: var(--color-foreground);
+}
 
 .modalBody {
   padding: 16px 20px;
@@ -708,10 +714,25 @@
   white-space: nowrap;
 }
 
-.estGen { background: color-mix(in srgb, var(--color-muted-foreground) 15%, transparent); color: var(--color-muted-foreground); }
-.estAsig { background: color-mix(in srgb, #3B82F6 15%, transparent); color: #3B82F6; }
-.estEjec { background: color-mix(in srgb, var(--color-warning) 15%, transparent); color: var(--color-warning); }
-.estVal { background: color-mix(in srgb, var(--color-accent) 15%, transparent); color: var(--color-accent); }
+.estGen {
+  background: color-mix(in srgb, var(--color-muted-foreground) 15%, transparent);
+  color: var(--color-muted-foreground);
+}
+
+.estAsig {
+  background: color-mix(in srgb, #3B82F6 15%, transparent);
+  color: #3B82F6;
+}
+
+.estEjec {
+  background: color-mix(in srgb, var(--color-warning) 15%, transparent);
+  color: var(--color-warning);
+}
+
+.estVal {
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  color: var(--color-accent);
+}
 
 .selectAsignar {
   height: 30px;
@@ -743,7 +764,7 @@
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
   overflow: hidden;
 }
 
@@ -838,6 +859,7 @@
   font-family: 'Inter', sans-serif;
   outline: none;
 }
+
 .inputDateSmall:focus {
   border-color: var(--color-accent);
 }
@@ -872,9 +894,14 @@
   align-items: center;
   justify-content: space-between;
 }
+
 /* Standardize main buttons for mobile */
 @media (max-width: 768px) {
-  .btn, .btnNuevo, .btnPrimary, .btnCancelarTop {
+
+  .btn,
+  .btnNuevo,
+  .btnPrimary,
+  .btnCancelarTop {
     height: 48px !important;
     width: 100% !important;
     font-size: 16px !important;
@@ -884,9 +911,12 @@
     align-items: center !important;
     box-sizing: border-box !important;
   }
-  .formGrid, .editFormGrid {
+
+  .formGrid,
+  .editFormGrid {
     grid-template-columns: 1fr !important;
   }
+
   .inlineFieldRow {
     flex-direction: column;
   }
