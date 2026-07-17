@@ -19,6 +19,7 @@ export default function PanelAdmin() {
   const [encargados, setEncargados] = useState([]);
   const [lotes, setLotes] = useState([]);
   const [filter, setFilter] = useState('todas');
+  const [filterSiembra, setFilterSiembra] = useState('todas');
   const [asignando, setAsignando] = useState(null);
   const [evidenciaModal, setEvidenciaModal] = useState(null);
   const [excepciones, setExcepciones] = useState([]);
@@ -76,6 +77,18 @@ export default function PanelAdmin() {
     });
   };
 
+  const handleAprobarTarea = async (t) => {
+    await updateDoc(doc(db, 'tareas', t.id), { estado: 'Validado' });
+    if (t.siembraId) {
+      const otrasTareas = tareasRaw.filter(x => x.siembraId === t.siembraId && x.id !== t.id);
+      const todasCompletadas = otrasTareas.every(x => x.estado === 'Validado');
+      if (todasCompletadas) {
+        await updateDoc(doc(db, 'siembras', t.siembraId), { estado: 'finalizada' });
+        alert('🌱 ¡Cosecha Culminada! Todas las tareas de esta siembra han sido completadas con éxito.');
+      }
+    }
+  };
+
   const isVencida = (t) => new Date(t.fechaSugerida) < new Date() && t.estado !== 'Validado' && t.estado !== 'Ejecutado';
 
   const vencidasPorStage = {
@@ -86,7 +99,11 @@ export default function PanelAdmin() {
     Validado: 0,
   };
 
-  const filtradas = filter === 'todas' ? tareas : tareas.filter(t => t.estado === filter);
+  const filtradas = tareas.filter(t => {
+    const matchStage = filter === 'todas' || t.estado === filter;
+    const matchSiembra = filterSiembra === 'todas' || t.siembraId === filterSiembra;
+    return matchStage && matchSiembra;
+  });
 
   const conteo = {
     todas: tareas.length,
@@ -181,19 +198,40 @@ export default function PanelAdmin() {
           <h1 className={styles.title}>Panel de Control</h1>
           <p className={styles.subtitle}>Gestión operativa y seguimiento en tiempo real</p>
         </div>
-        <div className={styles.selectFilterContainer}>
-          <label className={styles.filterLabel}>Filtrar por etapa:</label>
-          <select
-            className={styles.filterSelect}
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          >
-            {stages.map((stage) => (
-              <option key={stage.id} value={stage.id}>
-                {stage.label} ({conteo[stage.id] || 0})
-              </option>
-            ))}
-          </select>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <div className={styles.selectFilterContainer}>
+            <label className={styles.filterLabel}>Filtrar por etapa:</label>
+            <select
+              className={styles.filterSelect}
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            >
+              {stages.map((stage) => (
+                <option key={stage.id} value={stage.id}>
+                  {stage.label} ({conteo[stage.id] || 0})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className={styles.selectFilterContainer}>
+            <label className={styles.filterLabel}>Filtrar por siembra:</label>
+            <select
+              className={styles.filterSelect}
+              value={filterSiembra}
+              onChange={(e) => setFilterSiembra(e.target.value)}
+            >
+              <option value="todas">Todas</option>
+              {siembras.map((s) => {
+                const lote = lotes.find(l => l.id === s.loteId);
+                const loteNombre = lote ? lote.nombre : 'Lote desconocido';
+                return (
+                  <option key={s.id} value={s.id}>
+                    {s.cultivo} ({loteNombre})
+                  </option>
+                );
+              })}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -345,7 +383,7 @@ export default function PanelAdmin() {
                   )}
                   
                   {t.estado === 'Ejecutado' && (
-                    <button className={styles.btnAprobar} onClick={() => updateDoc(doc(db, 'tareas', t.id), { estado: 'Validado' })}>
+                    <button className={styles.btnAprobar} onClick={() => handleAprobarTarea(t)}>
                       Aprobar Tarea
                     </button>
                   )}

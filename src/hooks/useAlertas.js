@@ -53,7 +53,7 @@ export function useAlertas(userRole, userDataId) {
         descripcion: `${t.descripcion || 'Sin descripción'} — Vence: ${fecha.toLocaleDateString()}`,
         prioridad: isVencida ? 1 : 2,
         key: `tarea-${t.id}`,
-        target: 'dashboard'
+        target: 'elempleado'
       });
     });
   } else if (userRole && userRole !== 'empleado') {
@@ -93,7 +93,7 @@ export function useAlertas(userRole, userDataId) {
         descripcion: `${t.titulo} ${t.asignadoA ? `por ${t.asignadoA}` : ''}`,
         prioridad: 5,
         key: `tarea-terminada-${t.id}`,
-        target: 'dashboard' // Admin can review tasks in dashboard
+        target: userRole === 'encargado' ? 'elencargado' : 'eladmin'
       });
     });
   }

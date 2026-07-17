@@ -170,22 +170,23 @@ export default function Dashboard({ onNavigate }) {
   const userName = userData?.nombre || auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'Usuario';
 
   const rolePanels = {
-    superadmin: { id: 'eladmin', label: 'Panel Admin' },
-    admin: { id: 'eladmin', label: 'Panel Admin' },
-    encargado: { id: 'elencargado', label: 'Panel Encargado' },
-    empleado: { id: 'elempleado', label: 'Mis Tareas' },
+    superadmin: { id: 'eladmin', label: 'Panel Admin', color: 'var(--color-cyan)' },
+    admin: { id: 'eladmin', label: 'Panel Admin', color: 'var(--color-cyan)' },
+    encargado: { id: 'elencargado', label: 'Panel Encargado', color: 'var(--color-cyan)' },
+    empleado: { id: 'elempleado', label: 'Mis Tareas', color: 'var(--color-cyan)' },
   };
 
   const rolePanel = rolePanels[userRole] || rolePanels.empleado;
 
-  const moduleColors = ['var(--color-orange)', 'var(--color-purple-light)', 'var(--color-red)', 'var(--color-cyan)'];
-
   const mainModules = [
-    { id: 'apply', label: 'Insumos', icon: Iconos.apply },
-    { id: 'historial', label: 'Reportes', icon: Iconos.historial },
-    { id: 'monitoreo', label: 'Monitoreo', icon: Iconos.monitoreo },
-    { id: rolePanel.id, label: rolePanel.label, icon: Iconos.usuarios },
-  ].filter(m => !(userRole === 'empleado' && m.id === 'historial'));
+    { id: 'apply', label: 'Insumos', icon: Iconos.apply, color: 'var(--color-orange)' },
+    { id: 'historial', label: 'Reportes', icon: Iconos.historial, color: 'var(--color-purple-light)' },
+    { id: 'monitoreo', label: 'Monitoreo', icon: Iconos.monitoreo, color: 'var(--color-red)' },
+    { id: rolePanel.id, label: rolePanel.label, icon: Iconos.usuarios, color: rolePanel.color },
+  ].filter(m => {
+    if (m.id === 'historial' && (userRole === 'empleado' || userRole === 'encargado')) return false;
+    return true;
+  });
 
   const quickAccessItems = [
     { id: 'inventario', label: 'Inventario', icon: Iconos.inventario },
@@ -375,8 +376,8 @@ export default function Dashboard({ onNavigate }) {
         <div className={styles.modulesSection}>
           <h3 className={styles.sectionTitle}>Mis Módulos</h3>
           <div className={styles.modulesGrid}>
-            {mainModules.map((item, idx) => (
-              <div key={item.id} className={styles.moduleCard} style={{ background: moduleColors[idx] }} onClick={() => onNavigate(item.id)}>
+            {mainModules.map((item) => (
+              <div key={item.id} className={styles.moduleCard} style={{ background: item.color }} onClick={() => onNavigate(item.id)}>
                 <div className={styles.moduleHeader}>
                   <item.icon />
                 </div>
@@ -395,7 +396,8 @@ export default function Dashboard({ onNavigate }) {
                 { id: 'lotes', label: 'Nuevo Lote' },
                 { id: 'siembras', label: 'Nueva Siembra' },
                 { id: 'inventario', label: 'Nuevo Insumo' }
-              ].map((item, idx) => (
+              ].filter(item => !(userRole === 'encargado' && item.id === 'lotes'))
+              .map((item, idx) => (
                 <div key={idx} className={styles.shortcutWrapper}>
                   <button className={styles.shortcutBtn} onClick={() => onNavigate(item.id, { autoOpenForm: true })}>
                     +

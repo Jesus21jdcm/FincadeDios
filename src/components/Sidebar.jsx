@@ -14,10 +14,11 @@ export default function Sidebar({ onNavigate, currentPage }) {
   const { userRole } = useAppContext();
 
   // Filter items based on user role
-  const empleadoOnly = ['dashboard', 'inventario', 'lotes', 'siembras'];
-  const visibleItems = userRole === 'empleado' 
-    ? navItems.filter(item => empleadoOnly.includes(item.id))
-    : navItems;
+  const adminOnly = ['usuarios'];
+  const isAdmin = userRole === 'admin' || userRole === 'superadmin';
+  const visibleItems = isAdmin 
+    ? navItems 
+    : navItems.filter(item => !adminOnly.includes(item.id));
 
   return (
     <aside className={styles.sidebar}>

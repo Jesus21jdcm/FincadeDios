@@ -10,6 +10,7 @@ export default function PanelEncargado() {
   const [tareas, setTareas] = useState([]);
   const [empleados, setEmpleados] = useState([]);
   const [modalTarea, setModalTarea] = useState(null);
+  const [modalEvidencia, setModalEvidencia] = useState(null);
 
   useEffect(() => {
     const constraints = [orderBy('fechaSugerida', 'asc')];
@@ -28,7 +29,18 @@ export default function PanelEncargado() {
   }, [userData]);
 
   const validarTarea = async (tareaId) => {
+    const t = tareas.find(x => x.id === tareaId);
     await updateDoc(doc(db, 'tareas', tareaId), { estado: 'Validado' });
+    
+    if (t && t.siembraId) {
+      const otrasTareas = tareas.filter(x => x.siembraId === t.siembraId && x.id !== t.id);
+      const todasCompletadas = otrasTareas.every(x => x.estado === 'Validado');
+      
+      if (todasCompletadas) {
+        await updateDoc(doc(db, 'siembras', t.siembraId), { estado: 'finalizada' });
+        alert('Cosecha Culminada! Todas las tareas de esta siembra han sido completadas con éxito.');
+      }
+    }
     setModalTarea(null);
   };
 
@@ -46,7 +58,7 @@ export default function PanelEncargado() {
     <div className={styles.container}>
       <div className={styles.headerRow}>
         <div>
-          <h1 className={styles.title}>🔍 Panel de Encargado</h1>
+          <h1 className={styles.title}>Panel de Encargado</h1>
           <p className={styles.subtitle}>
             {pendientes.length} tarea{pendientes.length !== 1 ? 's' : ''} pendiente{pendientes.length !== 1 ? 's' : ''} de validación
           </p>
@@ -54,34 +66,52 @@ export default function PanelEncargado() {
       </div>
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>
-          🟡 Pendientes de validar
-          {pendientes.length > 0 && <span className={styles.badge}>{pendientes.length}</span>}
-        </h2>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>
+            Pendientes de validar
+            {pendientes.length > 0 && <span className={styles.badge}>{pendientes.length}</span>}
+          </h2>
+        </div>
         {pendientes.length === 0 ? (
-          <div className={styles.empty}>No hay tareas pendientes de validación ✅</div>
+          <div className={styles.emptyState}>No hay tareas pendientes de validación</div>
         ) : (
-          <div className={styles.list}>
+          <div className={styles.taskList}>
             {pendientes.map(t => (
-              <div key={t.id} className={styles.card}>
-                <div className={styles.cardHeader}>
-                  <div className={styles.cardInfo}>
-                    <strong>{t.titulo}</strong>
-                    <p className={styles.cardMeta}>
-                      👤 {getNombreEmpleado(t.idEmpleado)} · 🌱 {t.cultivo || '—'}
-                    </p>
-                  </div>
-                  <div className={styles.cardActions}>
-                    <button className={styles.btnPrimary} onClick={() => validarTarea(t.id)}>✅ Validar</button>
-                    <button className={styles.btnSecondary} onClick={() => setModalTarea(t)}>✏️ Editar</button>
+              <div key={t.id} className={styles.taskCard}>
+                <div className={styles.taskCardMain}>
+                  <span className={`${styles.estadoBadge} ${styles[t.estado] || ''}`}>
+                    {t.estado.toUpperCase()}
+                  </span>
+                  <div className={styles.taskCardContent}>
+                    <h4 className={styles.taskCardTitle}>{t.titulo}</h4>
+                    {t.descripcion && <p className={styles.taskCardDesc}>{t.descripcion}</p>}
                   </div>
                 </div>
-                {t.evidencia && (
-                  <div className={styles.evidencia}>
-                    <img src={t.evidencia} alt="Evidencia" className={styles.evidenciaImg} />
+
+                <div className={styles.taskCardMeta}>
+                  <div className={styles.taskCardUbicacion}>
+                    <span className={styles.badgeCultivo}>{t.cultivo || '—'}</span>
                   </div>
-                )}
-                {t.descripcion && <p className={styles.cardDesc}>{t.descripcion}</p>}
+                  <div className={styles.metaItem}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.metaIcon}>
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    <span className={styles.empleadoAsignado}>{getNombreEmpleado(t.idEmpleado) || 'Sin asignar'}</span>
+                  </div>
+                </div>
+
+                <div className={styles.taskCardActions}>
+                  {t.evidencia && (
+                    <button className={styles.btnIconAction} onClick={() => setModalEvidencia(t.evidencia)} title="Ver evidencia">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
+                      <span>Evidencia</span>
+                    </button>
+                  )}
+                  <button className={styles.btnAprobar} onClick={() => validarTarea(t.id)}>
+                    Validar
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -89,43 +119,62 @@ export default function PanelEncargado() {
       </section>
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>📋 Tareas asignadas</h2>
-        <div className={styles.tableContainer}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Tarea</th>
-                <th>Empleado</th>
-                <th>Fecha límite</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {asignadas.map(t => (
-                <tr key={t.id}>
-                  <td className={styles.cellTitulo}>
-                    <strong>{t.titulo}</strong>
-                    <span className={styles.cellDesc}>{t.cultivo}</span>
-                  </td>
-                  <td>{getNombreEmpleado(t.idEmpleado) || 'Sin asignar'}</td>
-                  <td className={styles.cellFecha}>
-                    {new Date(t.fechaSugerida).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
-                  </td>
-                  <td><span className={`${styles.estadoBadge} ${styles[t.estado]}`}>{t.estado}</span></td>
-                </tr>
-              ))}
-              {asignadas.length === 0 && (
-                <tr><td colSpan={4} className={styles.empty}>Sin tareas asignadas</td></tr>
-              )}
-            </tbody>
-          </table>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Tareas asignadas</h2>
         </div>
+        {asignadas.length === 0 ? (
+          <div className={styles.emptyState}>Sin tareas asignadas</div>
+        ) : (
+          <div className={styles.taskList}>
+            {asignadas.map(t => (
+              <div key={t.id} className={styles.taskCard}>
+                <div className={styles.taskCardMain}>
+                  <span className={`${styles.estadoBadge} ${styles[t.estado] || ''}`}>
+                    {t.estado.toUpperCase()}
+                  </span>
+                  <div className={styles.taskCardContent}>
+                    <h4 className={styles.taskCardTitle}>{t.titulo}</h4>
+                    {t.descripcion && <p className={styles.taskCardDesc}>{t.descripcion}</p>}
+                  </div>
+                </div>
+
+                <div className={styles.taskCardMeta}>
+                  <div className={styles.taskCardUbicacion}>
+                    <span className={styles.badgeCultivo}>{t.cultivo || '—'}</span>
+                  </div>
+                  <div className={styles.metaItem}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.metaIcon}>
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                    <span>{t.fechaSugerida ? new Date(t.fechaSugerida).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</span>
+                  </div>
+                  <div className={styles.metaItem}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.metaIcon}>
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    <span className={styles.empleadoAsignado}>{getNombreEmpleado(t.idEmpleado) || 'Sin asignar'}</span>
+                  </div>
+                </div>
+
+                <div className={styles.taskCardActions}>
+                  <button className={styles.btnReasignar} onClick={() => setModalTarea(t)}>
+                    Editar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {modalTarea && (
         <div className={styles.modalOverlay} onClick={() => setModalTarea(null)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
-            <h3 className={styles.modalTitle}>✏️ Editar tarea</h3>
+            <h3 className={styles.modalTitle}>Editar tarea</h3>
             <form onSubmit={e => { e.preventDefault(); const fd = new FormData(e.target); editarTarea(modalTarea.id, { titulo: fd.get('titulo'), descripcion: fd.get('descripcion'), fechaSugerida: new Date(fd.get('fechaSugerida')).toISOString() }); }}>
               <div className={styles.field}>
                 <label className={styles.label}>Título</label>
@@ -147,10 +196,21 @@ export default function PanelEncargado() {
             <div className={styles.evidenciaModal}>
               {modalTarea.evidencia && (
                 <>
-                  <h4>📸 Evidencia</h4>
+                  <h4>Evidencia</h4>
                   <img src={modalTarea.evidencia} alt="Evidencia" className={styles.evidenciaImg} />
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+      {modalEvidencia && (
+        <div className={styles.modalOverlay} onClick={() => setModalEvidencia(null)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()} style={{ maxWidth: '600px', textAlign: 'center' }}>
+            <h3 className={styles.modalTitle}>Evidencia</h3>
+            <img src={modalEvidencia} alt="Evidencia de la tarea" className={styles.evidenciaImg} style={{ width: '100%', borderRadius: '8px', marginBottom: '16px' }} />
+            <div className={styles.modalActions}>
+              <button className={styles.btnSecondary} onClick={() => setModalEvidencia(null)}>Cerrar</button>
             </div>
           </div>
         </div>

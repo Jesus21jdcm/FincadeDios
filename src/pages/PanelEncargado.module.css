@@ -1,40 +1,67 @@
 .container {
-  padding: 24px;
-  max-width: 900px;
+  padding: 32px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+}
+
 .headerRow {
-  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--color-border);
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .headerRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
 }
 
 .title {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
   color: var(--color-foreground);
-  margin: 0 0 4px;
-  font-family: 'Fira Code', monospace;
+  margin: 0 0 6px;
+  letter-spacing: -0.3px;
 }
 
 .subtitle {
   font-size: 14px;
   color: var(--color-muted-foreground);
   margin: 0;
+  font-weight: 400;
 }
 
 .section {
   margin-bottom: 32px;
 }
 
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
 .sectionTitle {
   font-size: 16px;
   font-weight: 700;
   color: var(--color-foreground);
-  margin: 0 0 14px;
-  font-family: 'Fira Code', monospace;
+  margin: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .badge {
@@ -51,182 +78,237 @@
   font-weight: 700;
 }
 
-.list {
+.emptyState {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--color-text-light);
+  font-size: 14px;
+  background: var(--color-surface);
+  border-radius: 0;
+  border: 1px solid var(--color-border);
+}
+
+/* ── Modern List View for Tasks (Un Card por fila) ── */
+.taskList {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  margin-bottom: 32px;
 }
 
-.card {
-  padding: 16px;
-  border-radius: 12px;
-  border: 1px solid var(--color-border);
+.taskCard {
   background: var(--color-surface);
+  border-radius: 0;
+  border: 1px solid var(--color-border);
+  padding: 18px 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 
-.cardHeader {
+.taskCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-border));
+}
+
+/* On desktop, make card elements stack horizontally (tipo lista) */
+@media (min-width: 992px) {
+  .taskCard {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 16px 24px;
+  }
+}
+
+/* Main Container (Estado, Titulo y Descripcion) */
+.taskCardMain {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
+  flex: 2.2;
+  min-width: 0;
 }
 
-.cardInfo {
-  flex: 1;
+@media (max-width: 576px) {
+  .taskCardMain {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 }
 
-.cardInfo strong {
+.estadoBadge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.Generado { background: #F1F5F9; color: #475569; }
+.Asignado { background: #EFF6FF; color: #2563EB; }
+.Ejecutado { background: #FEF3C7; color: #D97706; }
+.Validado { background: #ECFDF5; color: #16A34A; }
+
+.taskCardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.taskCardTitle {
   font-size: 15px;
+  font-weight: 600;
   color: var(--color-foreground);
-  display: block;
-  margin-bottom: 4px;
-}
-
-.cardMeta {
-  font-size: 12px;
-  color: var(--color-muted-foreground);
   margin: 0;
-}
-
-.cardDesc {
-  font-size: 13px;
-  color: var(--color-muted-foreground);
-  margin: 10px 0 0;
   line-height: 1.4;
 }
 
-.cardActions {
+.taskCardDesc {
+  font-size: 12px;
+  color: var(--color-text-light);
+  margin: 0;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Meta Container (Ubicación, Fecha limite, Asignado) */
+.taskCardMeta {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1.8;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 991px) {
+  .taskCardMeta {
+    border-top: 1px solid var(--color-border);
+    padding-top: 14px;
+    gap: 16px;
+  }
+}
+
+.taskCardUbicacion {
   display: flex;
   gap: 6px;
+  align-items: center;
+}
+
+.badgeCultivo {
+  background: #FFF3E0;
+  color: #E65100;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 1px solid #FFE0B2;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-foreground);
+  white-space: nowrap;
+}
+
+.metaIcon {
+  color: var(--color-text-light);
   flex-shrink: 0;
 }
 
-.btnPrimary {
-  height: 36px;
-  padding: 0 16px;
-  border: none;
-  border-radius: 8px;
-  background: var(--color-accent);
-  color: var(--color-on-primary);
-  font-size: 13px;
-  font-weight: 600;
-  font-family: 'Fira Sans', sans-serif;
-  cursor: pointer;
-  transition: opacity 0.2s;
-  white-space: nowrap;
+.empleadoAsignado {
+  font-weight: 500;
 }
 
-.btnPrimary:hover { opacity: 0.9; }
+/* Actions Container */
+.taskCardActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
 
-.btnSecondary {
-  height: 36px;
-  padding: 0 14px;
+@media (max-width: 991px) {
+  .taskCardActions {
+    border-top: 1px solid var(--color-border);
+    padding-top: 14px;
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+.btnIconAction {
+  background: var(--color-background);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background: transparent;
   color: var(--color-foreground);
-  font-size: 13px;
-  font-family: 'Fira Sans', sans-serif;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   cursor: pointer;
   transition: all 0.2s;
-  white-space: nowrap;
 }
 
-.btnSecondary:hover { background: var(--color-muted); }
-
-.evidencia {
-  margin-top: 10px;
+.btnIconAction:hover {
+  background: var(--color-border);
 }
 
-.evidenciaImg {
-  width: 100%;
-  max-height: 200px;
-  object-fit: cover;
+.btnReasignar {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-foreground);
+  padding: 7px 12px;
   border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnReasignar:hover {
   background: var(--color-muted);
 }
 
-.tableContainer {
-  border-radius: 12px;
-  border: 1px solid var(--color-border);
-  overflow-x: auto;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 500px;
-}
-
-.table th {
-  padding: 10px 16px;
-  text-align: left;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-muted-foreground);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-  white-space: nowrap;
-}
-
-.table th:first-child {
-  position: sticky;
-  left: 0;
-  z-index: 3;
-}
-
-.table td {
-  padding: 12px 16px;
-  font-size: 13px;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-foreground);
-  vertical-align: middle;
-}
-
-.table td:first-child {
-  position: sticky;
-  left: 0;
-  z-index: 2;
-}
-
-.table tbody tr:last-child td { border-bottom: none; }
-
-.cellTitulo {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.cellTitulo strong { font-size: 13px; font-weight: 600; color: var(--color-foreground); }
-.cellDesc { font-size: 12px; color: var(--color-muted-foreground); line-height: 1.4; }
-.cellFecha { font-family: 'Fira Code', monospace; font-size: 12px; white-space: nowrap; color: var(--color-muted-foreground); }
-
-.estadoBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+.btnAprobar {
+  background: #16A34A;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
   font-size: 12px;
-  font-weight: 500;
-  white-space: nowrap;
-  color: var(--color-muted-foreground);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.estadoBadge::before {
-  content: '';
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
+.btnAprobar:hover {
+  background: #15803D;
+  box-shadow: 0 4px 10px rgba(22, 163, 74, 0.2);
 }
 
-.Generado::before { background: var(--color-muted-foreground); }
-.Asignado::before { background: #3B82F6; }
-.Ejecutado::before { background: var(--color-warning); }
-.Validado::before { background: var(--color-accent); }
-
+/* Modal and Form Styles */
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -242,7 +324,7 @@
   width: 100%;
   max-width: 500px;
   padding: 24px;
-  border-radius: 14px;
+  border-radius: 0;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
 }
@@ -252,7 +334,6 @@
   font-weight: 700;
   color: var(--color-foreground);
   margin: 0 0 20px;
-  font-family: 'Fira Code', monospace;
 }
 
 .field {
@@ -270,12 +351,11 @@
 
 .input, .textarea {
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 0;
   border: 1px solid var(--color-border);
   background: var(--color-background);
   color: var(--color-foreground);
   font-size: 14px;
-  font-family: 'Fira Sans', sans-serif;
   outline: none;
   transition: border-color 0.2s;
 }
@@ -286,7 +366,7 @@
 }
 
 .input:focus, .textarea:focus {
-  border-color: var(--color-accent);
+  border-color: var(--color-primary);
 }
 
 .modalActions {
@@ -294,6 +374,29 @@
   gap: 10px;
   justify-content: flex-end;
   margin-top: 20px;
+}
+
+.btnPrimary {
+  height: 36px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 0;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btnSecondary {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-foreground);
+  font-size: 13px;
+  cursor: pointer;
 }
 
 .evidenciaModal {
@@ -308,52 +411,10 @@
   margin: 0 0 8px;
 }
 
-.empty {
-  text-align: center;
-  padding: 40px;
-  color: var(--color-muted-foreground);
-  border-radius: 10px;
-  border: 1px dashed var(--color-border);
-}
-
-/* ── Responsive ── */
-
-@media (max-width: 640px) {
-  .container { padding: 16px; }
-  .title { font-size: 18px; }
-  .subtitle { font-size: 12px; }
-  .sectionTitle { font-size: 15px; }
-
-  .tableContainer { border-radius: 8px; border-left: none; border-right: none; }
-  .table { min-width: unset; }
-  .table th, .table td { padding: 10px 8px; font-size: 12px; }
-  .table th:first-child, .table td:first-child { padding-left: 12px; }
-
-  .table th:nth-child(3), .table td:nth-child(3) { display: none; }
-
-  .cellTitulo strong { font-size: 12px; }
-  .cellDesc { font-size: 11px; }
-  .cellFecha { font-size: 11px; }
-
-  .card { padding: 12px; }
-  .cardHeader { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .cardActions { width: 100%; }
-  .cardActions button { flex: 1; }
-  .btnPrimary, .btnSecondary { height: 38px; font-size: 13px; padding: 0 14px; }
-}
-
-@media (max-width: 480px) {
-  .container { padding: 12px; }
-  .title { font-size: 16px; }
-  .sectionTitle { font-size: 14px; }
-
-  .table th, .table td { padding: 8px 6px; font-size: 11px; }
-  .table th:first-child, .table td:first-child { padding-left: 8px; }
-
-  .table th:nth-child(2), .table td:nth-child(2) { display: none; }
-  .cellTitulo strong { font-size: 11px; }
-  .cellDesc { font-size: 10px; }
-
-  .card { padding: 10px; border-radius: 8px; }
-  .btnPrimary, .btnSecondary { height: 36px; font-size: 12px; }
+.evidenciaImg {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
 }

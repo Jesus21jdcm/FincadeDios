@@ -1,16 +1,5 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <g transform="translate(1, 1)">
-    <path d="M4 10C4 4.477 8.477 0 14 0H24.5C26.985 0 29 2.015 29 4.5C29 6.985 26.985 9 24.5 9H14.5C13.67 9 13 9.67 13 10.5V26.5C13 27.88 11.88 29 10.5 29H6.5C5.12 29 4 27.88 4 26.5V10Z" fill="url(#gradLogo1)"/>
-    <path d="M13 13H20.5C22.985 13 25 15.015 25 17.5C25 19.985 22.985 22 20.5 22H13V13Z" fill="url(#gradLogo2)"/>
-  </g>
-  <defs>
-    <linearGradient id="gradLogo1" x1="4" y1="0" x2="29" y2="29" gradientUnits="userSpaceOnUse">
-      <stop stopColor="#34D399"/>
-      <stop offset="1" stopColor="#14C2F4"/>
-    </linearGradient>
-    <linearGradient id="gradLogo2" x1="13" y1="13" x2="25" y2="22" gradientUnits="userSpaceOnUse">
-      <stop stopColor="#14C2F4"/>
-      <stop offset="1" stopColor="#633AF8"/>
-    </linearGradient>
-  </defs>
+  <rect width="32" height="32" rx="8" fill="#5EBC67"/>
+  <path d="M11 8 h11 v4 h-7 v4 h6 v4 h-6 v8 h-4 z" fill="#FFFFFF" />
+  <path d="M22 5 C 28 5, 29 11, 22 11 C 16 11, 15 5, 22 5 Z" fill="#0D2E1C" opacity="0.3" />
 </svg>

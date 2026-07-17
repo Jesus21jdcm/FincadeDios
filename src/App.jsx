@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppContext } from './context/AppContext';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
@@ -27,6 +27,13 @@ export default function App() {
   const [page, setPage] = useState('dashboard');
   const [pageProps, setPageProps] = useState({});
   const [unauthRoute, setUnauthRoute] = useState('landing');
+
+  useEffect(() => {
+    if (!user) {
+      setPage('dashboard');
+      setPageProps({});
+    }
+  }, [user]);
 
   if (loading) {
     return (
@@ -83,8 +90,17 @@ export default function App() {
     return <PendingApproval userData={user} onLogout={() => auth.signOut()} />;
   }
 
+  const adminOnly = ['usuarios', 'historial', 'eladmin'];
   const empleadoOnly = ['dashboard', 'elempleado', 'inventario', 'lotes', 'monitoreo', 'apply', 'siembras', 'perfil'];
-  const canAccess = (target) => userRole !== 'empleado' || empleadoOnly.includes(target);
+  
+  const canAccess = (target) => {
+    const isAdmin = userRole === 'admin' || userRole === 'superadmin';
+    if (isAdmin) return true;
+    if (adminOnly.includes(target)) return false;
+    if (userRole === 'encargado') return true;
+    return empleadoOnly.includes(target);
+  };
+  
   const safePage = canAccess(page) ? page : 'dashboard';
 
   const navigate = (target, props = {}) => {

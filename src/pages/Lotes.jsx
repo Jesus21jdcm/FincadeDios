@@ -83,6 +83,7 @@ export function getLoteImage(cultivo) {
 
 export default function Lotes({ autoOpenForm }) {
   const { userRole } = useAppContext();
+  const isAdmin = userRole === 'admin' || userRole === 'superadmin';
   const [lotes, setLotes] = useState([]);
   const [showForm, setShowForm] = useState(false);
 
@@ -217,7 +218,7 @@ export default function Lotes({ autoOpenForm }) {
           <h1 className={styles.title}>Lotes y Cultivos</h1>
           <p className={styles.subtitle}>{lotes.length} lotes registrados</p>
         </div>
-        {userRole !== 'empleado' && (
+        {isAdmin && (
           <button 
             className={showForm ? styles.btnCancelarTop : styles.btnNuevo} 
             onClick={() => { setShowForm(!showForm); setEditLote(null); setForm({ nombre: '', cultivo: '', area: '', ubicacion: null, foto: null }); }}
@@ -290,7 +291,7 @@ export default function Lotes({ autoOpenForm }) {
                 <h3 className={styles.loteName}>{lote.nombre}</h3>
                 <span className={styles.loteCultivo}>{lote.cultivo}</span>
               </div>
-              {userRole !== 'empleado' && (
+              {isAdmin && (
                 <div className={styles.loteActions}>
                   <button className={styles.editBtn} onClick={() => handleEdit(lote)} title="Editar">{SvgEdit}</button>
                   <button className={styles.deleteBtn} onClick={() => confirmDelete(lote)} title="Eliminar">{SvgTrash}</button>

@@ -3,7 +3,7 @@ import styles from './Landing.module.css';
 
 // Import images
 import heroBgField from '../assets/images/hero_bg_field.webp';
-import appMockup from '../assets/images/app_mockup.webp';
+import appMockup from '../assets/images/farmer_holding_phone.png';
 
 const GrassSeparator = ({ flip = false, fill = "#ffffff" }) => (
   <div className={styles.grassSeparator} style={{ transform: flip ? 'rotate(180deg)' : 'none' }}>
@@ -19,7 +19,6 @@ const LogoSvg = () => (
   <svg width="200" height="40" viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg">
     <text x="0" y="30" fontFamily="'Montserrat', sans-serif" fontWeight="900" fontSize="28" fill="#0D2E1C" letterSpacing="1">FINCA</text>
     <text x="90" y="30" fontFamily="'Montserrat', sans-serif" fontWeight="900" fontSize="28" fill="#5EBC67" letterSpacing="1">DIGI</text>
-    <path d="M165 15 C 165 5, 175 0, 180 15 C 185 30, 175 35, 165 15 Z" fill="#5EBC67" />
   </svg>
 );
 
@@ -32,13 +31,13 @@ const FooterLogoSvg = () => (
 
 const SvgIcon = ({ name, size = 48 }) => {
   const icons = {
-    tractor: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#5EBC67" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11V19H5M7 19H17M19 19H21V15C21 13 19 11 17 11H13V7H7V11H3"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg>,
-    leaf: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#5EBC67" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>,
-    sun: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#5EBC67" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>,
-    home: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#5EBC67" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-    facebook: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3.81l.39-4h-4.2V7a1 1 0 0 1 1-1h3z"/></svg>,
-    instagram: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>,
-    twitter: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+    tractor: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#5EBC67" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11V19H5M7 19H17M19 19H21V15C21 13 19 11 17 11H13V7H7V11H3" /><circle cx="6" cy="19" r="2" /><circle cx="18" cy="19" r="2" /></svg>,
+    leaf: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#5EBC67" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" /><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" /></svg>,
+    sun: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#5EBC67" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>,
+    home: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#5EBC67" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>,
+    facebook: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3.81l.39-4h-4.2V7a1 1 0 0 1 1-1h3z" /></svg>,
+    instagram: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></svg>,
+    twitter: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" /></svg>
   };
   return icons[name] || null;
 };
@@ -64,7 +63,7 @@ export default function Landing({ onGoToLogin, onGoToRegister }) {
         <div className={styles.heroOverlay}></div>
         <div className={styles.heroContent}>
           <p className={styles.heroPreTitle}>BIENVENIDO A</p>
-          <h1 className={styles.heroTitle}>Finca Digi<br/>Gestión Agrícola</h1>
+          <h1 className={styles.heroTitle}>Finca Digi<br />Gestión Agrícola</h1>
           <p className={styles.heroSlogan}>
             Los cultivos hermosos no ocurren por casualidad — ocurren con cuidado.
           </p>
@@ -109,25 +108,21 @@ export default function Landing({ onGoToLogin, onGoToRegister }) {
             <h3>Conoce Nuestro Sistema Integral</h3>
             <p>Una plataforma completa diseñada específicamente para transformar la manera en que administras tu finca y aumentar tu rentabilidad.</p>
           </div>
-          
+
           <div className={styles.systemGrid}>
             <div className={styles.systemCard}>
-              <div className={styles.systemIcon}><SvgIcon name="leaf" size={32}/></div>
+              <div className={styles.systemIcon}><SvgIcon name="leaf" size={32} /></div>
               <h4>Trazabilidad de Lotes</h4>
               <p>Lleva un registro detallado de todas tus cosechas, desde la siembra hasta la distribución.</p>
             </div>
             <div className={styles.systemCard}>
-              <div className={styles.systemIcon}><SvgIcon name="tractor" size={32}/></div>
+              <div className={styles.systemIcon}><SvgIcon name="tractor" size={32} /></div>
               <h4>Gestión de Empleados</h4>
               <p>Controla roles, asigna tareas específicas y haz seguimiento del rendimiento del personal.</p>
             </div>
+
             <div className={styles.systemCard}>
-              <div className={styles.systemIcon}><SvgIcon name="sun" size={32}/></div>
-              <h4>Alertas Climáticas</h4>
-              <p>Recibe notificaciones tempranas y monitorea el clima en tiempo real para proteger tus cultivos.</p>
-            </div>
-            <div className={styles.systemCard}>
-              <div className={styles.systemIcon}><SvgIcon name="home" size={32}/></div>
+              <div className={styles.systemIcon}><SvgIcon name="home" size={32} /></div>
               <h4>Decisiones con Datos</h4>
               <p>Accede a reportes y estadísticas claras para optimizar tus recursos y reducir las mermas.</p>
             </div>
@@ -157,7 +152,7 @@ export default function Landing({ onGoToLogin, onGoToRegister }) {
         <GrassSeparator fill="#0D2E1C" flip={true} />
         <div className={styles.footerContent}>
           <FooterLogoSvg />
-          
+
           <div className={styles.contactInfo}>
             <p className={styles.contactLabel}>¿Tienes alguna duda? Escríbenos a:</p>
             <p className={styles.contactEmail}>contacto@fincadigi.com</p>

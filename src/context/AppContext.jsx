@@ -25,6 +25,7 @@ export function AppProvider({ children }) {
       }
 
       if (firebaseUser) {
+        setLoading(true);
         try {
           const directRef = doc(db, 'usuarios', firebaseUser.uid);
           const directSnap = await getDoc(directRef);
