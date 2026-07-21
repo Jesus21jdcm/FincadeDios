@@ -156,6 +156,7 @@
 
 .Generado { background: #F1F5F9; color: #475569; }
 .Asignado { background: #EFF6FF; color: #2563EB; }
+.Atrasado { background: #FEF2F2; color: #DC2626; }
 .Ejecutado { background: #FEF3C7; color: #D97706; }
 .Validado { background: #ECFDF5; color: #16A34A; }
 
@@ -312,7 +313,7 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -349,7 +350,8 @@
   color: var(--color-foreground);
 }
 
-.input, .textarea {
+.input,
+.textarea {
   padding: 10px 12px;
   border-radius: 0;
   border: 1px solid var(--color-border);
@@ -365,7 +367,8 @@
   min-height: 80px;
 }
 
-.input:focus, .textarea:focus {
+.input:focus,
+.textarea:focus {
   border-color: var(--color-primary);
 }
 

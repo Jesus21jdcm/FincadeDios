@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
 import { collection, query, onSnapshot, doc, runTransaction, Timestamp } from 'firebase/firestore';
+import { useAppContext } from '../context/AppContext';
 import styles from './ApplyInput.module.css';
 
 const API_WEATHER = import.meta.env.VITE_WEATHER_API_KEY;
 
 export default function ApplyInput() {
+  const { userData } = useAppContext();
   const [step, setStep] = useState('form');
   const [lotes, setLotes] = useState([]);
   const [insumos, setInsumos] = useState([]);
@@ -110,7 +112,7 @@ export default function ApplyInput() {
           insumoId: formData.insumoId,
           cantidad,
           fecha: Timestamp.now(),
-          usuario: auth.currentUser.uid,
+          usuario: userData?.id || auth.currentUser?.uid || 'desconocido',
           clima: climaData,
         });
       });

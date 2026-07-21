@@ -8,6 +8,7 @@ const stages = [
   { id: 'todas', label: 'Todas' },
   { id: 'Generado', label: 'Por Asignar' },
   { id: 'Asignado', label: 'En Progreso' },
+  { id: 'Atrasado', label: 'Atraso Reportado' },
   { id: 'Ejecutado', label: 'Por Revisar' },
   { id: 'Validado', label: 'Completadas' },
 ];
@@ -15,12 +16,14 @@ const stages = [
 export default function PanelAdmin() {
   const [tareasRaw, setTareasRaw] = useState([]);
   const [siembras, setSiembras] = useState([]);
+  const [inventario, setInventario] = useState([]);
   const [empleados, setEmpleados] = useState([]);
   const [encargados, setEncargados] = useState([]);
   const [lotes, setLotes] = useState([]);
   const [filter, setFilter] = useState('todas');
   const [filterSiembra, setFilterSiembra] = useState('todas');
   const [asignando, setAsignando] = useState(null);
+  const [editandoFecha, setEditandoFecha] = useState(null);
   const [evidenciaModal, setEvidenciaModal] = useState(null);
   const [excepciones, setExcepciones] = useState([]);
   const [alertas, setAlertas] = useState([]);
@@ -56,7 +59,10 @@ export default function PanelAdmin() {
     const unsubL = onSnapshot(query(collection(db, 'lotes')), snap => {
       setLotes(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
-    return () => { unsubT(); unsubS(); unsubE(); unsubC(); unsubEx(); unsubAl(); unsubL(); };
+    const unsubInv = onSnapshot(collection(db, 'inventario'), snap => {
+      setInventario(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    });
+    return () => { unsubT(); unsubS(); unsubE(); unsubC(); unsubEx(); unsubAl(); unsubL(); unsubInv(); };
   }, []);
 
   const asignar = async (tareaId, empleadoId) => {
@@ -75,6 +81,18 @@ export default function PanelAdmin() {
       nombreEmpleado: null,
       estado: 'Generado',
     });
+  };
+
+  const actualizarFechaAtraso = async (tareaId, nuevaFecha) => {
+    if (!nuevaFecha) {
+      setEditandoFecha(null);
+      return;
+    }
+    await updateDoc(doc(db, 'tareas', tareaId), {
+      fechaSugerida: new Date(nuevaFecha).toISOString(),
+      estado: 'Asignado'
+    });
+    setEditandoFecha(null);
   };
 
   const handleAprobarTarea = async (t) => {
@@ -109,6 +127,7 @@ export default function PanelAdmin() {
     todas: tareas.length,
     Generado: tareas.filter(t => t.estado === 'Generado').length,
     Asignado: tareas.filter(t => t.estado === 'Asignado').length,
+    Atrasado: tareas.filter(t => t.estado === 'Atrasado').length,
     Ejecutado: tareas.filter(t => t.estado === 'Ejecutado').length,
     Validado: tareas.filter(t => t.estado === 'Validado').length,
   };
@@ -198,7 +217,7 @@ export default function PanelAdmin() {
           <h1 className={styles.title}>Panel de Control</h1>
           <p className={styles.subtitle}>Gestión operativa y seguimiento en tiempo real</p>
         </div>
-        <div style={{ display: 'flex', gap: '1rem' }}>
+        <div className={styles.filtersWrapper}>
           <div className={styles.selectFilterContainer}>
             <label className={styles.filterLabel}>Filtrar por etapa:</label>
             <select
@@ -299,7 +318,7 @@ export default function PanelAdmin() {
 
             return (
               <div key={t.id} className={`${styles.taskCard} ${vencida ? styles.taskCardVencida : ''}`}>
-                
+
                 {/* Contenedor Izquierdo: Estado, Título y Descripción */}
                 <div className={styles.taskCardMain}>
                   <span className={`${styles.estadoBadge} ${styles[t.estado] || ''}`}>
@@ -308,6 +327,18 @@ export default function PanelAdmin() {
                   <div className={styles.taskCardContent}>
                     <h4 className={styles.taskCardTitle}>{t.titulo}</h4>
                     {t.descripcion && <p className={styles.taskCardDesc}>{t.descripcion}</p>}
+                    
+                    {((t.insumosConsumidos && t.insumosConsumidos.length > 0) || (t.insumosUsados && t.insumosUsados.length > 0)) && (
+                      <div style={{ marginTop: '8px', padding: '8px', background: '#F8FAFC', borderRadius: '6px', fontSize: '12px' }}>
+                        <strong style={{ color: '#475569', display: 'block', marginBottom: '4px' }}>Insumos utilizados:</strong>
+                        <ul style={{ margin: 0, paddingLeft: '16px', color: '#64748B' }}>
+                          {(t.insumosConsumidos || t.insumosUsados).map((ins, i) => {
+                            const insumoName = inventario.find(inv => inv.id === ins.id)?.nombre || 'Insumo';
+                            return <li key={i}>{ins.cantidad}x {insumoName}</li>;
+                          })}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -354,14 +385,14 @@ export default function PanelAdmin() {
                       <span>Evidencia</span>
                     </button>
                   )}
-                  
+
                   {t.estado !== 'Validado' && t.estado !== 'Ejecutado' && t.idEmpleado && (
                     <button className={styles.btnReasignar} onClick={() => reasignar(t.id)} title="Reasignar">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
                       <span>Reasignar</span>
                     </button>
                   )}
-                  
+
                   {!t.idEmpleado && t.estado !== 'Validado' && t.estado !== 'Ejecutado' && (
                     asignando === t.id ? (
                       <div className={styles.asignadorInline}>
@@ -381,11 +412,27 @@ export default function PanelAdmin() {
                       </button>
                     )
                   )}
-                  
+
                   {t.estado === 'Ejecutado' && (
                     <button className={styles.btnAprobar} onClick={() => handleAprobarTarea(t)}>
                       Aprobar Tarea
                     </button>
+                  )}
+
+                  {t.estado === 'Atrasado' && (
+                    editandoFecha === t.id ? (
+                      <div className={styles.asignadorInline} style={{ gap: '4px' }}>
+                        <input type="date" className={styles.selectSmall} onChange={(e) => actualizarFechaAtraso(t.id, e.target.value)} />
+                        <button className={styles.btnCancelAsignar} onClick={() => setEditandoFecha(null)}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <button className={styles.btnReasignar} style={{ background: '#FFF7ED', color: '#EA580C', borderColor: '#FDBA74' }} onClick={() => setEditandoFecha(t.id)} title="Asignar nueva fecha">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        <span>Nueva fecha</span>
+                      </button>
+                    )
                   )}
                 </div>
 

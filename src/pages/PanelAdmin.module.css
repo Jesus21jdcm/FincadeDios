@@ -29,6 +29,18 @@
   }
 }
 
+.filtersWrapper {
+  display: flex;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .filtersWrapper {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
 .title {
   font-size: 26px;
   font-weight: 700;
@@ -62,6 +74,13 @@
   white-space: nowrap;
 }
 
+@media (max-width: 768px) {
+  .selectFilterContainer {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
 .filterSelect {
   height: 38px;
   padding: 0 32px 0 12px;
@@ -87,6 +106,13 @@
 .filterSelect:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px rgba(99, 58, 248, 0.15);
+}
+
+@media (max-width: 768px) {
+  .filterSelect {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 /* ── Alert & Exceptions sectionCard ── */
@@ -328,6 +354,7 @@
 
 .Generado { background: #F1F5F9; color: #475569; }
 .Asignado { background: #EFF6FF; color: #2563EB; }
+.Atrasado { background: #FEF2F2; color: #DC2626; }
 .Ejecutado { background: #FEF3C7; color: #D97706; }
 .Validado { background: #ECFDF5; color: #16A34A; }
 
@@ -569,7 +596,7 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -599,7 +626,7 @@
   justify-content: center;
   border: none;
   border-radius: 50%;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   color: #fff;
   cursor: pointer;
   transition: background 0.2s;
@@ -607,7 +634,7 @@
 }
 
 .modalClose:hover {
-  background: rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.8);
 }
 
 .evidenciaFull {

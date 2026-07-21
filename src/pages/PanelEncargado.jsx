@@ -31,11 +31,11 @@ export default function PanelEncargado() {
   const validarTarea = async (tareaId) => {
     const t = tareas.find(x => x.id === tareaId);
     await updateDoc(doc(db, 'tareas', tareaId), { estado: 'Validado' });
-    
+
     if (t && t.siembraId) {
       const otrasTareas = tareas.filter(x => x.siembraId === t.siembraId && x.id !== t.id);
       const todasCompletadas = otrasTareas.every(x => x.estado === 'Validado');
-      
+
       if (todasCompletadas) {
         await updateDoc(doc(db, 'siembras', t.siembraId), { estado: 'finalizada' });
         alert('Cosecha Culminada! Todas las tareas de esta siembra han sido completadas con éxito.');
@@ -52,7 +52,7 @@ export default function PanelEncargado() {
   const getNombreEmpleado = (id) => empleados.find(e => e.id === id)?.nombre || id;
 
   const pendientes = tareas.filter(t => t.estado === 'Ejecutado');
-  const asignadas = tareas.filter(t => t.estado === 'Asignado' || t.estado === 'Generado');
+  const asignadas = tareas.filter(t => t.estado === 'Asignado' || t.estado === 'Generado' || t.estado === 'Atrasado');
 
   return (
     <div className={styles.container}>
@@ -175,7 +175,17 @@ export default function PanelEncargado() {
         <div className={styles.modalOverlay} onClick={() => setModalTarea(null)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
             <h3 className={styles.modalTitle}>Editar tarea</h3>
-            <form onSubmit={e => { e.preventDefault(); const fd = new FormData(e.target); editarTarea(modalTarea.id, { titulo: fd.get('titulo'), descripcion: fd.get('descripcion'), fechaSugerida: new Date(fd.get('fechaSugerida')).toISOString() }); }}>
+            <form onSubmit={e => { 
+              e.preventDefault(); 
+              const fd = new FormData(e.target); 
+              const updates = { 
+                titulo: fd.get('titulo'), 
+                descripcion: fd.get('descripcion'), 
+                fechaSugerida: new Date(fd.get('fechaSugerida')).toISOString() 
+              };
+              if (modalTarea.estado === 'Atrasado') updates.estado = 'Asignado';
+              editarTarea(modalTarea.id, updates); 
+            }}>
               <div className={styles.field}>
                 <label className={styles.label}>Título</label>
                 <input className={styles.input} name="titulo" defaultValue={modalTarea.titulo} />

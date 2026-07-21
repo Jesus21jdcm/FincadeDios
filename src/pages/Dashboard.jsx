@@ -60,19 +60,26 @@ export default function Dashboard({ onNavigate }) {
     const buildChartData = (apps, tareas, excepciones) => {
       const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
+      const getLocalString = (dateObj) => {
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const d = String(dateObj.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+      };
+
       const weeklyData = Array.from({ length: 7 }).map((_, i) => {
         const d = new Date();
         d.setDate(d.getDate() - (6 - i));
         return {
           name: days[d.getDay()],
-          dateString: d.toISOString().split('T')[0],
+          dateString: getLocalString(d),
           consumo: 0
         };
       });
 
       const addConsumo = (dateObj, amount) => {
         if (!dateObj || !amount) return;
-        const dStr = dateObj.toISOString().split('T')[0];
+        const dStr = getLocalString(dateObj);
         const dayMatch = weeklyData.find(w => w.dateString === dStr);
         if (dayMatch) {
           dayMatch.consumo += Number(amount);
@@ -87,8 +94,22 @@ export default function Dashboard({ onNavigate }) {
       });
 
       tareas.forEach(tarea => {
-        if (tarea.estado === 'Ejecutado' && tarea.fechaEjecucion && tarea.cantidadConsumida) {
-          addConsumo(new Date(tarea.fechaEjecucion), tarea.cantidadConsumida);
+        const fechaReal = tarea.fechaEjecucion || tarea.fechaSugerida;
+        if ((tarea.estado === 'Ejecutado' || tarea.estado === 'Validado') && fechaReal) {
+          let dateObj = new Date(fechaReal);
+          if (dateObj > new Date()) {
+            dateObj = new Date();
+          }
+          const insumosArray = tarea.insumosConsumidos || tarea.insumosUsados;
+          if (insumosArray && Array.isArray(insumosArray)) {
+            insumosArray.forEach(item => {
+              if (item.cantidad) addConsumo(dateObj, Number(item.cantidad));
+            });
+          } else if (tarea.cantidadUsada) {
+            addConsumo(dateObj, Number(tarea.cantidadUsada));
+          } else if (tarea.cantidadConsumida) {
+            addConsumo(dateObj, Number(tarea.cantidadConsumida));
+          }
         }
       });
 
@@ -397,14 +418,14 @@ export default function Dashboard({ onNavigate }) {
                 { id: 'siembras', label: 'Nueva Siembra' },
                 { id: 'inventario', label: 'Nuevo Insumo' }
               ].filter(item => !(userRole === 'encargado' && item.id === 'lotes'))
-              .map((item, idx) => (
-                <div key={idx} className={styles.shortcutWrapper}>
-                  <button className={styles.shortcutBtn} onClick={() => onNavigate(item.id, { autoOpenForm: true })}>
-                    +
-                  </button>
-                  <span className={styles.shortcutLabel}>{item.label}</span>
-                </div>
-              ))}
+                .map((item, idx) => (
+                  <div key={idx} className={styles.shortcutWrapper}>
+                    <button className={styles.shortcutBtn} onClick={() => onNavigate(item.id, { autoOpenForm: true })}>
+                      +
+                    </button>
+                    <span className={styles.shortcutLabel}>{item.label}</span>
+                  </div>
+                ))}
             </div>
           </div>
         )}

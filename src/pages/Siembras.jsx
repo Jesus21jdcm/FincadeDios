@@ -6,7 +6,7 @@ import { useAppContext } from '../context/AppContext';
 import cacaoImg from '../assets/images/Cacao.webp';
 import platanoImg from '../assets/images/platano.webp';
 import maizImg from '../assets/images/maiz.webp';
-import yucaImg from '../assets/yuca.webp';
+import yucaImg from '../assets/images/yuca.webp';
 import styles from './Siembras.module.css';
 
 const SvgIcon = ({ name, size = 16 }) => {
